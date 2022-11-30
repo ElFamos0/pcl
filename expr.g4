@@ -25,13 +25,11 @@ operationComparaison
 ;
 
 operationAddition
-:   operationMultiplication ('+' operationMultiplication)*
-    ('-' operationMultiplication ('+' operationMultiplication)*)*
+:   operationMultiplication ( ('+' operationMultiplication) |('-' operationMultiplication ) )*
 ;
 
 operationMultiplication
-:   expressionUnaire  ('*' expressionUnaire)*
-    ('/' expressionUnaire('*' expressionUnaire)*)*
+:   expressionUnaire ( ('*' expressionUnaire) |('/' expressionUnaire) )*
 ;
 
 expressionUnaire

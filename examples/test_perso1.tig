@@ -1,0 +1,91 @@
+let
+    type float = {val : int, pow : int}
+
+    function powfunc(x : int, power : int) : int = 
+        let 
+        var retour: int := 1
+        in 
+            for i:= 0 to power do 
+                (retour := retour * x);
+            retour
+        end
+
+    function min(x1 : int, x2:int) : int =
+        let 
+            var retour: int := 0
+        in 
+            if x1>x2 then retour := x2 else retour:= x1;
+            retour
+        end
+    
+    function float_default_form(x : float) = 
+
+        let
+        var retour := float {val = x.val, pow =  x.pow}
+        in
+        while (retour.val - retour.val/10 * 10 = 0) do
+        
+        	(retour.val := retour.val /10 ;
+        	retour.pow := retour.pow + 1);
+        x.val = retour.val;
+        x.pow = retour.pow
+        end
+
+    function fload_add(x1 : float, x2: float, r : float) = 
+        let
+        var retour := float {val = 0, pow =  min(x1.pow,x2.pow)}
+        in
+        if x1.pow > x2.pow then retour.val := x2.val + x1.val * powfunc(10, x1.pow - x2.pow)
+                             else retour.val := x1.val + x2.val * powfunc(10, x2.pow - x1.pow);
+        r.val := retour.val;
+        r.pow := retour.pow
+        end
+
+    function fload_sub((x1 : float, x2: float, r : float) = 
+        let
+        var retour := float {val = 0, pow =  min(x1.pow,x2.pow)}
+        in
+        if x1.pow > x2.pow then retour.val := -x2.val + x1.val * powfunc(10, x1.pow - x2.pow)
+                             else retour.val := x1.val - x2.val * powfunc(10, x2.pow - x1.pow);
+        r.val := retour.val;
+        r.pow := retour.pow
+        end
+
+    function fload_mult(x1: float, x2 : float, r : float) =
+        let
+        var retour := float {val = 0, pow =  x1.pow + x2.pow}
+        in
+        retour.val := x1.val * x2.val;
+        r.val := retour.val;
+        r.pow := retour.pow
+        end
+
+     function float_div(x1: float, x2 : float, p : int, r : float) =
+        let
+        var retour := float {val = 0, pow =  x1.pow - x2.pow - p}
+        in
+        retour.val := x1.val * powfunc(10, p)/ x2.val;
+        r.val := retour.val;
+        r.pow := retour.pow
+        end
+     
+    function float_print(f : float) = 
+
+        (printi(f.val); print("*"); printi(10);print("^");printi(f.pow))
+    
+
+    var f1 := float {val = 5, pow = -1}
+    var f2 := float {val = 467, pow = -2}
+
+
+in
+    fload_add(f1,f2,f1);
+    float_print(f1)
+end
+        
+        
+
+
+    
+
+            
