@@ -16,8 +16,11 @@ import parser.*;
 import parser.exprParser.ProgramContext;
 import java.awt.event.MouseListener;
 
+import ast.*;
+import graphViz.GraphVizVisitor;
+
 public class Main {
-    public static void main(String[] args){
+	public static void main(String[] args){
 
         if (args.length < 1){
             System.out.println("Error : Expected 1 argument filepath, found 0");
@@ -26,7 +29,34 @@ public class Main {
 
         String testFile = args[0];
 
-        new Parser(testFile);
+        try {
+
+            //chargement du fichier et construction du parser
+
+            CharStream input = CharStreams.fromFileName(testFile);
+            exprLexer lexer = new exprLexer(input); 
+            CommonTokenStream stream = new CommonTokenStream(lexer);
+            exprParser parser = new exprParser(stream);
+
+            // Récupération du noeud program (le noeud à la racine)
+            ProgramContext program = parser.program();
+
+            // Visiteur de création de l'AST + création de l'AST
+            AstCreator creator = new AstCreator();
+            Ast ast = program.accept(creator);
+
+            // Visiteur de représentation graphique + appel
+            GraphVizVisitor graphViz = new GraphVizVisitor();
+            ast.accept(graphViz);
+        
+            graphViz.dumpGraph("./out/tree.dot");
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (RecognitionException e) {
+            e.printStackTrace();
+        }
     }
-    
 }
