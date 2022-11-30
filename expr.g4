@@ -25,13 +25,11 @@ operationComparaison
 ;
 
 operationAddition
-:   operationMultiplication ('+' operationMultiplication)*
-    ('-' operationMultiplication ('+' operationMultiplication)*)*
+:   operationMultiplication ( ( '+' | '-' ) operationMultiplication )*
 ;
 
 operationMultiplication
-:   expressionUnaire  ('*' expressionUnaire)*
-    ('/' expressionUnaire('*' expressionUnaire)*)*
+:   expressionUnaire ( ( '*' | '/' ) expressionUnaire )*
 ;
 
 expressionUnaire
@@ -44,38 +42,56 @@ expressionUnaire
 |   definition
 |   STR
 |   INT
-|   'nil'
-|   'break'
+|   'nil'   
+|   'break'                                                                          
 ;
 
 sequenceInstruction
-:   '(' expression ( ';' expression )* ')'
+:   '(' expression ( ';' expression )* ')'                                                  #Sequence
 ;
 
 operationNegation
-:   '-' expressionUnaire
+:   '-' expressionUnaire                                                                    #Negation
 ;
 
 expressionValeur
-:   ID
-    ( 
-      '(' ( expression ( ',' expression )* )? ')'
-    | '[' expression ']' ( ( '[' expression ']' | '.' ID )* | 'of' expressionUnaire )
-    | '.' ID ( '[' expression ']' | '.' ID )*
-    | '{' ( ID '=' expression ( ',' ID '=' expression )* )? '}'
-    )?
+:   
+    ID ( expressionValeur2 )?                                                               #Merde1
+;
+
+expressionValeur2
+:     '(' ( expression ( ',' expression )* )? ')'                                           #AppelFonction
+    | expressionValeurItem ( ( expressionValeurItem | expressionValeurChamps )* | expressionValeurCreationArray )     #Merde2
+    | expressionValeurChamps ( expressionValeurItem | expressionValeurChamps )*                                       #Merde2
+    | '{' ( ID '=' expression ( ',' ID '=' expression )* )? '}'                             #InstanciationType
+;
+
+expressionValeurItem
+:
+    '[' expression ']' #Item
+;
+
+expressionValeurChamps
+:
+    '.' ID #Champs
+;
+
+expressionValeurCreationArray
+:
+    'of' expressionUnaire #CreationArray
 ;
 
 operationSi
-:   'if' expression 'then' expression ( 'else' expression )?
+:   'if' expression 'then' expressionUnaire                                                       #SiAlors
+  | 'if' expression 'then' expressionUnaire 'else' expressionUnaire                               #SiAlorsSinon
 ;
 
 operationTantque
-:   'while' expression 'do' expression
+:   'while' expression 'do' expressionUnaire                                                      #TantQue
 ;
 
-operationBoucle
-:   'for' ID ':=' expression 'to' expression 'do' expression
+operationBoucle                                                                             
+:   'for' ID ':=' expression 'to' expression 'do' expressionUnaire                                #Pour
 ;
 
 definition

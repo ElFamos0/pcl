@@ -1,5 +1,5 @@
 parser:
-	@java -jar ./lib/antlr-4.9.2-complete.jar ./expr.g4 -no-listener -no-visitor -o ./src/parser
+	@java -jar ./lib/antlr-4.9.2-complete.jar ./expr.g4 -no-listener -visitor -o ./src/parser
 	@echo "Number of adaptive prediction: $$(cat ./src/parser/exprParser.java | grep adaptive | wc -l)"
 
 compile:
