@@ -1,0 +1,6 @@
+let
+	type numbers = array of int
+	var x := numbers[5] of [1,2,3]
+in
+	arr1
+end

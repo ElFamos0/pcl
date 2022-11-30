@@ -1,0 +1,4 @@
+if i then
+    print(s)
+else
+    x := 5&6

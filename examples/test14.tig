@@ -1,0 +1,9 @@
+
+let
+
+	type arrtype = array of int
+	var arr := arrtype [3] of 0
+
+in
+	if rec <> arr then 3 else 4
+end

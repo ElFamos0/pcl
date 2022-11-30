@@ -1,0 +1,6 @@
+# Ignore .class
+bin
+.antlr
+images
+out
+src/parser
