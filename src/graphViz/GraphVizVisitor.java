@@ -56,10 +56,6 @@ public class GraphVizVisitor implements AstVisitor<String> {
         output.close();
     }
 
-    private String currentState() {
-        return "N" + this.state;
-    }
-
 	private String nextState(){
         int returnedState = this.state;
         this.state++;
