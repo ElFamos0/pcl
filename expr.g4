@@ -40,10 +40,7 @@ expressionUnaire
 |   operationTantque
 |   operationBoucle
 |   definition
-|   STR
-|   INT
-|   'nil'   
-|   'break'                                                                          
+|   constantes                                                                       
 ;
 
 sequenceInstruction
@@ -56,14 +53,14 @@ operationNegation
 
 expressionValeur
 :   
-    ID ( expressionValeur2 )?                                                               #Merde1
+    identifiant ( expressionValeur2 )?                                                             
 ;
 
 expressionValeur2
 :     '(' ( expression ( ',' expression )* )? ')'                                           #AppelFonction
-    | expressionValeurItem ( ( expressionValeurItem | expressionValeurChamps )* | expressionValeurCreationArray )     #Merde2
-    | expressionValeurChamps ( expressionValeurItem | expressionValeurChamps )*                                       #Merde2
-    | '{' ( ID '=' expression ( ',' ID '=' expression )* )? '}'                             #InstanciationType
+    | expressionValeurItem ( ( expressionValeurItem | expressionValeurChamps )* | expressionValeurCreationArray )     #ExpressionItem
+    | expressionValeurChamps ( expressionValeurItem | expressionValeurChamps )*                                       #ExpressionChamps
+    | '{' ( identifiant '=' expression ( ',' identifiant '=' expression )* )? '}'                             #InstanciationType
 ;
 
 expressionValeurItem
@@ -73,7 +70,7 @@ expressionValeurItem
 
 expressionValeurChamps
 :
-    '.' ID #Champs
+    '.' identifiant #Champs
 ;
 
 expressionValeurCreationArray
@@ -91,7 +88,7 @@ operationTantque
 ;
 
 operationBoucle                                                                             
-:   'for' ID ':=' expression 'to' expression 'do' expressionUnaire                                #Pour
+:   'for' identifiant ':=' expression 'to' expression 'do' expressionUnaire                                #Pour
 ;
 
 definition
@@ -105,20 +102,31 @@ declaration
 ;
 
 declarationType
-:   'type' ID '=' ( ID | 'array' 'of' ID | '{' ( ID ':' ID ( ',' ID ':' ID )* )? '}')
+:   'type' identifiant '=' ( identifiant | 'array' 'of' identifiant | '{' ( identifiant ':' identifiant ( ',' identifiant ':' identifiant )* )? '}')
 ;
 
 declarationFonction
-:   'function' ID '(' ( i += ID ':' j += ID ( ',' i += ID ':' j += ID )* )? ')' ( ':' k = ID )? '=' expression
+:   'function' identifiant '(' ( i += identifiant ':' j += identifiant ( ',' i += identifiant ':' j += identifiant )* )? ')' ( ':' k = identifiant )? '=' expression
 ;
 
 declarationValeur
-:   'var' ID ( ':' k = ID )? ':=' expression
+:   'var' identifiant ( ':' k = identifiant )? ':=' expression
 ;
+
+constantes
+:   STR #String
+|   INT #Entier
+|   'nil' #Nil
+|   'break' #Break
+;
+
+identifiant
+: ID
+; 
 
 ID
 :   ( 'A'..'Z' | 'a'..'z' ) // Les identificateurs ne peuvent pas commencer par des caractéres de types numériques
-    ( '0'..'9' | 'A'..'Z' | '_' | 'a'..'z' )*
+    ( '0'..'9' | 'A'..'Z' | '_' | 'a'..'z' )* 
 ;
 
 STR

@@ -1,17 +1,19 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                                            */
-/*   AstVisitor.java                                                          */
-/*                                                                            */
-/*   By: Thibault Cheneviere <thibault.cheneviere@telecomnancy.eu>            */
-/*                                                                            */
-/*   Created: 2022/11/30 17:07:19 by Thibault Cheneviere                      */
-/*   Updated: 2022/11/30 17:08:08 by Thibault Cheneviere                      */
-/*                                                                            */
-/* ************************************************************************** */
-
 package ast;
 
 public interface AstVisitor<T> {
-	public T visit(Program affect);
+	public T visit(Program a);
+	public T visit(Expression a);
+	public T visit(Ou a);
+	public T visit(Et a);
+	public T visit(Compar a);
+	public T visit(Addition a);
+	public T visit(Soustraction a);
+	public T visit(Multiplication a);
+	public T visit(Division a);
+	public T visit(Sequence a);
+	public T visit(Negation a);
+	public T visit(ID a);
+	public T visit(Int a);
+	public T visit(ExprValeur a);
+	public T visit(AppelFonction a);
 }

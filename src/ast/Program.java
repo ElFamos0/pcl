@@ -13,9 +13,13 @@
 package ast;
 
 public class Program implements Ast {
-	public Ast instructions;
-
 	public <T> T accept(AstVisitor<T> visitor) {
 		return visitor.visit(this);
+	}
+
+	public Ast expression;
+
+	public Program(Ast expression) {
+		this.expression = expression;
 	}
 }
