@@ -12,8 +12,4 @@ public class Expression implements Ast {
         this.left = left;
         this.right = right;
     }
-
-    public Expression(Ast left) {
-        this.left = left;
-    }
 }

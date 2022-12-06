@@ -16,11 +16,12 @@ import parser.exprBaseVisitor;
 import parser.exprParser;
 import parser.exprParser.AppelFonctionContext;
 import parser.exprParser.EntierContext;
+import parser.exprParser.ExpressionIdentifiantContext;
 import parser.exprParser.ExpressionUnaireContext;
-import parser.exprParser.ExpressionValeurContext;
 import parser.exprParser.IdentifiantContext;
 import parser.exprParser.NegationContext;
 import parser.exprParser.OperationAdditionContext;
+import parser.exprParser.OperationComparaisonContext;
 import parser.exprParser.OperationEtContext;
 import parser.exprParser.OperationMultiplicationContext;
 import parser.exprParser.OperationOuContext;
@@ -35,12 +36,13 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
 	@Override
 	public Ast visitExpression(exprParser.ExpressionContext ctx) {
-		Ast left = ctx.getChild(0).accept(this);
-		if (ctx.getChildCount() == 1) {
-			return new Expression(left);
+		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+
+		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
+			noeudTemporaire = new Expression(noeudTemporaire, ctx.getChild(2*i+2).accept(this));
 		}
-		Ast right = ctx.getChild(2).accept(this);
-		return new Expression(left, right);
+
+		return noeudTemporaire;
 	}
 
 	@Override
@@ -48,7 +50,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
 		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
-			noeudTemporaire = new Ou(noeudTemporaire, ctx.getChild(2*i).accept(this));
+			noeudTemporaire = new Ou(noeudTemporaire, ctx.getChild(2*i+2).accept(this));
 		}
 
 		return noeudTemporaire;
@@ -59,7 +61,18 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
 		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
-			noeudTemporaire = new Et(noeudTemporaire, ctx.getChild(2*i).accept(this));
+			noeudTemporaire = new Et(noeudTemporaire, ctx.getChild(2*i+2).accept(this));
+		}
+
+		return noeudTemporaire;
+	}
+
+	@Override
+	public Ast visitOperationComparaison(OperationComparaisonContext ctx) {
+		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+
+		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
+			noeudTemporaire = new Compar(noeudTemporaire, ctx.getChild(2*i+2).accept(this), ctx.getChild(2*i+1).getText());
 		}
 
 		return noeudTemporaire;
@@ -144,26 +157,22 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 	}
 
 	@Override
-	public Ast visitExpressionValeur(ExpressionValeurContext ctx) {
-		Ast left = ctx.getChild(0).accept(this);
-		if (ctx.getChildCount() == 1) {
-			return new Expression(left);
-		}
-		Ast right = ctx.getChild(1).accept(this);
-		return new Expression(left, right);
-	}
-
-	@Override
 	public Ast visitAppelFonction(AppelFonctionContext ctx) {
-		AppelFonction af = new AppelFonction();
-		// args are located at odd indexes
-		if (ctx.getChildCount() > 2) {
-			for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
-				af.addArg(ctx.getChild(2*i+1).accept(this));
+		ArgFonction argFonction = new ArgFonction();
+		// args are located at even indexes
+		if (ctx.getChildCount() > 3) {
+			for (int i = 0; 2*i+1 < ctx.getChildCount()-1; i++) {
+				argFonction.addArg(ctx.getChild(2*i+2).accept(this));
 			}
 		}
 
+		AppelFonction af = new AppelFonction(ctx.getChild(0).accept(this), argFonction);
 		return af;
+	}
+
+	@Override
+	public Ast visitExpressionIdentifiant(ExpressionIdentifiantContext ctx) {
+		return ctx.getChild(0).accept(this);
 	}
 
 }

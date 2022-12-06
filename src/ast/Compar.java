@@ -7,9 +7,11 @@ public class Compar implements Ast {
 
     public Ast left;
     public Ast right;
+    public String operator;
 
-    public Compar(Ast left, Ast right) {
+    public Compar(Ast left, Ast right, String operator) {
         this.left = left;
         this.right = right;
+        this.operator = operator;
     }
 }

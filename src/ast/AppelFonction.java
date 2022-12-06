@@ -7,13 +7,11 @@ public class AppelFonction implements Ast {
 		return visitor.visit(this);
 	}
 
-    public ArrayList<Ast> args;
+    public Ast id;
+    public Ast args;
 
-    public AppelFonction() {
-        this.args = new ArrayList<>();
-    }
-
-    public void addArg(Ast arg) {
-        this.args.add(arg);
+    public AppelFonction(Ast id, Ast args) {
+        this.id = id;
+        this.args = args;
     }
 }

@@ -53,29 +53,11 @@ operationNegation
 
 expressionValeur
 :   
-    identifiant ( expressionValeur2 )?                                                             
-;
-
-expressionValeur2
-:     '(' ( expression ( ',' expression )* )? ')'                                           #AppelFonction
-    | expressionValeurItem ( ( expressionValeurItem | expressionValeurChamps )* | expressionValeurCreationArray )     #ExpressionItem
-    | expressionValeurChamps ( expressionValeurItem | expressionValeurChamps )*                                       #ExpressionChamps
-    | '{' ( identifiant '=' expression ( ',' identifiant '=' expression )* )? '}'                             #InstanciationType
-;
-
-expressionValeurItem
-:
-    '[' expression ']' #Item
-;
-
-expressionValeurChamps
-:
-    '.' identifiant #Champs
-;
-
-expressionValeurCreationArray
-:
-    'of' expressionUnaire #CreationArray
+    identifiant                                                                                            #ExpressionIdentifiant
+  | identifiant '(' ( expression ( ',' expression )* )? ')'                                                #AppelFonction
+  | identifiant '[' expression ']' ( ( '[' expression ']' | '.' identifiant )* | 'of' expressionUnaire )   #ExpressionItem
+  | identifiant '.' identifiant ( '[' expression ']' | '.' identifiant )*                                  #ExpressionChamps
+  | identifiant '{' ( identifiant '=' expression ( ',' identifiant '=' expression )* )? '}'                #InstanciationType
 ;
 
 operationSi

@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import ast.Addition;
 import ast.AppelFonction;
+import ast.ArgFonction;
 import ast.Ast;
 import ast.AstVisitor;
 import ast.Compar;
@@ -88,17 +89,14 @@ public class GraphVizVisitor implements AstVisitor<String> {
     @Override
     public String visit(Expression expression) {
         String nodeIdentifier = this.nextState();
+
         String leftState = expression.left.accept(this);
-        if (expression.right != null) {
-            String rightState = expression.right.accept(this);
-            // Le nom dépend du type du fils de droite
-            this.addNode(nodeIdentifier, "Expression");
-            this.addTransition(nodeIdentifier, leftState);
-            this.addTransition(nodeIdentifier, rightState);
-        } else {
-            this.addNode(nodeIdentifier, "Expression");
-            this.addTransition(nodeIdentifier, leftState);
-        }
+        String rightState = expression.right.accept(this);
+
+        this.addNode(nodeIdentifier, ":=");
+        this.addTransition(nodeIdentifier, leftState);
+        this.addTransition(nodeIdentifier, rightState);
+
         return nodeIdentifier;
     }
 
@@ -137,7 +135,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
         String leftState = comp.left.accept(this);
         String rightState = comp.right.accept(this);
 
-        this.addNode(nodeIdentifier, "Comparaison");
+        this.addNode(nodeIdentifier, comp.operator);
         this.addTransition(nodeIdentifier, leftState);
         this.addTransition(nodeIdentifier, rightState);
 
@@ -259,13 +257,26 @@ public class GraphVizVisitor implements AstVisitor<String> {
     public String visit(AppelFonction af) {
         String nodeIdentifier = this.nextState();
         
-        this.addNode(nodeIdentifier, "Arguments");
+        this.addNode(nodeIdentifier, "AppelFonction");
+        // Add subtree for name & subtree for args
+        String nameState = af.id.accept(this);
+        this.addTransition(nodeIdentifier, nameState);
+        String args = af.args.accept(this);
+        this.addTransition(nodeIdentifier, args);
 
-        for (Ast ast : af.args) {
+        return nodeIdentifier;
+    }   
+
+    @Override
+    public String visit(ArgFonction a) {
+        String nodeIdentifier = this.nextState();
+
+        this.addNode(nodeIdentifier, "ArgFonction");
+        for (Ast ast : a.args) {
             String state = ast.accept(this);
             this.addTransition(nodeIdentifier, state);
         }
 
         return nodeIdentifier;
-    }   
+    }
 }

@@ -51,7 +51,6 @@ public class Main {
         
             graphViz.dumpGraph("./out/tree.dot");
 
-
         } catch (IOException e) {
             e.printStackTrace();
         }
