@@ -197,8 +197,8 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 	@Override
 	public Ast visitDeclarationType(DeclarationTypeContext ctx) {
 		// right child needs to know this child 0
-		Ast child = ctx.getChild(0).accept(this);
-		Ast branch = ctx.getChild(1).accept(this);
+		Ast child = ctx.getChild(1).accept(this);
+		Ast branch = ctx.getChild(3).accept(this);
 		if (branch instanceof DeclarationTypeClassique) {
 			((DeclarationTypeClassique) branch).setId(child);
 			return branch;

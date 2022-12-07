@@ -377,7 +377,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     public String visit(DeclarationArrayType a) {
         String nodeIdentifier = this.nextState();
         
-        this.addNode(nodeIdentifier, "DeclarationArrayType");
+        this.addNode(nodeIdentifier, "Array");
         String nameState = a.id.accept(this);
         String typeState = a.type.accept(this);
         this.addTransition(nodeIdentifier, nameState);
@@ -390,7 +390,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     public String visit(DeclarationTypeClassique a) {
         String nodeIdentifier = this.nextState();
         
-        this.addNode(nodeIdentifier, "DeclarationTypeClassique");
+        this.addNode(nodeIdentifier, "Type");
         String nameState = a.id.accept(this);
         String typeState = a.type.accept(this);
         this.addTransition(nodeIdentifier, nameState);
@@ -403,7 +403,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     public String visit(DeclarationRecordType a) {
         String nodeIdentifier = this.nextState();
         
-        this.addNode(nodeIdentifier, "DeclarationTypeFonction");
+        this.addNode(nodeIdentifier, "DeclarationRecord");
         String nameState = a.id.accept(this);
         this.addTransition(nodeIdentifier, nameState);
         for (Ast ast : a.champs) {
@@ -418,7 +418,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     public String visit(DeclarationChamp a) {
         String nodeIdentifier = this.nextState();
         
-        this.addNode(nodeIdentifier, "DeclarationChamp");
+        this.addNode(nodeIdentifier, "Champ");
         String nameState = a.id.accept(this);
         String typeState = a.type.accept(this);
         this.addTransition(nodeIdentifier, nameState);
