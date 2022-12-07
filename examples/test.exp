@@ -1,8 +1,5 @@
-a = 1+2*3+4;
-
-if (a) {
-    print a;
-} 
-else {
-    print a;
-}
+let
+	type a = {maison:int,troll:string}
+in 
+	for i:=0 to 100 do (a:=a+1)
+end

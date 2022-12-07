@@ -1,15 +1,15 @@
 package ast;
 
-public class AppelFonction implements Ast {
+public class DeclarationArrayType implements Ast{
 	public <T> T accept(AstVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
 
     public Ast id;
-    public Ast args;
+    public Ast type;
 
-    public AppelFonction(Ast args) {
-        this.args = args;
+    public DeclarationArrayType(Ast type) {
+        this.type = type;
     }
 
     public void setId(Ast id) {

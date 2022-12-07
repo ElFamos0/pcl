@@ -21,10 +21,16 @@ import ast.ArgFonction;
 import ast.Ast;
 import ast.AstVisitor;
 import ast.Compar;
+import ast.DeclarationArrayType;
+import ast.DeclarationChamp;
+import ast.DeclarationRecordType;
+import ast.DeclarationTypeClassique;
+import ast.Definition;
 import ast.Division;
 import ast.Et;
 import ast.ExprValeur;
 import ast.Expression;
+import ast.For;
 import ast.ID;
 import ast.IfThen;
 import ast.IfThenElse;
@@ -35,6 +41,7 @@ import ast.Ou;
 import ast.Program;
 import ast.Sequence;
 import ast.Soustraction;
+import ast.While;
 
 public class GraphVizVisitor implements AstVisitor<String> {
     private int state;
@@ -311,6 +318,111 @@ public class GraphVizVisitor implements AstVisitor<String> {
         this.addTransition(nodeIdentifier, conditionState);
         this.addTransition(nodeIdentifier, thenBlockState);
         this.addTransition(nodeIdentifier, elseBlockState);
+
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(While wh) {
+        String nodeIdentifier = this.nextState();
+
+        String conditionState = wh.condition.accept(this);
+        String blockState = wh.block.accept(this);
+
+        this.addNode(nodeIdentifier, "While");
+
+        this.addTransition(nodeIdentifier, conditionState);
+        this.addTransition(nodeIdentifier, blockState);
+
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(For a) {
+        String nodeIdentifier = this.nextState();
+
+        String start = a.start.accept(this);
+        String starVal = a.startValue.accept(this);
+        String end = a.endValue.accept(this);
+        String block = a.block.accept(this);
+
+        this.addNode(nodeIdentifier, "For");
+
+        this.addTransition(nodeIdentifier, start);
+        this.addTransition(nodeIdentifier, starVal);
+        this.addTransition(nodeIdentifier, end);
+        this.addTransition(nodeIdentifier, block);
+
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(Definition a) {
+        String nodeIdentifier = this.nextState();
+        
+        this.addNode(nodeIdentifier, "Let");
+        for (Ast ast : a.declarations) {
+            String state = ast.accept(this);
+            this.addTransition(nodeIdentifier, state);
+        }
+        for (Ast ast : a.exprs) {
+            String state = ast.accept(this);
+            this.addTransition(nodeIdentifier, state);
+        }
+
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(DeclarationArrayType a) {
+        String nodeIdentifier = this.nextState();
+        
+        this.addNode(nodeIdentifier, "DeclarationArrayType");
+        String nameState = a.id.accept(this);
+        String typeState = a.type.accept(this);
+        this.addTransition(nodeIdentifier, nameState);
+        this.addTransition(nodeIdentifier, typeState);
+
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(DeclarationTypeClassique a) {
+        String nodeIdentifier = this.nextState();
+        
+        this.addNode(nodeIdentifier, "DeclarationTypeClassique");
+        String nameState = a.id.accept(this);
+        String typeState = a.type.accept(this);
+        this.addTransition(nodeIdentifier, nameState);
+        this.addTransition(nodeIdentifier, typeState);
+
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(DeclarationRecordType a) {
+        String nodeIdentifier = this.nextState();
+        
+        this.addNode(nodeIdentifier, "DeclarationTypeFonction");
+        String nameState = a.id.accept(this);
+        this.addTransition(nodeIdentifier, nameState);
+        for (Ast ast : a.champs) {
+            String state = ast.accept(this);
+            this.addTransition(nodeIdentifier, state);
+        }
+
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(DeclarationChamp a) {
+        String nodeIdentifier = this.nextState();
+        
+        this.addNode(nodeIdentifier, "DeclarationChamp");
+        String nameState = a.id.accept(this);
+        String typeState = a.type.accept(this);
+        this.addTransition(nodeIdentifier, nameState);
+        this.addTransition(nodeIdentifier, typeState);
 
         return nodeIdentifier;
     }

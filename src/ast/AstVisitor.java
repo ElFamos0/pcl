@@ -19,4 +19,11 @@ public interface AstVisitor<T> {
 	public T visit(ArgFonction a);
 	public T visit(IfThenElse a);
 	public T visit(IfThen a);
+	public T visit(While a);
+	public T visit(For a);
+	public T visit(Definition a);
+	public T visit(DeclarationTypeClassique a);
+	public T visit(DeclarationArrayType a);
+	public T visit(DeclarationRecordType a);
+	public T visit(DeclarationChamp a);
 }

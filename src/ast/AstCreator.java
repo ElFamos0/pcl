@@ -12,9 +12,17 @@
 
 package ast;
 
+import javax.sound.sampled.BooleanControl;
+
 import parser.exprBaseVisitor;
 import parser.exprParser;
 import parser.exprParser.AppelFonctionContext;
+import parser.exprParser.DeclarationArrayTypeContext;
+import parser.exprParser.DeclarationChampContext;
+import parser.exprParser.DeclarationRecordTypeContext;
+import parser.exprParser.DeclarationTypeClassiqueContext;
+import parser.exprParser.DeclarationTypeContext;
+import parser.exprParser.DefinitionContext;
 import parser.exprParser.EntierContext;
 import parser.exprParser.ExpressionIdentifiantContext;
 import parser.exprParser.ExpressionUnaireContext;
@@ -25,9 +33,11 @@ import parser.exprParser.OperationComparaisonContext;
 import parser.exprParser.OperationEtContext;
 import parser.exprParser.OperationMultiplicationContext;
 import parser.exprParser.OperationOuContext;
+import parser.exprParser.PourContext;
 import parser.exprParser.SequenceContext;
 import parser.exprParser.SiAlorsContext;
 import parser.exprParser.SiAlorsSinonContext;
+import parser.exprParser.TantQueContext;
 
 public class AstCreator extends exprBaseVisitor<Ast> {
 	@Override
@@ -163,17 +173,67 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 		// args are located at even indexes
 		if (ctx.getChildCount() > 3) {
 			for (int i = 0; 2*i+1 < ctx.getChildCount()-1; i++) {
-				argFonction.addArg(ctx.getChild(2*i+2).accept(this));
+				argFonction.addArg(ctx.getChild(2*i+1).accept(this));
 			}
 		}
-
-		AppelFonction af = new AppelFonction(ctx.getChild(0).accept(this), argFonction);
+		AppelFonction af = new AppelFonction(argFonction);
 		return af;
 	}
 
 	@Override
 	public Ast visitExpressionIdentifiant(ExpressionIdentifiantContext ctx) {
+		// right child needs to know this child 0
+		Ast child = ctx.getChild(0).accept(this);
+		if (ctx.getChildCount() > 1) {
+			Ast branch = ctx.getChild(1).accept(this);
+			if (branch instanceof AppelFonction) {
+				((AppelFonction) branch).setId(child);
+				return branch;
+			}
+		}
+		return child;
+	}
+
+	@Override
+	public Ast visitDeclarationType(DeclarationTypeContext ctx) {
+		// right child needs to know this child 0
+		Ast child = ctx.getChild(0).accept(this);
+		Ast branch = ctx.getChild(1).accept(this);
+		if (branch instanceof DeclarationTypeClassique) {
+			((DeclarationTypeClassique) branch).setId(child);
+			return branch;
+		} else if (branch instanceof DeclarationArrayType) {
+			((DeclarationArrayType) branch).setId(child);
+			return branch;
+		} else if (branch instanceof DeclarationRecordType) {
+			((DeclarationRecordType) branch).setId(child);
+			return branch;
+		}
+		return branch;
+	}
+
+	@Override
+	public Ast visitDeclarationTypeClassique(DeclarationTypeClassiqueContext ctx) {
 		return ctx.getChild(0).accept(this);
+	}
+
+	@Override
+	public Ast visitDeclarationArrayType(DeclarationArrayTypeContext ctx) {
+		return ctx.getChild(2).accept(this);
+	}
+
+	@Override
+	public Ast visitDeclarationRecordType(DeclarationRecordTypeContext ctx) {
+		DeclarationRecordType drt = new DeclarationRecordType();
+		for (int i = 0; 2*i+1 < ctx.getChildCount()-1; i++) {
+			drt.addChamp(ctx.getChild(2*i+1).accept(this));
+		}
+		return drt;
+	}
+
+	@Override
+	public Ast visitDeclarationChamp(DeclarationChampContext ctx) {
+		return new DeclarationChamp(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
 	}
 
 	@Override
@@ -192,4 +252,46 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
 		return new IfThenElse(condition, thenBlock, elseBlock);
 	}
+
+	@Override
+	public Ast visitTantQue(TantQueContext ctx) {
+		Ast condition = ctx.getChild(1).accept(this);
+		Ast block = ctx.getChild(3).accept(this);
+
+		return new While(condition, block);
+	}
+
+	@Override
+	public Ast visitPour(PourContext ctx) {
+		Ast init = ctx.getChild(1).accept(this);
+		Ast condition = ctx.getChild(3).accept(this);
+		Ast increment = ctx.getChild(5).accept(this);
+		Ast block = ctx.getChild(7).accept(this);
+
+		return new For(init, condition, increment, block);
+	}
+
+	@Override
+	public Ast visitDefinition(DefinitionContext ctx) {
+		boolean sawIn = false;
+
+		Definition def = new Definition();
+
+		for (int i = 0; i < ctx.getChildCount(); i++) {
+			if (ctx.getChild(i).getText().equals("in")) {
+				sawIn = true;
+				continue;
+			}
+			if (ctx.getChild(i).getText().equals("let") || ctx.getChild(i).getText().equals("end") || ctx.getChild(i).getText().equals(";")) {
+				continue;
+			}
+			if (sawIn) {
+				def.addExpr(ctx.getChild(i).accept(this));
+			} else {
+				def.addDeclaration(ctx.getChild(i).accept(this));
+			}
+		}
+		return def;
+	}
+
 }

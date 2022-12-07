@@ -53,11 +53,14 @@ operationNegation
 
 expressionValeur
 :   
-    identifiant                                                                                            #ExpressionIdentifiant
-  | identifiant '(' ( expression ( ',' expression )* )? ')'                                                #AppelFonction
-  | identifiant '[' expression ']' ( ( '[' expression ']' | '.' identifiant )* | 'of' expressionUnaire )   #ExpressionItem
-  | identifiant '.' identifiant ( '[' expression ']' | '.' identifiant )*                                  #ExpressionChamps
-  | identifiant '{' ( identifiant '=' expression ( ',' identifiant '=' expression )* )? '}'                #InstanciationType
+    identifiant ( expressionValeur2 )? #ExpressionIdentifiant
+;
+
+expressionValeur2
+: '(' ( expression ( ',' expression )* )? ')'                                                #AppelFonction
+| '[' expression ']' ( ( '[' expression ']' | '.' identifiant )* | 'of' expressionUnaire )   #ExpressionItem
+| '.' identifiant ( '[' expression ']' | '.' identifiant )*                                  #ExpressionChamps
+| '{' ( identifiant '=' expression ( ',' identifiant '=' expression )* )? '}'                #InstanciationType
 ;
 
 operationSi
@@ -84,7 +87,17 @@ declaration
 ;
 
 declarationType
-:   'type' identifiant '=' ( identifiant | 'array' 'of' identifiant | '{' ( identifiant ':' identifiant ( ',' identifiant ':' identifiant )* )? '}')
+:   'type' identifiant '=' declarationType2
+;
+
+declarationType2
+: identifiant #DeclarationTypeClassique
+| 'array' 'of' identifiant #DeclarationArrayType
+| '{' ( declarationChamp ( ',' declarationChamp )* )? '}' #DeclarationRecordType
+;
+
+declarationChamp
+:  identifiant ':' identifiant
 ;
 
 declarationFonction
