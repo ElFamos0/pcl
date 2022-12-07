@@ -1,1 +1,11 @@
-print(5&6,3-6)
+(
+    i := 5/2*3;
+    j := i*2;
+    r := 5;
+    if (i/2 = 0) then (
+        r := multiply(i,j)
+    ) else (
+        r := multiply(i,i)
+    );
+    print(divide(i*j,r))
+)

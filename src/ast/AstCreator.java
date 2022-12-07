@@ -26,6 +26,8 @@ import parser.exprParser.OperationEtContext;
 import parser.exprParser.OperationMultiplicationContext;
 import parser.exprParser.OperationOuContext;
 import parser.exprParser.SequenceContext;
+import parser.exprParser.SiAlorsContext;
+import parser.exprParser.SiAlorsSinonContext;
 
 public class AstCreator extends exprBaseVisitor<Ast> {
 	@Override
@@ -132,10 +134,9 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 	@Override
 	public Ast visitSequence(SequenceContext ctx) {
 		Sequence sequence = new Sequence();
-		sequence.addSeq(ctx.getChild(0).accept(this));
 
 		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
-			sequence.addSeq(ctx.getChild(2*i+2).accept(this));
+			sequence.addSeq(ctx.getChild(2*i+1).accept(this));
 		}
 
 		return sequence;
@@ -175,4 +176,20 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 		return ctx.getChild(0).accept(this);
 	}
 
+	@Override
+	public Ast visitSiAlors(SiAlorsContext ctx) {
+		Ast condition = ctx.getChild(1).accept(this);
+		Ast thenBlock = ctx.getChild(3).accept(this);
+
+		return new IfThen(condition, thenBlock);
+	}
+
+	@Override
+	public Ast visitSiAlorsSinon(SiAlorsSinonContext ctx) {
+		Ast condition = ctx.getChild(1).accept(this);
+		Ast thenBlock = ctx.getChild(3).accept(this);
+		Ast elseBlock = ctx.getChild(5).accept(this);
+
+		return new IfThenElse(condition, thenBlock, elseBlock);
+	}
 }

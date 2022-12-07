@@ -9,8 +9,9 @@ compile:
 
 run:
 	@java -cp ./lib/antlr-4.9.2-complete.jar:./bin Main $(target)
-	
-all: parser compile run
 
 svg: 
 	@dot -Tsvg ./out/tree.dot -o ./out/tree.svg
+	@inkscape ./out/tree.svg
+	
+all: parser compile run svg

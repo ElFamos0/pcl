@@ -26,6 +26,8 @@ import ast.Et;
 import ast.ExprValeur;
 import ast.Expression;
 import ast.ID;
+import ast.IfThen;
+import ast.IfThenElse;
 import ast.Int;
 import ast.Multiplication;
 import ast.Negation;
@@ -276,6 +278,39 @@ public class GraphVizVisitor implements AstVisitor<String> {
             String state = ast.accept(this);
             this.addTransition(nodeIdentifier, state);
         }
+
+        return nodeIdentifier;
+    }
+
+
+    @Override
+    public String visit(IfThen ifThen) {
+        String nodeIdentifier = this.nextState();
+
+        String conditionState = ifThen.condition.accept(this);
+        String thenBlockState = ifThen.thenBlock.accept(this);
+
+        this.addNode(nodeIdentifier, "IfThen");
+
+        this.addTransition(nodeIdentifier, conditionState);
+        this.addTransition(nodeIdentifier, thenBlockState);
+
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(IfThenElse ifThenElse) {
+        String nodeIdentifier = this.nextState();
+
+        String conditionState = ifThenElse.condition.accept(this);
+        String thenBlockState = ifThenElse.thenBlock.accept(this);
+        String elseBlockState = ifThenElse.elseBlock.accept(this);
+        
+        this.addNode(nodeIdentifier, "IfThenElse");
+
+        this.addTransition(nodeIdentifier, conditionState);
+        this.addTransition(nodeIdentifier, thenBlockState);
+        this.addTransition(nodeIdentifier, elseBlockState);
 
         return nodeIdentifier;
     }

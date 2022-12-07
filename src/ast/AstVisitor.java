@@ -17,4 +17,6 @@ public interface AstVisitor<T> {
 	public T visit(ExprValeur a);
 	public T visit(AppelFonction a);
 	public T visit(ArgFonction a);
+	public T visit(IfThenElse a);
+	public T visit(IfThen a);
 }
