@@ -12,8 +12,6 @@
 
 package ast;
 
-import javax.sound.sampled.BooleanControl;
-
 import parser.exprBaseVisitor;
 import parser.exprParser;
 import parser.exprParser.AppelFonctionContext;
@@ -171,10 +169,8 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 	public Ast visitAppelFonction(AppelFonctionContext ctx) {
 		ArgFonction argFonction = new ArgFonction();
 		// args are located at even indexes
-		if (ctx.getChildCount() > 3) {
-			for (int i = 0; 2*i+1 < ctx.getChildCount()-1; i++) {
-				argFonction.addArg(ctx.getChild(2*i+1).accept(this));
-			}
+		for (int i = 0; 2*i+1 < ctx.getChildCount()-1; i++) {
+			argFonction.addArg(ctx.getChild(2*i+1).accept(this));
 		}
 		AppelFonction af = new AppelFonction(argFonction);
 		return af;
@@ -241,6 +237,22 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 		Ast condition = ctx.getChild(1).accept(this);
 		Ast thenBlock = ctx.getChild(3).accept(this);
 
+		if (condition instanceof Sequence) {
+			((Sequence) condition).setNom("Condition");
+		} else {
+			Sequence seq = new Sequence();
+			seq.addSeq(condition);
+			condition = seq;
+		}
+ 
+		if (thenBlock instanceof Sequence) {
+			((Sequence) thenBlock).setNom("Then");
+		} else {
+			Sequence seq = new Sequence();
+			seq.addSeq(thenBlock);
+			thenBlock = seq;
+		}
+
 		return new IfThen(condition, thenBlock);
 	}
 
@@ -249,6 +261,30 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 		Ast condition = ctx.getChild(1).accept(this);
 		Ast thenBlock = ctx.getChild(3).accept(this);
 		Ast elseBlock = ctx.getChild(5).accept(this);
+
+		if (condition instanceof Sequence) {
+			((Sequence) condition).setNom("Condition");
+		} else {
+			Sequence seq = new Sequence();
+			seq.addSeq(condition);
+			condition = seq;
+		}
+ 
+		if (thenBlock instanceof Sequence) {
+			((Sequence) thenBlock).setNom("Then");
+		} else {
+			Sequence seq = new Sequence();
+			seq.addSeq(thenBlock);
+			thenBlock = seq;
+		}
+ 
+		if (elseBlock instanceof Sequence) {
+			((Sequence) elseBlock).setNom("Else");
+		} else {
+			Sequence seq = new Sequence();
+			seq.addSeq(elseBlock);
+			elseBlock = seq;
+		}
 
 		return new IfThenElse(condition, thenBlock, elseBlock);
 	}

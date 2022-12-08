@@ -211,7 +211,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     public String visit(Sequence sequence) {
         String nodeIdentifier = this.nextState();
         
-        this.addNode(nodeIdentifier, "Sequence");
+        this.addNode(nodeIdentifier, sequence.nom);
 
         for (Ast ast : sequence.seqs) {
             String state = ast.accept(this);
@@ -403,7 +403,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     public String visit(DeclarationRecordType a) {
         String nodeIdentifier = this.nextState();
         
-        this.addNode(nodeIdentifier, "DeclarationRecord");
+        this.addNode(nodeIdentifier, "Record");
         String nameState = a.id.accept(this);
         this.addTransition(nodeIdentifier, nameState);
         for (Ast ast : a.champs) {

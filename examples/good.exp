@@ -7,5 +7,6 @@
     ) else (
         r := multiply(i,i)
     );
-    print(divide(i*j,r))
+    print(divide(i*j,r));
+    i := 5
 )

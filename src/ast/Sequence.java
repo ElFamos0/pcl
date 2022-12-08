@@ -7,6 +7,7 @@ public class Sequence implements Ast {
         return visitor.visit(this);
     }
     
+    public String nom = "Sequence";
     public ArrayList<Ast> seqs;
 
     public Sequence() {
@@ -15,5 +16,9 @@ public class Sequence implements Ast {
 
     public void addSeq(Ast seq){
         this.seqs.add(seq);
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 }
