@@ -37,6 +37,7 @@ import parser.exprParser.SiAlorsContext;
 import parser.exprParser.SiAlorsSinonContext;
 import parser.exprParser.TantQueContext;
 import parser.exprParser.DeclarationFonctionContext;
+import parser.exprParser.ChaineChrContext;
 
 public class AstCreator extends exprBaseVisitor<Ast> {
 	@Override
@@ -45,6 +46,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 		return new Program(child);
 	}
 
+	
 	@Override
 	public Ast visitExpression(exprParser.ExpressionContext ctx) {
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
@@ -164,6 +166,11 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 	@Override
 	public Ast visitEntier(EntierContext ctx) {
 		return new Int(Integer.parseInt(ctx.getChild(0).getText()));
+	}
+
+	@Override
+	public Ast visitChaineChr(ChaineChrContext ctx) {
+		return new ChaineChr(ctx.getChild(0).getText());
 	}
 
 	@Override

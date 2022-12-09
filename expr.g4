@@ -105,11 +105,11 @@ declarationFonction
 ;
 
 declarationValeur
-:   'var' identifiant ( ':' k = identifiant )? ':=' expression
+:   'var' identifiant ( ':' identifiant )? ':=' expression
 ;
 
 constantes
-:   STR #String
+:   STR #ChaineChr
 |   INT #Entier
 |   'nil' #Nil
 |   'break' #Break

@@ -43,6 +43,7 @@ import ast.Program;
 import ast.Sequence;
 import ast.Soustraction;
 import ast.While;
+import ast.ChaineChr;
 
 
 public class GraphVizVisitor implements AstVisitor<String> {
@@ -243,6 +244,13 @@ public class GraphVizVisitor implements AstVisitor<String> {
     public String visit(Int entier) {
         String nodeIdentifier = this.nextState();
         this.addNode(nodeIdentifier, String.valueOf(entier.valeur));
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(ChaineChr chaine) {
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, chaine.valeur);
         return nodeIdentifier;
     }
 
