@@ -36,6 +36,7 @@ import parser.exprParser.SequenceContext;
 import parser.exprParser.SiAlorsContext;
 import parser.exprParser.SiAlorsSinonContext;
 import parser.exprParser.TantQueContext;
+import parser.exprParser.DeclarationFonctionContext;
 
 public class AstCreator extends exprBaseVisitor<Ast> {
 	@Override
@@ -230,6 +231,45 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 	@Override
 	public Ast visitDeclarationChamp(DeclarationChampContext ctx) {
 		return new DeclarationChamp(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+	}
+
+
+
+	@Override
+	public Ast visitDeclarationFonction(DeclarationFonctionContext ctx) {
+		DeclarationFonction drf = new DeclarationFonction();
+		drf.setId(ctx.getChild(1).accept(this));
+
+		boolean endOfArgs = false;
+		int count = 3;
+		while(!endOfArgs) {
+			Ast branch = ctx.getChild(count).accept(this);
+			String txt = ctx.getChild(count).getText();
+			if (txt.equals(",")) {
+				count++;
+			} else if (txt.equals(")")) {
+				endOfArgs = true;
+				count++;
+			} else  {
+				drf.addArg(((DeclarationChamp) branch));
+				count++;
+			}
+		}
+
+		Ast branch = ctx.getChild(count).accept(this);
+		String txt = ctx.getChild(count).getText();
+
+		if (txt == ":") {
+			count++;
+			branch = ctx.getChild(count).accept(this);
+			drf.setReturn(((ID) branch));
+			count++;
+		} 
+
+		count++;
+		branch = ctx.getChild(count).accept(this);
+		drf.setExpr(branch);
+		return drf;
 	}
 
 	@Override

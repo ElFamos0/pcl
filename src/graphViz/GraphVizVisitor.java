@@ -25,6 +25,7 @@ import ast.DeclarationArrayType;
 import ast.DeclarationChamp;
 import ast.DeclarationRecordType;
 import ast.DeclarationTypeClassique;
+import ast.DeclarationFonction;
 import ast.Definition;
 import ast.Division;
 import ast.Et;
@@ -42,6 +43,7 @@ import ast.Program;
 import ast.Sequence;
 import ast.Soustraction;
 import ast.While;
+
 
 public class GraphVizVisitor implements AstVisitor<String> {
     private int state;
@@ -425,5 +427,27 @@ public class GraphVizVisitor implements AstVisitor<String> {
         this.addTransition(nodeIdentifier, typeState);
 
         return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(DeclarationFonction a) {
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "Declaration Fonction");
+        String nameState = a.id.accept(this);
+        this.addTransition(nodeIdentifier, nameState);
+        for (Ast ast : a.args) {
+            String state = ast.accept(this);
+            this.addTransition(nodeIdentifier, state);
+        }
+        if (a.has_return) {
+            String typeState= a.return_type.accept(this);
+            this.addTransition(nodeIdentifier, typeState);
+        }
+        String exprState = a.expr.accept(this);
+        this.addTransition(nodeIdentifier,exprState);
+        
+        return nodeIdentifier;
+        
+        
     }
 }

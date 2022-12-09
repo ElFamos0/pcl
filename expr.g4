@@ -101,7 +101,7 @@ declarationChamp
 ;
 
 declarationFonction
-:   'function' identifiant '(' ( i += identifiant ':' j += identifiant ( ',' i += identifiant ':' j += identifiant )* )? ')' ( ':' k = identifiant )? '=' expression
+:   'function' identifiant '(' ( declarationChamp ( ',' declarationChamp )* )? ')' ( ':' identifiant )? '=' expression 
 ;
 
 declarationValeur

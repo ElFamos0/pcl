@@ -26,4 +26,5 @@ public interface AstVisitor<T> {
 	public T visit(DeclarationArrayType a);
 	public T visit(DeclarationRecordType a);
 	public T visit(DeclarationChamp a);
+	public T visit(DeclarationFonction a);
 }
