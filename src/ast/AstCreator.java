@@ -26,6 +26,7 @@ import parser.exprParser.ExpressionIdentifiantContext;
 import parser.exprParser.ExpressionUnaireContext;
 import parser.exprParser.IdentifiantContext;
 import parser.exprParser.NegationContext;
+import parser.exprParser.NilContext;
 import parser.exprParser.OperationAdditionContext;
 import parser.exprParser.OperationComparaisonContext;
 import parser.exprParser.OperationEtContext;
@@ -38,6 +39,7 @@ import parser.exprParser.SiAlorsSinonContext;
 import parser.exprParser.TantQueContext;
 import parser.exprParser.DeclarationFonctionContext;
 import parser.exprParser.ChaineChrContext;
+import parser.exprParser.BreakContext;
 
 public class AstCreator extends exprBaseVisitor<Ast> {
 	@Override
@@ -46,7 +48,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 		return new Program(child);
 	}
 
-	
+
 	@Override
 	public Ast visitExpression(exprParser.ExpressionContext ctx) {
 		Ast noeudTemporaire = ctx.getChild(0).accept(this);
@@ -171,6 +173,16 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 	@Override
 	public Ast visitChaineChr(ChaineChrContext ctx) {
 		return new ChaineChr(ctx.getChild(0).getText());
+	}
+
+	@Override
+	public Ast visitNil(NilContext ctx) {
+		return new Nil(); 
+	}
+
+	@Override
+	public Ast visitBreak(BreakContext ctx) {
+		return new Break(); 
 	}
 
 	@Override

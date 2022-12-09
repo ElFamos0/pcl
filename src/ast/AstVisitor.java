@@ -28,4 +28,6 @@ public interface AstVisitor<T> {
 	public T visit(DeclarationChamp a);
 	public T visit(DeclarationFonction a);
 	public T visit(ChaineChr a);
+	public T visit(Nil a);
+	public T visit(Break a);
 }

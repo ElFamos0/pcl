@@ -20,6 +20,7 @@ import ast.AppelFonction;
 import ast.ArgFonction;
 import ast.Ast;
 import ast.AstVisitor;
+import ast.Break;
 import ast.Compar;
 import ast.DeclarationArrayType;
 import ast.DeclarationChamp;
@@ -38,6 +39,7 @@ import ast.IfThenElse;
 import ast.Int;
 import ast.Multiplication;
 import ast.Negation;
+import ast.Nil;
 import ast.Ou;
 import ast.Program;
 import ast.Sequence;
@@ -251,6 +253,21 @@ public class GraphVizVisitor implements AstVisitor<String> {
     public String visit(ChaineChr chaine) {
         String nodeIdentifier = this.nextState();
         this.addNode(nodeIdentifier, chaine.valeur);
+        return nodeIdentifier;
+    }
+    @Override
+
+    public String visit(Nil chaine) {
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "nil");
+        return nodeIdentifier;
+    }
+
+    @Override
+
+    public String visit(Break chaine) {
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "break");
         return nodeIdentifier;
     }
 
