@@ -12,8 +12,8 @@ make parser
 make compile
 
 # Run on a tiger source code
-target=source.tig make run
+target=examples/good.exp make run
 
 # Run all the steps in one
-target=source.tig make all
+target=examples/good.exp make all
 ```
