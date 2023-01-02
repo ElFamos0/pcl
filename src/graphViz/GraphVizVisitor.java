@@ -47,20 +47,19 @@ import ast.Soustraction;
 import ast.While;
 import ast.ChaineChr;
 
-
 public class GraphVizVisitor implements AstVisitor<String> {
     private int state;
     private String nodeBuffer;
     private String linkBuffer;
 
-    public GraphVizVisitor(){
+    public GraphVizVisitor() {
         this.state = 0;
         this.nodeBuffer = "digraph \"ast\"{\n\n\tnodesep=1;\n\tranksep=1;\n\n";
         this.linkBuffer = "\n";
     }
 
-	public void dumpGraph(String filepath) throws IOException{
-            
+    public void dumpGraph(String filepath) throws IOException {
+
         FileOutputStream output = new FileOutputStream(filepath);
 
         String buffer = this.nodeBuffer + this.linkBuffer + "}";
@@ -71,23 +70,23 @@ public class GraphVizVisitor implements AstVisitor<String> {
         output.close();
     }
 
-	private String nextState(){
+    private String nextState() {
         int returnedState = this.state;
         this.state++;
-        return "N"+ returnedState;
+        return "N" + returnedState;
     }
 
-    private void addTransition(String from,String dest){
-        this.linkBuffer += String.format("\t%s -> %s; \n", from,dest);
-
-    }
-
-    private void addNode(String node,String label){
-        this.nodeBuffer += String.format("\t%s [label=\"%s\", shape=\"box\"];\n", node,label);
+    private void addTransition(String from, String dest) {
+        this.linkBuffer += String.format("\t%s -> %s; \n", from, dest);
 
     }
 
-	@Override
+    private void addNode(String node, String label) {
+        this.nodeBuffer += String.format("\t%s [label=\"%s\", shape=\"box\"];\n", node, label);
+
+    }
+
+    @Override
     public String visit(Program program) {
 
         String nodeIdentifier = this.nextState();
@@ -215,7 +214,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     @Override
     public String visit(Sequence sequence) {
         String nodeIdentifier = this.nextState();
-        
+
         this.addNode(nodeIdentifier, sequence.nom);
 
         for (Ast ast : sequence.seqs) {
@@ -226,7 +225,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
         return nodeIdentifier;
     }
 
-	@Override
+    @Override
     public String visit(Negation nega) {
         String nodeIdentifier = this.nextState();
         String instructionsState = nega.expression.accept(this);
@@ -255,6 +254,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
         this.addNode(nodeIdentifier, chaine.valeur);
         return nodeIdentifier;
     }
+
     @Override
 
     public String visit(Nil chaine) {
@@ -289,10 +289,10 @@ public class GraphVizVisitor implements AstVisitor<String> {
         return nodeIdentifier;
     }
 
-    @Override 
+    @Override
     public String visit(AppelFonction af) {
         String nodeIdentifier = this.nextState();
-        
+
         this.addNode(nodeIdentifier, "AppelFonction");
         // Add subtree for name & subtree for args
         String nameState = af.id.accept(this);
@@ -301,7 +301,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
         this.addTransition(nodeIdentifier, args);
 
         return nodeIdentifier;
-    }   
+    }
 
     @Override
     public String visit(ArgFonction a) {
@@ -315,7 +315,6 @@ public class GraphVizVisitor implements AstVisitor<String> {
 
         return nodeIdentifier;
     }
-
 
     @Override
     public String visit(IfThen ifThen) {
@@ -339,7 +338,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
         String conditionState = ifThenElse.condition.accept(this);
         String thenBlockState = ifThenElse.thenBlock.accept(this);
         String elseBlockState = ifThenElse.elseBlock.accept(this);
-        
+
         this.addNode(nodeIdentifier, "IfThenElse");
 
         this.addTransition(nodeIdentifier, conditionState);
@@ -386,7 +385,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     @Override
     public String visit(Definition a) {
         String nodeIdentifier = this.nextState();
-        
+
         this.addNode(nodeIdentifier, "Let");
         for (Ast ast : a.declarations) {
             String state = ast.accept(this);
@@ -403,7 +402,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     @Override
     public String visit(DeclarationArrayType a) {
         String nodeIdentifier = this.nextState();
-        
+
         this.addNode(nodeIdentifier, "Array");
         String nameState = a.id.accept(this);
         String typeState = a.type.accept(this);
@@ -416,7 +415,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     @Override
     public String visit(DeclarationTypeClassique a) {
         String nodeIdentifier = this.nextState();
-        
+
         this.addNode(nodeIdentifier, "Type");
         String nameState = a.id.accept(this);
         String typeState = a.type.accept(this);
@@ -429,7 +428,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     @Override
     public String visit(DeclarationRecordType a) {
         String nodeIdentifier = this.nextState();
-        
+
         this.addNode(nodeIdentifier, "Record");
         String nameState = a.id.accept(this);
         this.addTransition(nodeIdentifier, nameState);
@@ -444,7 +443,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     @Override
     public String visit(DeclarationChamp a) {
         String nodeIdentifier = this.nextState();
-        
+
         this.addNode(nodeIdentifier, "Champ");
         String nameState = a.id.accept(this);
         String typeState = a.type.accept(this);
@@ -465,14 +464,13 @@ public class GraphVizVisitor implements AstVisitor<String> {
             this.addTransition(nodeIdentifier, state);
         }
         if (a.has_return) {
-            String typeState= a.return_type.accept(this);
+            String typeState = a.return_type.accept(this);
             this.addTransition(nodeIdentifier, typeState);
         }
         String exprState = a.expr.accept(this);
-        this.addTransition(nodeIdentifier,exprState);
-        
+        this.addTransition(nodeIdentifier, exprState);
+
         return nodeIdentifier;
-        
-        
+
     }
 }

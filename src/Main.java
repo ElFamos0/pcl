@@ -5,16 +5,16 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 
-import parser.*;   
+import parser.*;
 import parser.exprParser.ProgramContext;
 
 import ast.*;
 import graphViz.GraphVizVisitor;
 
 public class Main {
-	public static void main(String[] args){
+    public static void main(String[] args) {
 
-        if (args.length < 1){
+        if (args.length < 1) {
             System.out.println("Error : Expected 1 argument filepath, found 0");
             return;
         }
@@ -23,10 +23,10 @@ public class Main {
 
         try {
 
-            //chargement du fichier et construction du parser
+            // chargement du fichier et construction du parser
 
             CharStream input = CharStreams.fromFileName(testFile);
-            exprLexer lexer = new exprLexer(input); 
+            exprLexer lexer = new exprLexer(input);
             CommonTokenStream stream = new CommonTokenStream(lexer);
             exprParser parser = new exprParser(stream);
 
@@ -40,13 +40,12 @@ public class Main {
             // Visiteur de représentation graphique + appel
             GraphVizVisitor graphViz = new GraphVizVisitor();
             ast.accept(graphViz);
-        
+
             graphViz.dumpGraph("./out/tree.dot");
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        catch (RecognitionException e) {
+        } catch (RecognitionException e) {
             e.printStackTrace();
         }
     }
