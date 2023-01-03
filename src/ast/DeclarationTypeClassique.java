@@ -6,10 +6,7 @@ public class DeclarationTypeClassique implements Ast{
 	}
 
     public Ast id;
-    public Ast type;
-
-    public DeclarationTypeClassique(Ast type) {
-        this.type = type;
+    public DeclarationTypeClassique() {
     }
 
     public void setId(Ast id) {

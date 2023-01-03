@@ -5,8 +5,8 @@
 /*                                                                            */
 /*   By: Thibault Cheneviere <thibault.cheneviere@telecomnancy.eu>            */
 /*                                                                            */
-/*   Created: 2022/11/30 17:11:04 by Thibault Cheneviere                      */
-/*   Updated: 2022/11/30 17:13:00 by Thibault Cheneviere                      */
+/*   Created: 2022/11/30 17:11:04 by Golem Géant,                             */
+/*   Updated: 2023/01/03 00:40:30 by Bo gosse                                 */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ import parser.exprParser.DeclarationChampContext;
 import parser.exprParser.DeclarationRecordTypeContext;
 import parser.exprParser.DeclarationTypeClassiqueContext;
 import parser.exprParser.DeclarationTypeContext;
+import parser.exprParser.DeclarationValeurContext;
 import parser.exprParser.DefinitionContext;
 import parser.exprParser.EntierContext;
 import parser.exprParser.ExpressionIdentifiantContext;
@@ -212,30 +213,24 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
 	@Override
 	public Ast visitDeclarationType(DeclarationTypeContext ctx) {
-		// right child needs to know this child 0
-		Ast child = ctx.getChild(1).accept(this);
-		Ast branch = ctx.getChild(3).accept(this);
-		if (branch instanceof DeclarationTypeClassique) {
-			((DeclarationTypeClassique) branch).setId(child);
-			return branch;
-		} else if (branch instanceof DeclarationArrayType) {
-			((DeclarationArrayType) branch).setId(child);
-			return branch;
-		} else if (branch instanceof DeclarationRecordType) {
-			((DeclarationRecordType) branch).setId(child);
-			return branch;
-		}
-		return branch;
+		DeclarationType dt = new DeclarationType();
+		dt.setId(ctx.getChild(1).accept(this));
+		dt.setType(ctx.getChild(3).accept(this));
+		return dt;
 	}
 
 	@Override
 	public Ast visitDeclarationTypeClassique(DeclarationTypeClassiqueContext ctx) {
-		return ctx.getChild(0).accept(this);
+		DeclarationTypeClassique dtc = new DeclarationTypeClassique();
+		dtc.setId(ctx.getChild(0).accept(this));
+		return dtc;
 	}
 
 	@Override
 	public Ast visitDeclarationArrayType(DeclarationArrayTypeContext ctx) {
-		return ctx.getChild(2).accept(this);
+		DeclarationArrayType dat = new DeclarationArrayType();
+		dat.setId(ctx.getChild(2).accept(this));
+		return dat;
 	}
 
 	@Override
@@ -252,7 +247,20 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 		return new DeclarationChamp(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
 	}
 
-
+	@Override
+	public Ast visitDeclarationValeur(DeclarationValeurContext ctx) {
+		DeclarationValeur dv = new DeclarationValeur();
+		dv.setId(ctx.getChild(1).accept(this));
+		
+		if (ctx.getChild(2).getText().equals(":")) {
+			dv.setType(ctx.getChild(3).accept(this));
+			dv.setExpr(ctx.getChild(5).accept(this));
+		} else {
+			dv.setExpr(ctx.getChild(3).accept(this));
+		}
+		return dv;
+		
+	}
 
 	@Override
 	public Ast visitDeclarationFonction(DeclarationFonctionContext ctx) {

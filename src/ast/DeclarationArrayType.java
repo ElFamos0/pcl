@@ -6,10 +6,8 @@ public class DeclarationArrayType implements Ast{
 	}
 
     public Ast id;
-    public Ast type;
 
-    public DeclarationArrayType(Ast type) {
-        this.type = type;
+    public DeclarationArrayType() {
     }
 
     public void setId(Ast id) {

@@ -25,8 +25,10 @@ import ast.Compar;
 import ast.DeclarationArrayType;
 import ast.DeclarationChamp;
 import ast.DeclarationRecordType;
+import ast.DeclarationType;
 import ast.DeclarationTypeClassique;
 import ast.DeclarationFonction;
+import ast.DeclarationValeur;
 import ast.Definition;
 import ast.Division;
 import ast.Et;
@@ -400,14 +402,23 @@ public class GraphVizVisitor implements AstVisitor<String> {
     }
 
     @Override
+    public String visit(DeclarationType a){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "Declaration Type");
+        String nameState = a.id.accept(this);
+        String typeState = a.type.accept(this);
+        this.addTransition(nodeIdentifier, nameState);
+        this.addTransition(nodeIdentifier, typeState);
+        return nodeIdentifier;
+    }
+
+    @Override
     public String visit(DeclarationArrayType a) {
         String nodeIdentifier = this.nextState();
 
         this.addNode(nodeIdentifier, "Array");
         String nameState = a.id.accept(this);
-        String typeState = a.type.accept(this);
         this.addTransition(nodeIdentifier, nameState);
-        this.addTransition(nodeIdentifier, typeState);
 
         return nodeIdentifier;
     }
@@ -416,11 +427,9 @@ public class GraphVizVisitor implements AstVisitor<String> {
     public String visit(DeclarationTypeClassique a) {
         String nodeIdentifier = this.nextState();
 
-        this.addNode(nodeIdentifier, "Type");
+        this.addNode(nodeIdentifier, "Type Classique");
         String nameState = a.id.accept(this);
-        String typeState = a.type.accept(this);
         this.addTransition(nodeIdentifier, nameState);
-        this.addTransition(nodeIdentifier, typeState);
 
         return nodeIdentifier;
     }
@@ -450,6 +459,22 @@ public class GraphVizVisitor implements AstVisitor<String> {
         this.addTransition(nodeIdentifier, nameState);
         this.addTransition(nodeIdentifier, typeState);
 
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(DeclarationValeur a) {
+        String nodeIdentifier = this.nextState();
+
+        this.addNode(nodeIdentifier, "Declaration valeur");
+        String nameState = a.id.accept(this);
+        this.addTransition(nodeIdentifier, nameState);
+        if (a.getType() != null) {
+            String typeState = a.getType().accept(this);
+            this.addTransition(nodeIdentifier, typeState);
+        }
+        String exprState = a.expr.accept(this);
+        this.addTransition(nodeIdentifier, exprState);
         return nodeIdentifier;
     }
 

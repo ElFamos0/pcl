@@ -22,11 +22,13 @@ public interface AstVisitor<T> {
 	public T visit(While a);
 	public T visit(For a);
 	public T visit(Definition a);
+	public T visit(DeclarationType a);
 	public T visit(DeclarationTypeClassique a);
 	public T visit(DeclarationArrayType a);
 	public T visit(DeclarationRecordType a);
 	public T visit(DeclarationChamp a);
 	public T visit(DeclarationFonction a);
+	public T visit(DeclarationValeur a);
 	public T visit(ChaineChr a);
 	public T visit(Nil a);
 	public T visit(Break a);
