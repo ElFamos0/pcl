@@ -1,7 +1,10 @@
-(
-    i := 5/2*3;
-    j := i*2;
-    r := 5;
+let
+    var i := 5/2*3
+    var j := i*2
+    var r := 5
+    var n := r
+    function f() : int = 42
+in
     if (i/2 = 0) then (
         r := multiply(i,j)
     ) else (
@@ -9,4 +12,4 @@
     );
     print(divide(i*j,r));
     i := 5
-)
+end

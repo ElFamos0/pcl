@@ -1,15 +1,18 @@
 package st;
 
 public class Function extends FuncOrVariable {
-    private SymbolTable table;
+    private SymbolLookup table;
 
-    public Function(String name, Type type, SymbolTable table) {
+    public Function(String name, Type type) {
         super(name, type);
-        this.table = table;
     }
 
-    public SymbolTable getTable() {
+    public SymbolLookup getTable() {
         return table;
+    }
+
+    public void setTable(SymbolLookup table) {
+        this.table = table;
     }
 
     public boolean isNative() {

@@ -1,8 +1,8 @@
 package st;
 
-public class Symbol {
-    protected String name;
-    protected Type type;
+public abstract class Symbol {
+    private String name;
+    private Type type;
 
     public Symbol(String name, Type type) {
         this.name = name;

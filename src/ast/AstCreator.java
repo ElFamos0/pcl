@@ -41,360 +41,420 @@ import parser.exprParser.TantQueContext;
 import parser.exprParser.DeclarationFonctionContext;
 import parser.exprParser.ChaineChrContext;
 import parser.exprParser.BreakContext;
+import st.*;
 
 public class AstCreator extends exprBaseVisitor<Ast> {
-	@Override
-	public Ast visitProgram(exprParser.ProgramContext ctx) {
-		Ast child = ctx.getChild(0).accept(this);
-		return new Program(child);
-	}
+    private SymbolLookup table;
+    private int region;
 
+    public AstCreator(SymbolLookup table) {
+        this.table = table;
+        region = 0;
+    }
 
-	@Override
-	public Ast visitExpression(exprParser.ExpressionContext ctx) {
-		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+    @Override
+    public Ast visitProgram(exprParser.ProgramContext ctx) {
+        Ast child = ctx.getChild(0).accept(this);
+        return new Program(child);
+    }
 
-		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
-			noeudTemporaire = new Expression(noeudTemporaire, ctx.getChild(2*i+2).accept(this));
-		}
+    @Override
+    public Ast visitExpression(exprParser.ExpressionContext ctx) {
+        Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
-		return noeudTemporaire;
-	}
+        for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
+            noeudTemporaire = new Expression(noeudTemporaire, ctx.getChild(2 * i + 2).accept(this));
+        }
 
-	@Override
-	public Ast visitOperationOu(OperationOuContext ctx) {
-		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+        return noeudTemporaire;
+    }
 
-		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
-			noeudTemporaire = new Ou(noeudTemporaire, ctx.getChild(2*i+2).accept(this));
-		}
+    @Override
+    public Ast visitOperationOu(OperationOuContext ctx) {
+        Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
-		return noeudTemporaire;
-	}
+        for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
+            noeudTemporaire = new Ou(noeudTemporaire, ctx.getChild(2 * i + 2).accept(this));
+        }
 
-	@Override
-	public Ast visitOperationEt(OperationEtContext ctx) {
-		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+        return noeudTemporaire;
+    }
 
-		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
-			noeudTemporaire = new Et(noeudTemporaire, ctx.getChild(2*i+2).accept(this));
-		}
+    @Override
+    public Ast visitOperationEt(OperationEtContext ctx) {
+        Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
-		return noeudTemporaire;
-	}
+        for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
+            noeudTemporaire = new Et(noeudTemporaire, ctx.getChild(2 * i + 2).accept(this));
+        }
 
-	@Override
-	public Ast visitOperationComparaison(OperationComparaisonContext ctx) {
-		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+        return noeudTemporaire;
+    }
 
-		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
-			noeudTemporaire = new Compar(noeudTemporaire, ctx.getChild(2*i+2).accept(this), ctx.getChild(2*i+1).getText());
-		}
+    @Override
+    public Ast visitOperationComparaison(OperationComparaisonContext ctx) {
+        Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
-		return noeudTemporaire;
-	}
+        for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
+            noeudTemporaire = new Compar(noeudTemporaire, ctx.getChild(2 * i + 2).accept(this),
+                    ctx.getChild(2 * i + 1).getText());
+        }
 
-	@Override
-	public Ast visitOperationAddition(OperationAdditionContext ctx) {
-		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+        return noeudTemporaire;
+    }
 
-		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
-			String operation = ctx.getChild(2*i+1).getText();
-			Ast right = ctx.getChild(2*i+2).accept(this);
+    @Override
+    public Ast visitOperationAddition(OperationAdditionContext ctx) {
+        Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
-			switch (operation) {
-				case "+":
-					noeudTemporaire = new Addition(noeudTemporaire, right);
-					break;
-				case "-":
-					noeudTemporaire = new Soustraction(noeudTemporaire, right);
-					break;
-				default:
-					break;
-			}
-		}
+        for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
+            String operation = ctx.getChild(2 * i + 1).getText();
+            Ast right = ctx.getChild(2 * i + 2).accept(this);
 
-		return noeudTemporaire;
-	}
+            switch (operation) {
+                case "+":
+                    noeudTemporaire = new Addition(noeudTemporaire, right);
+                    break;
+                case "-":
+                    noeudTemporaire = new Soustraction(noeudTemporaire, right);
+                    break;
+                default:
+                    break;
+            }
+        }
 
-	@Override
-	public Ast visitOperationMultiplication(OperationMultiplicationContext ctx) {
-		Ast noeudTemporaire = ctx.getChild(0).accept(this);
+        return noeudTemporaire;
+    }
 
-		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
-			String operation = ctx.getChild(2*i+1).getText();
-			Ast right = ctx.getChild(2*i+2).accept(this);
+    @Override
+    public Ast visitOperationMultiplication(OperationMultiplicationContext ctx) {
+        Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
-			switch (operation) {
-				case "*":
-					noeudTemporaire = new Multiplication(noeudTemporaire, right);
-					break;
-				case "/":
-					noeudTemporaire = new Division(noeudTemporaire, right);
-					break;
-				default:
-					break;
-			}
-		}
+        for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
+            String operation = ctx.getChild(2 * i + 1).getText();
+            Ast right = ctx.getChild(2 * i + 2).accept(this);
 
-		return noeudTemporaire;
-	}
+            switch (operation) {
+                case "*":
+                    noeudTemporaire = new Multiplication(noeudTemporaire, right);
+                    break;
+                case "/":
+                    noeudTemporaire = new Division(noeudTemporaire, right);
+                    break;
+                default:
+                    break;
+            }
+        }
 
-	@Override
-	public Ast visitExpressionUnaire(ExpressionUnaireContext ctx) {
-		return ctx.getChild(0).accept(this);
-	}
+        return noeudTemporaire;
+    }
 
-	@Override
-	public Ast visitSequence(SequenceContext ctx) {
-		Sequence sequence = new Sequence();
+    @Override
+    public Ast visitExpressionUnaire(ExpressionUnaireContext ctx) {
+        return ctx.getChild(0).accept(this);
+    }
 
-		for (int i = 0; 2*i < ctx.getChildCount()-1; i++) {
-			sequence.addSeq(ctx.getChild(2*i+1).accept(this));
-		}
+    @Override
+    public Ast visitSequence(SequenceContext ctx) {
+        Sequence sequence = new Sequence();
 
-		return sequence;
-	}
+        for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
+            sequence.addSeq(ctx.getChild(2 * i + 1).accept(this));
+        }
 
-	@Override
-	public Ast visitNegation(NegationContext ctx) {
-		return new Negation(ctx.getChild(1).accept(this));
-	}
-	
-	@Override
-	public Ast visitIdentifiant(IdentifiantContext ctx) {
-		return new ID(ctx.getChild(0).getText());
-	}
+        return sequence;
+    }
 
-	@Override
-	public Ast visitEntier(EntierContext ctx) {
-		return new Int(Integer.parseInt(ctx.getChild(0).getText()));
-	}
+    @Override
+    public Ast visitNegation(NegationContext ctx) {
+        return new Negation(ctx.getChild(1).accept(this));
+    }
 
-	@Override
-	public Ast visitChaineChr(ChaineChrContext ctx) {
-		return new ChaineChr(ctx.getChild(0).getText());
-	}
+    @Override
+    public Ast visitIdentifiant(IdentifiantContext ctx) {
+        return new ID(ctx.getChild(0).getText());
+    }
 
-	@Override
-	public Ast visitNil(NilContext ctx) {
-		return new Nil(); 
-	}
+    @Override
+    public Ast visitEntier(EntierContext ctx) {
+        return new Int(Integer.parseInt(ctx.getChild(0).getText()));
+    }
 
-	@Override
-	public Ast visitBreak(BreakContext ctx) {
-		return new Break(); 
-	}
+    @Override
+    public Ast visitChaineChr(ChaineChrContext ctx) {
+        return new ChaineChr(ctx.getChild(0).getText());
+    }
 
-	@Override
-	public Ast visitAppelFonction(AppelFonctionContext ctx) {
-		ArgFonction argFonction = new ArgFonction();
-		// args are located at even indexes
-		for (int i = 0; 2*i+1 < ctx.getChildCount()-1; i++) {
-			argFonction.addArg(ctx.getChild(2*i+1).accept(this));
-		}
-		AppelFonction af = new AppelFonction(argFonction);
-		return af;
-	}
+    @Override
+    public Ast visitNil(NilContext ctx) {
+        return new Nil();
+    }
 
-	@Override
-	public Ast visitExpressionIdentifiant(ExpressionIdentifiantContext ctx) {
-		// right child needs to know this child 0
-		Ast child = ctx.getChild(0).accept(this);
-		if (ctx.getChildCount() > 1) {
-			Ast branch = ctx.getChild(1).accept(this);
-			if (branch instanceof AppelFonction) {
-				((AppelFonction) branch).setId(child);
-				return branch;
-			}
-		}
-		return child;
-	}
+    @Override
+    public Ast visitBreak(BreakContext ctx) {
+        return new Break();
+    }
 
-	@Override
-	public Ast visitDeclarationType(DeclarationTypeContext ctx) {
-		DeclarationType dt = new DeclarationType();
-		dt.setId(ctx.getChild(1).accept(this));
-		dt.setType(ctx.getChild(3).accept(this));
-		return dt;
-	}
+    @Override
+    public Ast visitAppelFonction(AppelFonctionContext ctx) {
+        ArgFonction argFonction = new ArgFonction();
+        // args are located at even indexes
+        for (int i = 0; 2 * i + 1 < ctx.getChildCount() - 1; i++) {
+            argFonction.addArg(ctx.getChild(2 * i + 1).accept(this));
+        }
+        AppelFonction af = new AppelFonction(argFonction);
+        return af;
+    }
 
-	@Override
-	public Ast visitDeclarationTypeClassique(DeclarationTypeClassiqueContext ctx) {
-		DeclarationTypeClassique dtc = new DeclarationTypeClassique();
-		dtc.setId(ctx.getChild(0).accept(this));
-		return dtc;
-	}
+    @Override
+    public Ast visitExpressionIdentifiant(ExpressionIdentifiantContext ctx) {
+        // right child needs to know this child 0
+        Ast child = ctx.getChild(0).accept(this);
+        if (ctx.getChildCount() > 1) {
+            Ast branch = ctx.getChild(1).accept(this);
+            if (branch instanceof AppelFonction) {
+                ((AppelFonction) branch).setId(child);
+                return branch;
+            }
+        }
+        return child;
+    }
 
-	@Override
-	public Ast visitDeclarationArrayType(DeclarationArrayTypeContext ctx) {
-		DeclarationArrayType dat = new DeclarationArrayType();
-		dat.setId(ctx.getChild(2).accept(this));
-		return dat;
-	}
+    @Override
+    public Ast visitDeclarationType(DeclarationTypeContext ctx) {
+        DeclarationType dt = new DeclarationType();
+        dt.setId(ctx.getChild(1).accept(this));
+        dt.setType(ctx.getChild(3).accept(this));
+        return dt;
+    }
 
-	@Override
-	public Ast visitDeclarationRecordType(DeclarationRecordTypeContext ctx) {
-		DeclarationRecordType drt = new DeclarationRecordType();
-		for (int i = 0; 2*i+1 < ctx.getChildCount()-1; i++) {
-			drt.addChamp(ctx.getChild(2*i+1).accept(this));
-		}
-		return drt;
-	}
+    @Override
+    public Ast visitDeclarationTypeClassique(DeclarationTypeClassiqueContext ctx) {
+        DeclarationTypeClassique dtc = new DeclarationTypeClassique();
+        dtc.setId(ctx.getChild(0).accept(this));
+        return dtc;
+    }
 
-	@Override
-	public Ast visitDeclarationChamp(DeclarationChampContext ctx) {
-		return new DeclarationChamp(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
-	}
+    @Override
+    public Ast visitDeclarationArrayType(DeclarationArrayTypeContext ctx) {
+        DeclarationArrayType dat = new DeclarationArrayType();
+        dat.setId(ctx.getChild(2).accept(this));
+        return dat;
+    }
 
-	@Override
-	public Ast visitDeclarationValeur(DeclarationValeurContext ctx) {
-		DeclarationValeur dv = new DeclarationValeur();
-		dv.setId(ctx.getChild(1).accept(this));
-		
-		if (ctx.getChild(2).getText().equals(":")) {
-			dv.setType(ctx.getChild(3).accept(this));
-			dv.setExpr(ctx.getChild(5).accept(this));
-		} else {
-			dv.setExpr(ctx.getChild(3).accept(this));
-		}
-		return dv;
-		
-	}
+    @Override
+    public Ast visitDeclarationRecordType(DeclarationRecordTypeContext ctx) {
+        DeclarationRecordType drt = new DeclarationRecordType();
+        for (int i = 0; 2 * i + 1 < ctx.getChildCount() - 1; i++) {
+            drt.addChamp(ctx.getChild(2 * i + 1).accept(this));
+        }
+        return drt;
+    }
 
-	@Override
-	public Ast visitDeclarationFonction(DeclarationFonctionContext ctx) {
-		DeclarationFonction drf = new DeclarationFonction();
-		drf.setId(ctx.getChild(1).accept(this));
+    @Override
+    public Ast visitDeclarationChamp(DeclarationChampContext ctx) {
+        return new DeclarationChamp(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+    }
 
-		boolean endOfArgs = false;
-		int count = 3;
-		while(!endOfArgs) {
-			Ast branch = ctx.getChild(count).accept(this);
-			String txt = ctx.getChild(count).getText();
-			if (txt.equals(",")) {
-				count++;
-			} else if (txt.equals(")")) {
-				endOfArgs = true;
-				count++;
-			} else  {
-				drf.addArg(((DeclarationChamp) branch));
-				count++;
-			}
-		}
+    @Override
+    public Ast visitDeclarationValeur(DeclarationValeurContext ctx) {
+        DeclarationValeur dv = new DeclarationValeur();
+        dv.setId(ctx.getChild(1).accept(this));
 
-		Ast branch = ctx.getChild(count).accept(this);
-		String txt = ctx.getChild(count).getText();
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        String idf = ctx.getChild(1).getText();
+        String expr = ctx.getChild(3).getText();
 
-		if (txt == ":") {
-			count++;
-			branch = ctx.getChild(count).accept(this);
-			drf.setReturn(((ID) branch));
-			count++;
-		} 
+        if (ctx.getChild(2).getText().equals(":")) {
+            dv.setType(ctx.getChild(3).accept(this));
+            dv.setExpr(ctx.getChild(5).accept(this));
+        } else {
+            table.addSymbol(new Variable(idf, TypeInferer.inferType(table, expr)));
+            dv.setExpr(ctx.getChild(3).accept(this));
+        }
+        return dv;
 
-		count++;
-		branch = ctx.getChild(count).accept(this);
-		drf.setExpr(branch);
-		return drf;
-	}
+    }
 
-	@Override
-	public Ast visitSiAlors(SiAlorsContext ctx) {
-		Ast condition = ctx.getChild(1).accept(this);
-		Ast thenBlock = ctx.getChild(3).accept(this);
+    @Override
+    public Ast visitDeclarationFonction(DeclarationFonctionContext ctx) {
+        DeclarationFonction drf = new DeclarationFonction();
 
-		if (condition instanceof Sequence) {
-			((Sequence) condition).setNom("Condition");
-		} else {
-			Sequence seq = new Sequence();
-			seq.addSeq(condition);
-			condition = seq;
-		}
- 
-		if (thenBlock instanceof Sequence) {
-			((Sequence) thenBlock).setNom("Then");
-		} else {
-			Sequence seq = new Sequence();
-			seq.addSeq(thenBlock);
-			thenBlock = seq;
-		}
+        int temp = region;
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        table.addChildren();
+        region++;
 
-		return new IfThen(condition, thenBlock);
-	}
+        drf.setId(ctx.getChild(1).accept(this));
+        String idf = ctx.getChild(1).getText();
 
-	@Override
-	public Ast visitSiAlorsSinon(SiAlorsSinonContext ctx) {
-		Ast condition = ctx.getChild(1).accept(this);
-		Ast thenBlock = ctx.getChild(3).accept(this);
-		Ast elseBlock = ctx.getChild(5).accept(this);
+        boolean endOfArgs = false;
+        int count = 3;
+        while (!endOfArgs) {
+            Ast branch = ctx.getChild(count).accept(this);
+            String txt = ctx.getChild(count).getText();
+            if (txt.equals(",")) {
+                count++;
+            } else if (txt.equals(")")) {
+                endOfArgs = true;
+                count++;
+            } else {
+                drf.addArg(((DeclarationChamp) branch));
+                count++;
+            }
+        }
 
-		if (condition instanceof Sequence) {
-			((Sequence) condition).setNom("Condition");
-		} else {
-			Sequence seq = new Sequence();
-			seq.addSeq(condition);
-			condition = seq;
-		}
- 
-		if (thenBlock instanceof Sequence) {
-			((Sequence) thenBlock).setNom("Then");
-		} else {
-			Sequence seq = new Sequence();
-			seq.addSeq(thenBlock);
-			thenBlock = seq;
-		}
- 
-		if (elseBlock instanceof Sequence) {
-			((Sequence) elseBlock).setNom("Else");
-		} else {
-			Sequence seq = new Sequence();
-			seq.addSeq(elseBlock);
-			elseBlock = seq;
-		}
+        Ast branch = ctx.getChild(count).accept(this);
+        String txt = ctx.getChild(count).getText();
+        Type type = new Primitive(Void.class);
 
-		return new IfThenElse(condition, thenBlock, elseBlock);
-	}
+        if (txt.equals(":")) {
+            count++;
+            type = TypeInferer.inferType(table, ctx.getChild(count).getText());
+            branch = ctx.getChild(count).accept(this);
+            drf.setReturn(((ID) branch));
+            count++;
+        }
+        count++;
+        branch = ctx.getChild(count).accept(this);
+        drf.setExpr(branch);
 
-	@Override
-	public Ast visitTantQue(TantQueContext ctx) {
-		Ast condition = ctx.getChild(1).accept(this);
-		Ast block = ctx.getChild(3).accept(this);
+        table.addSymbol(new Function(idf, type));
 
-		return new While(condition, block);
-	}
+        // Get out of the lookupTable
+        region = temp;
 
-	@Override
-	public Ast visitPour(PourContext ctx) {
-		Ast init = ctx.getChild(1).accept(this);
-		Ast condition = ctx.getChild(3).accept(this);
-		Ast increment = ctx.getChild(5).accept(this);
-		Ast block = ctx.getChild(7).accept(this);
+        return drf;
+    }
 
-		return new For(init, condition, increment, block);
-	}
+    @Override
+    public Ast visitSiAlors(SiAlorsContext ctx) {
+        int temp = region;
+        table.getSymbolLookup(region).addChildren();
+        region++;
 
-	@Override
-	public Ast visitDefinition(DefinitionContext ctx) {
-		boolean sawIn = false;
+        Ast condition = ctx.getChild(1).accept(this);
+        Ast thenBlock = ctx.getChild(3).accept(this);
 
-		Definition def = new Definition();
+        if (condition instanceof Sequence) {
+            ((Sequence) condition).setNom("Condition");
+        } else {
+            Sequence seq = new Sequence();
+            seq.addSeq(condition);
+            condition = seq;
+        }
 
-		for (int i = 0; i < ctx.getChildCount(); i++) {
-			if (ctx.getChild(i).getText().equals("in")) {
-				sawIn = true;
-				continue;
-			}
-			if (ctx.getChild(i).getText().equals("let") || ctx.getChild(i).getText().equals("end") || ctx.getChild(i).getText().equals(";")) {
-				continue;
-			}
-			if (sawIn) {
-				def.addExpr(ctx.getChild(i).accept(this));
-			} else {
-				def.addDeclaration(ctx.getChild(i).accept(this));
-			}
-		}
-		return def;
-	}
+        if (thenBlock instanceof Sequence) {
+            ((Sequence) thenBlock).setNom("Then");
+        } else {
+            Sequence seq = new Sequence();
+            seq.addSeq(thenBlock);
+            thenBlock = seq;
+        }
+
+        region = temp;
+
+        return new IfThen(condition, thenBlock);
+    }
+
+    @Override
+    public Ast visitSiAlorsSinon(SiAlorsSinonContext ctx) {
+        int temp = region;
+        table.getSymbolLookup(region).addChildren();
+        region++;
+
+        Ast condition = ctx.getChild(1).accept(this);
+        Ast thenBlock = ctx.getChild(3).accept(this);
+
+        table.getSymbolLookup(temp).addChildren();
+        Ast elseBlock = ctx.getChild(5).accept(this);
+
+        if (condition instanceof Sequence) {
+            ((Sequence) condition).setNom("Condition");
+        } else {
+            Sequence seq = new Sequence();
+            seq.addSeq(condition);
+            condition = seq;
+        }
+
+        if (thenBlock instanceof Sequence) {
+            ((Sequence) thenBlock).setNom("Then");
+        } else {
+            Sequence seq = new Sequence();
+            seq.addSeq(thenBlock);
+            thenBlock = seq;
+        }
+
+        if (elseBlock instanceof Sequence) {
+            ((Sequence) elseBlock).setNom("Else");
+        } else {
+            Sequence seq = new Sequence();
+            seq.addSeq(elseBlock);
+            elseBlock = seq;
+        }
+
+        region = temp;
+
+        return new IfThenElse(condition, thenBlock, elseBlock);
+    }
+
+    @Override
+    public Ast visitTantQue(TantQueContext ctx) {
+        int temp = region;
+        table.getSymbolLookup(region).addChildren();
+        region++;
+
+        Ast condition = ctx.getChild(1).accept(this);
+        Ast block = ctx.getChild(3).accept(this);
+
+        region = temp;
+
+        return new While(condition, block);
+    }
+
+    @Override
+    public Ast visitPour(PourContext ctx) {
+        int temp = region;
+        table.getSymbolLookup(region).addChildren();
+        region++;
+
+        Ast init = ctx.getChild(1).accept(this);
+        Ast condition = ctx.getChild(3).accept(this);
+        Ast increment = ctx.getChild(5).accept(this);
+        Ast block = ctx.getChild(7).accept(this);
+
+        region = temp;
+
+        return new For(init, condition, increment, block);
+    }
+
+    @Override
+    public Ast visitDefinition(DefinitionContext ctx) {
+        boolean sawIn = false;
+
+        Definition def = new Definition();
+
+        int temp = region;
+        table.getSymbolLookup(region).addChildren();
+        region++;
+
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i).getText().equals("in")) {
+                sawIn = true;
+                continue;
+            }
+            if (ctx.getChild(i).getText().equals("let") || ctx.getChild(i).getText().equals("end")
+                    || ctx.getChild(i).getText().equals(";")) {
+                continue;
+            }
+            if (sawIn) {
+                def.addExpr(ctx.getChild(i).accept(this));
+            } else {
+                def.addDeclaration(ctx.getChild(i).accept(this));
+            }
+        }
+        region = temp;
+        return def;
+    }
 
 }

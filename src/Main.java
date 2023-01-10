@@ -1,5 +1,7 @@
 import java.io.IOException;
 
+import javax.lang.model.type.PrimitiveType;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -10,6 +12,8 @@ import parser.exprParser.ProgramContext;
 
 import ast.*;
 import graphViz.GraphVizVisitor;
+
+import st.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -33,8 +37,11 @@ public class Main {
             // Récupération du noeud program (le noeud à la racine)
             ProgramContext program = parser.program();
 
+            // Creation de la TDS
+            SymbolLookup table = new SymbolLookup(null);
+
             // Visiteur de création de l'AST + création de l'AST
-            AstCreator creator = new AstCreator();
+            AstCreator creator = new AstCreator(table);
             Ast ast = program.accept(creator);
 
             // Visiteur de représentation graphique + appel

@@ -9,8 +9,8 @@ public class Array extends Type {
         this.size = size;
     }
 
-    public int getSize() {
-        return size;
+    public Integer getSize() {
+        return size * type.getSize();
     }
 
     public Type getType() {
