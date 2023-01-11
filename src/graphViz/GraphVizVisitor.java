@@ -14,6 +14,7 @@ package graphViz;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import ast.Addition;
 import ast.AppelFonction;
@@ -32,7 +33,7 @@ import ast.DeclarationValeur;
 import ast.Definition;
 import ast.Division;
 import ast.Et;
-import ast.ExprValeur;
+import ast.ExpressionIdentifiant;
 import ast.Expression;
 import ast.For;
 import ast.ID;
@@ -48,6 +49,7 @@ import ast.Sequence;
 import ast.Soustraction;
 import ast.While;
 import ast.ChaineChr;
+import ast.InstanciationType;
 
 public class GraphVizVisitor implements AstVisitor<String> {
     private int state;
@@ -111,6 +113,24 @@ public class GraphVizVisitor implements AstVisitor<String> {
         this.addNode(nodeIdentifier, ":=");
         this.addTransition(nodeIdentifier, leftState);
         this.addTransition(nodeIdentifier, rightState);
+
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(InstanciationType instantiation){
+        String nodeIdentifier = this.nextState();
+        this.addNode(nodeIdentifier, "InstanciationType");
+        String idvar = instantiation.getId().accept(this);
+        this.addTransition(nodeIdentifier, idvar);
+        ArrayList<Ast> identifiants = instantiation.getIdentifiants();
+        ArrayList<Ast> expressions = instantiation.getExpressions();
+        for (int i=0; i<identifiants.size(); i++){
+            String id = identifiants.get(i).accept(this);
+            this.addTransition(nodeIdentifier, id);
+            String expr = expressions.get(i).accept(this);
+            this.addTransition(nodeIdentifier, expr);
+        }
 
         return nodeIdentifier;
     }
@@ -274,7 +294,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     }
 
     @Override
-    public String visit(ExprValeur expression) {
+    public String visit(ExpressionIdentifiant expression) {
         String nodeIdentifier = this.nextState();
 
         String leftState = expression.left.accept(this);
