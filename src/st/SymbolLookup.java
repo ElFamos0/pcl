@@ -8,7 +8,8 @@ public class SymbolLookup {
     private HashMap<String, Type> types;
     private int scope;
     private int region;
-    private int offset = 0;
+    private int varOffset = 0;
+    private int paramOffset = 0;
     private static int regionCount = 0;
     private SymbolLookup parent;
     private ArrayList<SymbolLookup> children;
@@ -73,16 +74,28 @@ public class SymbolLookup {
             return children.get(i);
     }
 
-    public void addSymbol(Symbol s) {
+    public void addSymbolVarAndFunc(Symbol s) {
         if (s instanceof Variable) {
-            ((Variable) s).setOffset(offset);
-            offset += s.getType().getSize();
+            ((Variable) s).setOffset(varOffset);
+
+            varOffset += s.getType().getSize();
         }
         if (s instanceof Function) {
             // Get the last children
             ((Function) s).setTable(getChildren(-1));
         }
         funcAndVar.put(s.getName(), s);
+    }
+
+    public void addSymbolParam(Variable s) {
+        ((Variable) s).setOffset(paramOffset);
+        paramOffset -= s.getType().getSize();
+
+        funcAndVar.put(s.getName(), s);
+    }
+
+    public void addType(String key, Type t) {
+        types.put(key, t);
     }
 
     public void addChildren() {

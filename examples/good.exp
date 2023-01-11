@@ -1,9 +1,15 @@
 let
+    type intArray = array of int
+    type zebi = int
+    var x := intArray[5] of 0
+
+    var baz : string := "test"
     var i := 5/2*3
     var j := i*2
-    var r := 5
+    var r : zebi := 5
     var n := r
     function f() : int = 42
+    function test(x: int, y: int) : int = x + y
 in
     if (i/2 = 0) then (
         r := multiply(i,j)

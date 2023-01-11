@@ -12,6 +12,8 @@
 
 package ast;
 
+import java.util.ArrayList;
+
 import parser.exprBaseVisitor;
 import parser.exprParser;
 import parser.exprParser.AppelFonctionContext;
@@ -42,10 +44,12 @@ import parser.exprParser.DeclarationFonctionContext;
 import parser.exprParser.ChaineChrContext;
 import parser.exprParser.BreakContext;
 import st.*;
+import st.Record;
 
 public class AstCreator extends exprBaseVisitor<Ast> {
     private SymbolLookup table;
     private int region;
+    private String idf;
 
     public AstCreator(SymbolLookup table) {
         this.table = table;
@@ -223,6 +227,9 @@ public class AstCreator extends exprBaseVisitor<Ast> {
     @Override
     public Ast visitDeclarationType(DeclarationTypeContext ctx) {
         DeclarationType dt = new DeclarationType();
+
+        idf = ctx.getChild(1).getText();
+
         dt.setId(ctx.getChild(1).accept(this));
         dt.setType(ctx.getChild(3).accept(this));
         return dt;
@@ -231,6 +238,8 @@ public class AstCreator extends exprBaseVisitor<Ast> {
     @Override
     public Ast visitDeclarationTypeClassique(DeclarationTypeClassiqueContext ctx) {
         DeclarationTypeClassique dtc = new DeclarationTypeClassique();
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        table.addType(idf, TypeInferer.inferType(table, ctx.getChild(0).getText()));
         dtc.setId(ctx.getChild(0).accept(this));
         return dtc;
     }
@@ -238,6 +247,10 @@ public class AstCreator extends exprBaseVisitor<Ast> {
     @Override
     public Ast visitDeclarationArrayType(DeclarationArrayTypeContext ctx) {
         DeclarationArrayType dat = new DeclarationArrayType();
+
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        table.addType(idf, new Array(TypeInferer.inferType(table, ctx.getChild(2).getText())));
+
         dat.setId(ctx.getChild(2).accept(this));
         return dat;
     }
@@ -245,9 +258,15 @@ public class AstCreator extends exprBaseVisitor<Ast> {
     @Override
     public Ast visitDeclarationRecordType(DeclarationRecordTypeContext ctx) {
         DeclarationRecordType drt = new DeclarationRecordType();
+        Record rec = new Record();
+        SymbolLookup table = this.table.getSymbolLookup(region);
         for (int i = 0; 2 * i + 1 < ctx.getChildCount() - 1; i++) {
+            String[] split = ctx.getChild(2 * i + 1).getText().split(":");
+            Variable v = new Variable(split[0], TypeInferer.inferType(table, split[1]));
+            rec.addField(v);
             drt.addChamp(ctx.getChild(2 * i + 1).accept(this));
         }
+        table.addType(idf, rec);
         return drt;
     }
 
@@ -266,10 +285,12 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         String expr = ctx.getChild(3).getText();
 
         if (ctx.getChild(2).getText().equals(":")) {
+            table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
             dv.setType(ctx.getChild(3).accept(this));
             dv.setExpr(ctx.getChild(5).accept(this));
         } else {
-            table.addSymbol(new Variable(idf, TypeInferer.inferType(table, expr)));
+            // TODO: System.out.println("expr = " + expr);
+            table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
             dv.setExpr(ctx.getChild(3).accept(this));
         }
         return dv;
@@ -283,6 +304,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         int temp = region;
         SymbolLookup table = this.table.getSymbolLookup(region);
         table.addChildren();
+        ArrayList<Variable> params = new ArrayList<>();
         region++;
 
         drf.setId(ctx.getChild(1).accept(this));
@@ -299,6 +321,8 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 endOfArgs = true;
                 count++;
             } else {
+                String[] split = txt.split(":");
+                params.add(new Variable(split[0], TypeInferer.inferType(table, split[1])));
                 drf.addArg(((DeclarationChamp) branch));
                 count++;
             }
@@ -319,12 +343,15 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         branch = ctx.getChild(count).accept(this);
         drf.setExpr(branch);
 
-        table.addSymbol(new Function(idf, type));
+        Function f = new Function(idf, type);
+        table.addSymbolVarAndFunc(f);
+        f.addParams(params);
 
         // Get out of the lookupTable
         region = temp;
 
         return drf;
+
     }
 
     @Override

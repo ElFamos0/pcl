@@ -1,5 +1,7 @@
 package st;
 
+import java.util.ArrayList;
+
 public class Function extends FuncOrVariable {
     private SymbolLookup table;
 
@@ -13,6 +15,12 @@ public class Function extends FuncOrVariable {
 
     public void setTable(SymbolLookup table) {
         this.table = table;
+    }
+
+    public void addParams(ArrayList<Variable> params) {
+        for (Variable param : params) {
+            table.addSymbolParam(param);
+        }
     }
 
     public boolean isNative() {

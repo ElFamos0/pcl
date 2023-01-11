@@ -1,19 +1,18 @@
 package st;
 
 public class Array extends Type {
-    private int size;
     private Type type;
 
-    public Array(Type type, int size) {
+    public Array(Type type) {
         this.type = type;
-        this.size = size;
-    }
-
-    public Integer getSize() {
-        return size * type.getSize();
     }
 
     public Type getType() {
         return type;
+    }
+
+    public Integer getSize() {
+        // Array size is 8 because it is a ptr to the heap
+        return 8;
     }
 }
