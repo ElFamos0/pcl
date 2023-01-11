@@ -43,6 +43,7 @@ import parser.exprParser.TantQueContext;
 import parser.exprParser.DeclarationFonctionContext;
 import parser.exprParser.ChaineChrContext;
 import parser.exprParser.BreakContext;
+import parser.exprParser.InstanciationTypeContext;
 import st.*;
 import st.Record;
 
@@ -71,6 +72,44 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         }
 
         return noeudTemporaire;
+    }
+
+
+    @Override
+    public Ast visitInstanciationType(exprParser.InstanciationTypeContext ctx){
+        InstanciationType ist = new InstanciationType();
+
+        int temp = region;
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        table.addChildren();
+        region++;
+
+        boolean endOfArgs = false;
+        int count = 1;
+        String txt = ctx.getChild(count).getText();
+        if (txt.equals("}")) {
+            endOfArgs = true;
+        }
+        while (!endOfArgs) {
+            Ast id = ctx.getChild(count).accept(this);
+            ist.addID(id);
+            count+=2;
+
+            Ast expr = ctx.getChild(count).accept(this);
+            ist.addExpr(expr);
+            count++;
+
+            txt = ctx.getChild(count).getText();
+            if (txt.equals(",")) {
+                count++;
+            } else{
+                endOfArgs = true;
+                count++;
+            }
+
+        }
+        return ist;
+
     }
 
     @Override
@@ -218,6 +257,10 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             Ast branch = ctx.getChild(1).accept(this);
             if (branch instanceof AppelFonction) {
                 ((AppelFonction) branch).setId(child);
+                return branch;
+            }
+            else if (branch instanceof InstanciationType) {
+                ((InstanciationType) branch).setId(child);
                 return branch;
             }
         }

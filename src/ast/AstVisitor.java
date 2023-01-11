@@ -14,7 +14,7 @@ public interface AstVisitor<T> {
 	public T visit(Negation a);
 	public T visit(ID a);
 	public T visit(Int a);
-	public T visit(ExprValeur a);
+	public T visit(ExpressionIdentifiant a);
 	public T visit(AppelFonction a);
 	public T visit(ArgFonction a);
 	public T visit(IfThenElse a);
@@ -32,4 +32,5 @@ public interface AstVisitor<T> {
 	public T visit(ChaineChr a);
 	public T visit(Nil a);
 	public T visit(Break a);
+	public T visit(InstanciationType a);
 }
