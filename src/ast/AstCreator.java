@@ -46,6 +46,8 @@ import parser.exprParser.DeclarationFonctionContext;
 import parser.exprParser.ChaineChrContext;
 import parser.exprParser.BreakContext;
 import parser.exprParser.InstanciationTypeContext;
+import parser.exprParser.ListeAccesContext;
+import st.*;
 
 public class AstCreator extends exprBaseVisitor<Ast> {
     private SymbolLookup table;
@@ -260,9 +262,135 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             } else if (branch instanceof InstanciationType) {
                 ((InstanciationType) branch).setId(child);
                 return branch;
+            } else if (branch instanceof ListeAcces) {
+                ((ListeAcces) branch).setId(child);
+                return branch;
             }
         }
         return child;
+    }
+
+
+    @Override
+    public Ast visitListeAcces(ListeAccesContext ctx) {
+        Ast retour;
+        String text = ctx.getChild(0).getText();
+        int countmax = ctx.getChildCount();
+        int count = 1;
+        if (text.equals(".")) {
+            ListeAcces listeacces = new ListeAcces();
+            listeacces.setisExpressionArray(false);
+            Ast champ = ctx.getChild(count).accept(this);
+            AccesChamp acceschamp = new AccesChamp();
+            acceschamp.setChild(champ);
+            acceschamp.setisArrayAccess(false);
+            listeacces.addAccesChamp(acceschamp);
+            count ++;
+            boolean endOfArgs = false;
+            if (count >= countmax){
+                endOfArgs = true;
+            }
+            while(!endOfArgs){
+                String text2 = ctx.getChild(count).getText();
+                if (text2.equals(".")){
+                    count ++;
+                    Ast champ2 = ctx.getChild(count).accept(this);
+                    AccesChamp acceschamp2 = new AccesChamp();
+                    acceschamp2.setChild(champ2);
+                    acceschamp2.setisArrayAccess(false);
+                    listeacces.addAccesChamp(acceschamp2);
+                    count ++;
+                }
+                else if (text2.equals("[")){
+                    count ++;
+                    Ast index = ctx.getChild(count).accept(this);
+                    AccesChamp acceschamp2 = new AccesChamp();
+                    acceschamp2.setChild(index);
+                    acceschamp2.setisArrayAccess(true);
+                    listeacces.addAccesChamp(acceschamp2);
+                    count ++;
+                    count ++;
+                }
+                else{
+                    endOfArgs = true;
+                }
+                if (count >= countmax){
+                    endOfArgs = true;
+                }
+
+            }
+            retour = listeacces;
+        }
+        else if (text.equals("[")) {
+            Ast expression = ctx.getChild(count).accept(this);
+            ListeAcces listeacces = new ListeAcces();
+            listeacces.setisExpressionArray(false);
+            count += 2;
+            if (count >= countmax){
+                AccesChamp acceschamp = new AccesChamp();
+                acceschamp.setChild(expression);
+                acceschamp.setisArrayAccess(true);
+                listeacces.addAccesChamp(acceschamp);
+                retour = listeacces;
+            }
+            else {
+                String text3 = ctx.getChild(count).getText();
+                if (text3.equals("of")){
+                    listeacces.setisExpressionArray(true);
+                    listeacces.setExpressionArray(new ExpressionArray());
+                    listeacces.getExpressionArray().setSize(expression);
+                    count ++;
+                    Ast expression2 = ctx.getChild(count).accept(this);
+                    listeacces.getExpressionArray().setExpr(expression2);
+
+                    retour = listeacces;
+                }
+                else{
+                    AccesChamp acceschamp = new AccesChamp();
+                    acceschamp.setChild(expression);
+                    acceschamp.setisArrayAccess(true);
+                    listeacces.addAccesChamp(acceschamp);
+                    boolean endOfArgs = false;
+                    while(!endOfArgs){
+                        String text2 = ctx.getChild(count).getText();
+                        if (text2.equals(".")){
+                            count ++;
+                            Ast champ2 = ctx.getChild(count).accept(this);
+                            AccesChamp acceschamp2 = new AccesChamp();
+                            acceschamp2.setChild(champ2);
+                            acceschamp2.setisArrayAccess(false);
+                            listeacces.addAccesChamp(acceschamp2);
+                            count ++;
+                        }
+                        else if (text2.equals("[")){
+                            count ++;
+                            Ast index = ctx.getChild(count).accept(this);
+                            AccesChamp acceschamp2 = new AccesChamp();
+                            acceschamp2.setChild(index);
+                            acceschamp2.setisArrayAccess(true);
+                            listeacces.addAccesChamp(acceschamp2);
+                            count ++;
+                            count ++;
+                        }
+                        else{
+                            endOfArgs = true;
+                        }
+                        if (count >= countmax){
+                            endOfArgs = true;
+                        }
+        
+                    }
+                    retour = listeacces;
+
+                }
+            }
+
+            
+        }
+        else {
+            retour = null;
+        }
+        return retour;
     }
 
     @Override

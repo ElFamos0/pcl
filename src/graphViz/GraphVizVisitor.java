@@ -50,6 +50,10 @@ import ast.Soustraction;
 import ast.While;
 import ast.ChaineChr;
 import ast.InstanciationType;
+import ast.ListeAcces;
+import ast.ExpressionArray;
+import ast.AccesChamp;
+
 
 public class GraphVizVisitor implements AstVisitor<String> {
     private int state;
@@ -308,6 +312,52 @@ public class GraphVizVisitor implements AstVisitor<String> {
             this.addTransition(nodeIdentifier, leftState);
         }
 
+        return nodeIdentifier;
+    }
+
+    @Override
+    public String visit(ListeAcces listeacces){
+        String nodeIdentifier = this.nextState();
+        String id = listeacces.getId().accept(this);
+        this.addTransition(nodeIdentifier, id);
+        if (listeacces.getisExpressionArray()){
+            String expressionarray = listeacces.getExpressionArray().accept(this);
+            this.addTransition(nodeIdentifier, expressionarray);
+        }
+        else{
+            for(Ast accesChamp : listeacces.getAccesChamps()){
+                String accesChampState = accesChamp.accept(this);
+                this.addTransition(nodeIdentifier, accesChampState);
+            }
+        }
+        return nodeIdentifier;
+    }
+
+
+    @Override
+    public String visit(ExpressionArray expressionarray){
+        String nodeIdentifier = this.nextState();
+        String size = expressionarray.getSize().accept(this);
+        String expr = expressionarray.getExpr().accept(this);
+        this.addNode(nodeIdentifier, "ExpressionArray");
+        this.addTransition(nodeIdentifier, size);
+        this.addTransition(nodeIdentifier, expr);
+        return nodeIdentifier;
+    }
+
+
+    @Override
+    public String visit(AccesChamp accesChamp) {
+        String nodeIdentifier = this.nextState();
+        String child = accesChamp.getChild().accept(this);
+        if (accesChamp.getisArrayAccess()){
+            this.addNode(nodeIdentifier, "AccesArray");
+
+        }
+        else{
+            this.addNode(nodeIdentifier, "AccesChamp");
+        }
+        this.addTransition(nodeIdentifier, child);
         return nodeIdentifier;
     }
 
