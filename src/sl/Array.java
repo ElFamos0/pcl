@@ -1,4 +1,4 @@
-package st;
+package sl;
 
 public class Array extends Type {
     private Type type;

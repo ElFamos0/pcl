@@ -1,4 +1,4 @@
-package st;
+package sl;
 
 public class TypeInferer {
     public static Type inferType(SymbolLookup table, String expr) {

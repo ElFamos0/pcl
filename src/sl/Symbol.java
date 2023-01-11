@@ -1,4 +1,4 @@
-package st;
+package sl;
 
 public abstract class Symbol {
     private String name;

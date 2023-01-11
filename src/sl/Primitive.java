@@ -1,4 +1,4 @@
-package st;
+package sl;
 
 public class Primitive extends Type {
     private PrimitiveType type;

@@ -9,11 +9,9 @@ import org.antlr.v4.runtime.RecognitionException;
 
 import parser.*;
 import parser.exprParser.ProgramContext;
-
+import sl.*;
 import ast.*;
 import graphViz.GraphVizVisitor;
-
-import st.*;
 
 public class Main {
     public static void main(String[] args) {

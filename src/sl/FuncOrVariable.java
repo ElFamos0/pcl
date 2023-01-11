@@ -1,4 +1,4 @@
-package st;
+package sl;
 
 public abstract class FuncOrVariable extends Symbol {
     public FuncOrVariable(String name, Type type) {
