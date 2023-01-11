@@ -1,0 +1,17 @@
+   1) Operators
+
+Sur opérande +,-,*,/ : deux entiers de chaque côté. Division par 0.
+Sur opérande <,> =>, =< : deux entiers OU deux string 
+Sur opérande =, <> : deux objets du même type (qui doivent avoir une valeur !)
+
+("The logical operators & and | are lazy logical operators on
+integers. They do not evaluate their right argument if evaluating
+the left determines the result.")
+
+    2) Functions & Procedures
+
+Déclaration d'une fonction : nom de fonction ne doit pas être pris dans le scope (partagé avec le nom des variables mais pas celui des types !).
+                             Attention aux fonctions définies mutuellement récursives.
+                             Attention aux fonctions de base de tiger : print,printi,flush,.... cf manuel.
+Déclaration d'une fonction : le type des paramètres (et celui de retour pour les fonctions) doit exister. Aucun nom de paramètre en double.
+Appel d'une fonction :

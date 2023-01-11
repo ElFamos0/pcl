@@ -7,6 +7,15 @@ public class ExpressionArray implements Ast{
 
     Ast size;
     Ast expr;
+    Ast id;
+
+    public Ast getId() {
+        return id;
+    }
+
+    public void setId(Ast id) {
+        this.id = id;
+    }
 
     public ExpressionArray() {
     }

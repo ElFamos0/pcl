@@ -319,12 +319,15 @@ public class GraphVizVisitor implements AstVisitor<String> {
     public String visit(ListeAcces listeacces){
         String nodeIdentifier = this.nextState();
         String id = listeacces.getId().accept(this);
+        
         this.addTransition(nodeIdentifier, id);
         if (listeacces.getisExpressionArray()){
+            this.addNode(nodeIdentifier, "ExprArray");
             String expressionarray = listeacces.getExpressionArray().accept(this);
             this.addTransition(nodeIdentifier, expressionarray);
         }
         else{
+            this.addNode(nodeIdentifier, "AccèsChamps");
             for(Ast accesChamp : listeacces.getAccesChamps()){
                 String accesChampState = accesChamp.accept(this);
                 this.addTransition(nodeIdentifier, accesChampState);
@@ -351,11 +354,11 @@ public class GraphVizVisitor implements AstVisitor<String> {
         String nodeIdentifier = this.nextState();
         String child = accesChamp.getChild().accept(this);
         if (accesChamp.getisArrayAccess()){
-            this.addNode(nodeIdentifier, "AccesArray");
+            this.addNode(nodeIdentifier, "ArrayElt");
 
         }
         else{
-            this.addNode(nodeIdentifier, "AccesChamp");
+            this.addNode(nodeIdentifier, "Champ");
         }
         this.addTransition(nodeIdentifier, child);
         return nodeIdentifier;

@@ -264,7 +264,14 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 return branch;
             } else if (branch instanceof ListeAcces) {
                 ((ListeAcces) branch).setId(child);
-                return branch;
+				if(((ListeAcces) branch).getisExpressionArray()) {
+					((ListeAcces) branch).getExpressionArray().setId(child);
+					return ((ListeAcces) branch).getExpressionArray();
+				}
+				else {
+					return branch;
+				}
+                
             }
         }
         return child;
