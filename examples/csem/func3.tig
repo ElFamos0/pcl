@@ -1,0 +1,8 @@
+/* Test double déclaration d'une fonction / var */
+
+let
+    var a := 5
+    function a() : int = 3
+in  
+
+end

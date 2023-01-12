@@ -1,0 +1,8 @@
+/* Test double déclaration d'une fonction de base */
+
+let
+    function a() : int = 3
+    function print() : int = 3
+in  
+
+end

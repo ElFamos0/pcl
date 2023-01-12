@@ -1,0 +1,9 @@
+/* Test fonction param du mauvais type */
+
+let
+    function a(x:int, y:string) :int = 3
+in  
+
+a(3,3)
+
+end

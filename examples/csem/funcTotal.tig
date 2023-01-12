@@ -1,0 +1,28 @@
+/* La majorité des contrôles à tester sur les fonctions*/
+
+let
+    var d := 5
+    function c() : int = 3
+    function c() : int = 3
+    function print() : int = 3
+    function d() = 3
+    type type1 = int
+    function e(x : type1, y : type2 ) : int = 3
+    function f(x : int, x :string ) : int = 3
+    function g() : int = for i:= 0 to 10 do (3)
+    function h() : int = ("Ceci est un string")
+
+    function a1(x:int, y:string) :int = 3
+    var b1 :string := a1(3,"test")
+    function a2(x:int, y:string) = 3
+    var b2 :string := a2(3,"test")
+
+    function a(x:int, y:string) :string = b()
+    function b() : string = a(0,"")
+in  
+
+    notAFunction();
+    e(3,"Test",3);
+    e(3,3);
+    e(3)
+end

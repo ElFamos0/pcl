@@ -1,0 +1,8 @@
+/* Test procédure appelée sans retour de valeur*/
+
+let
+    function a(x:int, y:string) = 3
+    var b :string := a(3,"test")
+in  
+
+end

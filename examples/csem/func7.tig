@@ -1,0 +1,7 @@
+/* Test valeur renvoyée du bon type */
+
+let
+    function a() : int = ("Ceci est un string")
+in  
+
+end

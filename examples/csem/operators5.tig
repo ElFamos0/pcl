@@ -1,0 +1,8 @@
+/*Type différents pour le '=>'*/
+
+let
+    var x1 :string := "Non"
+    var x2 :int := 4
+in  
+    x1 >= x2
+end

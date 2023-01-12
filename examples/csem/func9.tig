@@ -1,0 +1,9 @@
+/* Test fonction trop de param */
+
+let
+    function a(x:int, y:string) :int = 3
+in  
+
+a(3,"Test",3)
+
+end

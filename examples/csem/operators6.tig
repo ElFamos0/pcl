@@ -1,0 +1,8 @@
+/*Erreur : x2 est nil, on peut pas la comparer*/
+
+let
+    var x1 :int := 5
+    var x2 :int := nil
+in  
+    x1 = x2
+end

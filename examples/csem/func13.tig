@@ -1,0 +1,8 @@
+/* Test appel avec pas assez de paramètres*/
+
+let
+    function a(x:int, y:string) :string = "3"
+    var b :string := a(3")
+in  
+
+end

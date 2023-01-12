@@ -1,0 +1,8 @@
+/* Test type des paramètres existe */
+
+let
+    type type1 = int
+    function a(x : type1, y :type2 ) : int = 3
+in  
+
+end

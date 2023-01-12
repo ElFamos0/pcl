@@ -1,0 +1,8 @@
+/* Test fonction retour du mauvais type à l'appel*/
+
+let
+    function a(x:int, y:string) :int = 3
+    var b :string := a(3,"test")
+in  
+
+end

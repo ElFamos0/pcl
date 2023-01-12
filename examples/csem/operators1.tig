@@ -1,0 +1,8 @@
+/* erreur de type sur + */
+
+let
+    var x1 :int := 5
+    var x2 :str := "Test"
+in  
+    x1 + x2
+end

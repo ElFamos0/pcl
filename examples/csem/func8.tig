@@ -1,0 +1,9 @@
+/* Test fonction non def à l'appel */
+
+let
+    function a(x:int, y:string) :int = 3
+in  
+
+notAFunction()
+
+end

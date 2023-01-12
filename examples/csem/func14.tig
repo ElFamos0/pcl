@@ -1,0 +1,9 @@
+/* Ce test ne renvoie pas d'erreur ! Les fonctions doivent se connaîtrent mutuellement*/
+
+let
+    function a(x:int, y:string) :string = b()
+        
+    function b() : string = a(0,"")
+in  
+
+end

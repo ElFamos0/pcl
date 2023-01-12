@@ -1,0 +1,19 @@
+/* Majorité des tests sur les opérateurs de base */
+
+let
+    type record1 = {test :int}
+    var x1 :int := 5
+    var x2 :str := "Test"
+    var x3 :int := nil
+    var x4 := record1{test = 0}
+    var x5 := 0
+    
+in  
+    x1 + x2;
+    x1 + for i:= 0 to 10 do (nil);
+    -x2;
+    x1 >= x2;
+    x1 = x3;
+    x1 = x4;
+    x1/x5
+end

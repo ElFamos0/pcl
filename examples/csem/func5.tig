@@ -1,0 +1,7 @@
+/* Test paramètre en double */
+
+let
+    function a(x : int, x :string ) : int = 3
+in  
+
+end

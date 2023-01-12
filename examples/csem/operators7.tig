@@ -1,0 +1,9 @@
+/*Même problème mais pour le '='*/
+
+let
+    type record1 = {test :int}
+    var x1 := record1 {test = 5}
+    var x2 :int := 5
+in  
+    x1 = x2
+end
