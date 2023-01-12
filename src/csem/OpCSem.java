@@ -2,8 +2,10 @@ package csem;
 
 import sl.SymbolLookup;
 import sl.TypeInferer;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+
 import ast.Int;
-import ast.Negation;
 import parser.exprParser.NegationContext;
 import sl.Primitive;
 
@@ -48,6 +50,44 @@ public class OpCSem {
         } else{ 
             if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))){
                 err.printError(a.ctx, "Not an integer");
+            }
+        }
+    }
+
+
+    public static void checkint(ParserRuleContext ctx, String left, String right, SymbolLookup table) {
+        CSemErrorFormatter err = new CSemErrorFormatter();
+        String split[] = left.split(":");
+
+        if (split.length == 1){
+            String s = split[0];
+            if(table.getSymbol(s) != null) {
+                if (!(table.getSymbol(s).getType().equals(new Primitive(Integer.class)))){
+                    err.printError(ctx, s+" is not an integer");
+                }
+            }
+            else{   
+                if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))){
+                    err.printError(ctx, s+" is not an integer");
+                }
+            }
+        }
+
+        if (right == null) {
+            return;
+        }
+        String split2[] = right.split(":");
+
+        if (split2.length == 1){
+            String s2 = split2[0];
+            if(table.getSymbol(s2) != null) {
+                if (!(table.getSymbol(s2).getType().equals(new Primitive(Integer.class)))){
+                    err.printError(ctx, s2+" is not an integer");
+                }
+            } else{ 
+                if (!(TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class)))){
+                    err.printError(ctx, s2+" is not an integer");
+                }
             }
         }
     }

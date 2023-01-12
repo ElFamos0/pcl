@@ -156,10 +156,10 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
             switch (operation) {
                 case "+":
-                    noeudTemporaire = new Addition(noeudTemporaire, right);
+                    noeudTemporaire = new Addition(ctx, noeudTemporaire, right);
                     break;
                 case "-":
-                    noeudTemporaire = new Soustraction(noeudTemporaire, right);
+                    noeudTemporaire = new Soustraction(ctx,noeudTemporaire, right);
                     break;
                 default:
                     break;
@@ -179,10 +179,10 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
             switch (operation) {
                 case "*":
-                    noeudTemporaire = new Multiplication(noeudTemporaire, right);
+                    noeudTemporaire = new Multiplication(ctx,noeudTemporaire, right);
                     break;
                 case "/":
-                    noeudTemporaire = new Division(noeudTemporaire, right);
+                    noeudTemporaire = new Division(ctx,noeudTemporaire, right);
                     break;
                 default:
                     break;
@@ -210,7 +210,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitNegation(NegationContext ctx) {
-        return new Negation(ctx.getChild(1).accept(this));
+        return new Negation(ctx,ctx.getChild(1).accept(this));
     }
 
     @Override

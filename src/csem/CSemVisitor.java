@@ -59,6 +59,8 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(Addition a) {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        OpCSem.checkint(a.ctx, left, right, table);
 
         return left + ":" + right;
     }
@@ -69,6 +71,10 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
 
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        OpCSem.checkint(a.ctx, left, right, table);
+
+
         return left + ":" + right;
     }
 
@@ -76,6 +82,9 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(Multiplication a) {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
+
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        OpCSem.checkint(a.ctx, left, right, table);
 
         return left + ":" + right;
     }
@@ -85,10 +94,14 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
 
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        OpCSem.checkint(a.ctx, left, right, table);
+
         // check division by zero
 
         if (right.equals("0")) {
-            System.out.println("Division by zero");
+            CSemErrorFormatter csemErrorFormatter = new CSemErrorFormatter();
+            csemErrorFormatter.printError(a.ctx, "Division by zero");
         }
 
         return left + ":" + right;
@@ -108,6 +121,10 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(Negation a) {
+        String left = a.expression.accept(this);
+        String right = null;
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        OpCSem.checkint(a.ctx, left, right, table);
         return a.expression.accept(this);
     }
 
