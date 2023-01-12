@@ -54,7 +54,6 @@ import ast.ListeAcces;
 import ast.ExpressionArray;
 import ast.AccesChamp;
 
-
 public class GraphVizVisitor implements AstVisitor<String> {
     private int state;
     private String nodeBuffer;
@@ -122,14 +121,14 @@ public class GraphVizVisitor implements AstVisitor<String> {
     }
 
     @Override
-    public String visit(InstanciationType instantiation){
+    public String visit(InstanciationType instantiation) {
         String nodeIdentifier = this.nextState();
         this.addNode(nodeIdentifier, "InstanciationType");
         String idvar = instantiation.getId().accept(this);
         this.addTransition(nodeIdentifier, idvar);
         ArrayList<Ast> identifiants = instantiation.getIdentifiants();
         ArrayList<Ast> expressions = instantiation.getExpressions();
-        for (int i=0; i<identifiants.size(); i++){
+        for (int i = 0; i < identifiants.size(); i++) {
             String id = identifiants.get(i).accept(this);
             this.addTransition(nodeIdentifier, id);
             String expr = expressions.get(i).accept(this);
@@ -316,19 +315,18 @@ public class GraphVizVisitor implements AstVisitor<String> {
     }
 
     @Override
-    public String visit(ListeAcces listeacces){
+    public String visit(ListeAcces listeacces) {
         String nodeIdentifier = this.nextState();
         String id = listeacces.getId().accept(this);
-        
+
         this.addTransition(nodeIdentifier, id);
-        if (listeacces.getisExpressionArray()){
+        if (listeacces.getisExpressionArray()) {
             this.addNode(nodeIdentifier, "ExprArray");
             String expressionarray = listeacces.getExpressionArray().accept(this);
             this.addTransition(nodeIdentifier, expressionarray);
-        }
-        else{
+        } else {
             this.addNode(nodeIdentifier, "AccèsChamps");
-            for(Ast accesChamp : listeacces.getAccesChamps()){
+            for (Ast accesChamp : listeacces.getAccesChamps()) {
                 String accesChampState = accesChamp.accept(this);
                 this.addTransition(nodeIdentifier, accesChampState);
             }
@@ -336,9 +334,8 @@ public class GraphVizVisitor implements AstVisitor<String> {
         return nodeIdentifier;
     }
 
-
     @Override
-    public String visit(ExpressionArray expressionarray){
+    public String visit(ExpressionArray expressionarray) {
         String nodeIdentifier = this.nextState();
         String id = expressionarray.getId().accept(this);
         String size = expressionarray.getSize().accept(this);
@@ -350,16 +347,14 @@ public class GraphVizVisitor implements AstVisitor<String> {
         return nodeIdentifier;
     }
 
-
     @Override
     public String visit(AccesChamp accesChamp) {
         String nodeIdentifier = this.nextState();
         String child = accesChamp.getChild().accept(this);
-        if (accesChamp.getisArrayAccess()){
+        if (accesChamp.getisArrayAccess()) {
             this.addNode(nodeIdentifier, "ArrayElt");
 
-        }
-        else{
+        } else {
             this.addNode(nodeIdentifier, "Champ");
         }
         this.addTransition(nodeIdentifier, child);
@@ -477,7 +472,7 @@ public class GraphVizVisitor implements AstVisitor<String> {
     }
 
     @Override
-    public String visit(DeclarationType a){
+    public String visit(DeclarationType a) {
         String nodeIdentifier = this.nextState();
         this.addNode(nodeIdentifier, "Declaration Type");
         String nameState = a.id.accept(this);

@@ -9,6 +9,8 @@ public abstract class Symbol {
         this.type = type;
     }
 
+    public abstract String toString();
+
     public String getName() {
         return name;
     }

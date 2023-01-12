@@ -6,10 +6,12 @@ import ast.*;
 import sl.SymbolLookup;
 
 public class CSemVisitor implements AstVisitor<String> {
-    SymbolLookup table;
+    private SymbolLookup table;
+    private int region;
 
     public CSemVisitor(SymbolLookup table) {
         this.table = table;
+        region = 0;
     }
 
     @Override
@@ -87,28 +89,26 @@ public class CSemVisitor implements AstVisitor<String> {
             ast.accept(this);
         }
 
-        return null;
+        return a.nom;
     }
 
     @Override
     public String visit(Negation a) {
-        a.expression.accept(this);
-
-        return null;
+        return a.expression.accept(this);
     }
 
     @Override
     public String visit(ID a) {
         String idf = a.nom;
 
-        return null;
+        return idf;
     }
 
     @Override
     public String visit(Int a) {
         String val = String.valueOf(a.valeur);
 
-        return null;
+        return val;
     }
 
     @Override
@@ -139,47 +139,67 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(IfThenElse a) {
+        int temp = region;
+        region++;
         a.condition.accept(this);
         a.thenBlock.accept(this);
         a.elseBlock.accept(this);
+
+        region = temp;
 
         return null;
     }
 
     @Override
     public String visit(IfThen a) {
+        int temp = region;
+        region++;
         a.condition.accept(this);
         a.thenBlock.accept(this);
+
+        region = temp;
 
         return null;
     }
 
     @Override
     public String visit(While a) {
+        int temp = region;
+        region++;
         a.condition.accept(this);
         a.block.accept(this);
+
+        region = temp;
 
         return null;
     }
 
     @Override
     public String visit(For a) {
+        int temp = region;
+        region++;
         a.start.accept(this);
         a.startValue.accept(this);
         a.endValue.accept(this);
         a.block.accept(this);
+
+        region = temp;
 
         return null;
     }
 
     @Override
     public String visit(Definition a) {
+        int temp = region;
+        region++;
         for (Ast ast : a.declarations) {
             ast.accept(this);
         }
         for (Ast ast : a.exprs) {
             ast.accept(this);
         }
+
+        region = temp;
 
         return null;
     }
@@ -194,16 +214,12 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(DeclarationTypeClassique a) {
-        a.id.accept(this);
-
-        return null;
+        return a.id.accept(this);
     }
 
     @Override
     public String visit(DeclarationArrayType a) {
-        a.id.accept(this);
-
-        return null;
+        return a.id.accept(this);
     }
 
     @Override
@@ -216,20 +232,29 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(DeclarationChamp a) {
-        a.id.accept(this);
-        a.type.accept(this);
+        String idf = a.id.accept(this);
+        String type = a.type.accept(this);
 
-        return null;
+        return idf + ":" + type;
     }
 
     @Override
     public String visit(DeclarationFonction a) {
-        a.id.accept(this);
-        for (Ast ast : a.args)
-            ast.accept(this);
+        int temp = region;
+        region++;
+        String idf = a.id.accept(this);
+        for (Ast ast : a.args) {
+            String field = ast.accept(this);
+            String[] split = field.split(":");
+            FuncCSem.checkArgs(split[0], split[1], table.getSymbolLookup(region));
+        }
         if (a.has_return)
             a.return_type.accept(this);
         a.expr.accept(this);
+
+        FuncCSem.checkFuncFromLib(idf);
+
+        region = temp;
 
         return null;
     }
@@ -248,14 +273,14 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(ChaineChr a) {
         String val = a.valeur;
 
-        return null;
+        return val;
     }
 
     @Override
     public String visit(Nil a) {
         String val = "nil";
 
-        return null;
+        return val;
     }
 
     @Override

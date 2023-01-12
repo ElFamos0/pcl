@@ -21,6 +21,10 @@ public class SymbolLookup {
         funcAndVar = new HashMap<String, Symbol>();
         types = new HashMap<String, Type>();
         children = new ArrayList<SymbolLookup>();
+
+        if (parent == null) {
+            initLib();
+        }
     }
 
     public SymbolLookup getSymbolLookup(int region) {
@@ -48,7 +52,13 @@ public class SymbolLookup {
     }
 
     public Type getType(String name) {
-        return types.get(name);
+        if (types.containsKey(name)) {
+            return types.get(name);
+        } else if (parent != null) {
+            return parent.getType(name);
+        } else {
+            return null;
+        }
     }
 
     public int getScope() {
@@ -84,14 +94,20 @@ public class SymbolLookup {
             // Get the last children
             ((Function) s).setTable(getChildren(-1));
         }
-        funcAndVar.put(s.getName(), s);
+        Symbol temp = funcAndVar.put(s.getName(), s);
+        if (temp != null) {
+            System.out.println("Error: " + s.toString() + " " + s.getName() + " already exists");
+        }
     }
 
     public void addSymbolParam(Variable s) {
         ((Variable) s).setOffset(paramOffset);
         paramOffset -= s.getType().getSize();
 
-        funcAndVar.put(s.getName(), s);
+        Symbol temp = funcAndVar.put(s.getName(), s);
+        if (temp != null) {
+            System.out.println("Error: arg " + s.getName() + " already exists");
+        }
     }
 
     public void addType(String key, Type t) {
@@ -101,5 +117,12 @@ public class SymbolLookup {
     public void addChildren() {
         SymbolLookup child = new SymbolLookup(this);
         children.add(child);
+    }
+
+    private void initLib() {
+        funcAndVar.put("print", new Function("print", new Primitive(Void.class)));
+        types.put("int", new Primitive(Integer.class));
+        types.put("string", new Array(new Primitive(Character.class)));
+        types.put("void", new Primitive(Void.class));
     }
 }

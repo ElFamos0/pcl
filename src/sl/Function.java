@@ -26,4 +26,8 @@ public class Function extends FuncOrVariable {
     public boolean isNative() {
         return table.getParent() == null;
     }
+
+    public String toString() {
+        return "function";
+    }
 }

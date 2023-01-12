@@ -9,6 +9,7 @@ import parser.*;
 import parser.exprParser.ProgramContext;
 import sl.*;
 import ast.*;
+import csem.CSemVisitor;
 import graphViz.GraphVizVisitor;
 
 public class Main {
@@ -43,6 +44,10 @@ public class Main {
             // Visiteur de représentation graphique + appel
             GraphVizVisitor graphViz = new GraphVizVisitor();
             ast.accept(graphViz);
+
+            // Controle semantique
+            CSemVisitor csem = new CSemVisitor(table);
+            ast.accept(csem);
 
             graphViz.dumpGraph("./out/tree.dot");
 

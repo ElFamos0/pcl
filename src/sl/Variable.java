@@ -14,4 +14,8 @@ public class Variable extends FuncOrVariable {
     public void setOffset(int offset) {
         this.offset = offset;
     }
+
+    public String toString() {
+        return "variable";
+    }
 }
