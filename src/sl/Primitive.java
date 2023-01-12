@@ -44,4 +44,15 @@ public class Primitive extends Type {
                 return null;
         }
     }
+
+    @Override
+    public boolean equals(Type t) {
+        System.out.println(t);
+        if (t instanceof Primitive) {
+            Primitive p = (Primitive) t;
+            System.out.println(p.getType() + " " + type);
+            return p.getType() == type;
+        }
+        return false;
+    }
 }

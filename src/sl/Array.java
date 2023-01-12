@@ -15,4 +15,12 @@ public class Array extends Type {
         // Array size is 8 because it is a ptr to the heap
         return 8;
     }
+
+    public boolean equals(Type t) {
+        if (t instanceof Array) {
+            Array a = (Array) t;
+            return a.getType().equals(type);
+        }
+        return false;
+    }
 }

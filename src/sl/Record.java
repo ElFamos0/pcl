@@ -33,4 +33,20 @@ public class Record extends Type {
         }
         return size;
     }
+
+    public boolean equals(Type t) {
+        if (t instanceof Record) {
+            Record r = (Record) t;
+            if (r.getFields().size() != fields.size()) {
+                return false;
+            }
+            for (int i = 0; i < fields.size(); i++) {
+                if (!fields.get(i).getType().equals(r.getFields().get(i).getType())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 }
