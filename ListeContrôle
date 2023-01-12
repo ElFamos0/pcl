@@ -1,0 +1,92 @@
+   1) Operators
+
+Sur opérande +,-,*,/ : deux entiers de chaque côté. Division par 0 interdite.
+Sur opérande <,> =>, =< : deux entiers OU deux string 
+Sur opérande =, <> : deux objets du même type (qui doivent avoir une valeur !)
+
+("The logical operators & and | are lazy logical operators on
+integers. They do not evaluate their right argument if evaluating
+the left determines the result.")
+
+    2) Functions & Procedures
+
+Déclaration d'une fonction : nom de fonction ne doit pas être pris dans le scope (partagé avec le nom des variables mais pas celui des types !).
+                             Attention aux fonctions définies mutuellement récursives.
+                             Attention aux fonctions de base de tiger : print,printi,flush,.... cf manuel.
+Déclaration d'une fonction : le type des paramètres (et celui de retour pour les fonctions) doit exister. Aucun nom de paramètre en double. Le type de retour de la fonction est bien cohérent avec la valeur renvoyée à la fin de la fonction.
+
+Appel d'une fonction / procédure : la fonction doit être définie dans ce scope, on doit lui fournir le bon nombre de paramètres et ils doivent être du bon type / exister (variable définies). Si c'est une fonction : le retour d'une valeur doit être justifié à cet endroit, et le type doit correspondre. Sinon, on doit s'assurer qu'aucune valeur ne devait être renvoyée.
+(Ex : var x :int := add(5,4) est good si add renvoit un int, mais var x :int := print(5) marche pas car print ne renvoie rien)
+
+Les fonctions de base (print,....) existent et doivent être reconnues à tout moment
+
+    3) Variables
+
+Déclaration d'une variable : le nom doit être libre dans le scope actuel (Attention, l'espace de noms des types et des variables est séparé, mais celui des variables et des fonctions est commun : si x est un type, alors x peut être une variable (ou une fonction), mais si x est une fonction, x ne peut pas être une variable).
+Déclaration d'une variable : le membre droit de la déclaration doit renvoyer une valeur. De plus, si le type de la variable a été précisé, alors cette valeur doit être du bon type (ex : var x :string := 9  doit renvoyer une erreur, mais var x := 9 est good). Une variable, lorsque déclarée, doit toujours recevoir une valeur d'initialisation ! (nil si besoin, cf pt suivant)
+Utilisation d'une variable : On doit vérifier que la variable existe dans le scope où elle est appelée, et que son type correspond à ce qui est souhaité à cet endroit (si on voulait une valeur à cet endroit).
+
+    3.5) nil
+
+
+    Peut être assigné à n'importe quel variable / champ à la déclaration. 
+    Peut être utilisé partout où l'on a besoin d'une valeur et son type peut être déterminé : 
+        var a : rec := nil   ou a := nil (a déjà def avant)           
+        if a <> nil then ... if a = nil then ...
+        function f(p: rec) = f(nil)
+
+        MAIS 
+        var a := nil  ou if nil = nil then interdits (on peut pas connaître le type de nil)
+    
+    L'accès à un champ dont la valeur est nil cause une erreur (d'éxécution).
+
+
+
+    4) Types custom
+
+Les types ont un espace de nom propres à eux
+Déclaration d'un type custom : "'type' type-id = type"
+    type-id ne doit pas être un nom de type utilisé dans le scope
+    le membre droit peut être : 
+        un type qui existe déjà (ex : type newInt = int OK, mais type newFloat = float --> erreur si le type 'float' n'est pas def avant) -> à check via contrôle sémantique
+        un {type-fields *}, où chaque type-field est de la forme "id : type-id" 
+            type-id est un nom de type déjà connu dans le scope (types mutuellement et récusrivement def autorisés)
+            id est un nom de champ (var) non déjà pris par un autre champ du type que l'on définit
+        un 'array of type-id' -> type-id doit être un type qui existe déjà (types mutuellement et récusrivement def autorisés)
+
+        Ex de types mutuellement et récursivement def : 
+            let 
+            type t1 = {champ1 : t2, champ2 : int}
+            type t2 = {champ1 : t1, champ2 : int}
+            var a :t1 := {champ1 = nil, champ2 = 3};
+            var b :t2 := {champ1 = a, champ2 = 5};
+            in
+            a.champ1 := b
+            end
+        si on a le temps on fera les contrôles sémantiques pour ça mais c'est vraiment les plus chiant
+
+Déclaration d'une var associée à un type custom : 
+    Ex : let
+         type t1 = {champ1 : int, champ2 :string}
+         var a:t1 := {champ1 = 3, champ2 = "test};
+         var b:t1 := {champ2 = "test", champ1 = 3}
+         in 
+         
+         end
+
+
+
+    5) Array
+
+    6) If
+
+    7) For
+
+    8) While
+
+    8.5) Break
+
+    9) Let ... in ... end
+
+    10) expr-seq
+

@@ -33,4 +33,7 @@ public interface AstVisitor<T> {
 	public T visit(Nil a);
 	public T visit(Break a);
 	public T visit(InstanciationType a);
+	public T visit(ListeAcces a);
+	public T visit(ExpressionArray a);
+	public T visit(AccesChamp a);
 }

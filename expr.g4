@@ -58,8 +58,7 @@ expressionValeur
 
 expressionValeur2
 : '(' ( expression ( ',' expression )* )? ')'                                                #AppelFonction
-| '[' expression ']' ( ( '[' expression ']' | '.' identifiant )* | 'of' expressionUnaire )   #ExpressionItem
-| '.' identifiant ( '[' expression ']' | '.' identifiant )*                                  #ExpressionChamps
+| ('[' expression ']'('of' expressionUnaire | ('.' identifiant | '[' expression ']')*) | '.' identifiant('.' identifiant | '[' expression ']')*) #ListeAcces
 | '{' ( identifiant '=' expression ( ',' identifiant '=' expression )* )? '}'                #InstanciationType
 ;
 

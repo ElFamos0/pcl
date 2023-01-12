@@ -195,4 +195,22 @@ public class AstVisitor implements ast.AstVisitor<String> {
         return null;
     }
 
+    @Override
+    public String visit(AccesChamp a) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(ExpressionArray a) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(ListeAcces a) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
