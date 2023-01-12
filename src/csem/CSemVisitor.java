@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import ast.*;
 import sl.SymbolLookup;
+import sl.Type;
+import sl.TypeInferer;
 
 public class CSemVisitor implements AstVisitor<String> {
     private SymbolLookup table;
@@ -22,9 +24,10 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(Expression a) {
-        a.left.accept(this);
-        a.right.accept(this);
-        return null;
+        String left = a.left.accept(this);
+        String right = a.right.accept(this);
+
+        return left + ":" + right;
     }
 
     @Override
@@ -53,26 +56,26 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(Addition a) {
-        a.left.accept(this);
-        a.right.accept(this);
+        String left = a.left.accept(this);
+        String right = a.right.accept(this);
 
-        return null;
+        return left + ":" + right;
     }
 
     @Override
     public String visit(Soustraction a) {
-        a.left.accept(this);
-        a.right.accept(this);
+        String left = a.left.accept(this);
+        String right = a.right.accept(this);
 
-        return null;
+        return left + ":" + right;
     }
 
     @Override
     public String visit(Multiplication a) {
-        a.left.accept(this);
-        a.right.accept(this);
+        String left = a.left.accept(this);
+        String right = a.right.accept(this);
 
-        return null;
+        return left + ":" + right;
     }
 
     @Override
@@ -85,11 +88,14 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(Sequence a) {
+        String seq = "";
         for (Ast ast : a.seqs) {
-            ast.accept(this);
+            seq += ast.accept(this) + ":";
         }
 
-        return a.nom;
+        // Return the last expression
+        // Because this is the only one to infer the type
+        return seq.substring(0, seq.length() - 1);
     }
 
     @Override
@@ -242,15 +248,21 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(DeclarationFonction a) {
         int temp = region;
         region++;
+        SymbolLookup table = this.table.getSymbolLookup(region);
         String idf = a.id.accept(this);
         for (Ast ast : a.args) {
             String field = ast.accept(this);
             String[] split = field.split(":");
-            FuncCSem.checkArgs(split[0], split[1], table.getSymbolLookup(region));
+            FuncCSem.checkArgs(split[0], split[1], table);
         }
         if (a.has_return)
             a.return_type.accept(this);
-        a.expr.accept(this);
+
+        Type t = TypeInferer.inferType(table, a.expr.accept(this));
+        Type f = table.getSymbol(idf).getType();
+
+        if (!t.equals(f))
+            System.out.println("Type mismatch in function " + idf + " : " + t + " != " + f);
 
         FuncCSem.checkFuncFromLib(idf);
 

@@ -29,6 +29,10 @@ public class Primitive extends Type {
         return type;
     }
 
+    public boolean isChar() {
+        return type == PrimitiveType.CHAR;
+    }
+
     public Integer getSize() {
         switch (type) {
             case INT:
@@ -52,5 +56,20 @@ public class Primitive extends Type {
             return p.getType() == type;
         }
         return false;
+    }
+
+    public String toString() {
+        switch (type) {
+            case INT:
+                return "int";
+            case CHAR:
+                return "char";
+            case BOOL:
+                return "bool";
+            case VOID:
+                return "void";
+            default:
+                return null;
+        }
     }
 }

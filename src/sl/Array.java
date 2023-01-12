@@ -23,4 +23,14 @@ public class Array extends Type {
         }
         return false;
     }
+
+    public String toString() {
+        if (type instanceof Primitive) {
+            Primitive p = (Primitive) type;
+            if (p.isChar())
+                return "string";
+        }
+
+        return "array of " + type.toString() + "s";
+    }
 }

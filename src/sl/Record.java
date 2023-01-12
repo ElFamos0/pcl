@@ -49,4 +49,14 @@ public class Record extends Type {
         }
         return false;
     }
+
+    public String toString() {
+        String s = "record {";
+        for (Symbol field : fields) {
+            s += field.toString() + ", ";
+        }
+        s = s.substring(0, s.length() - 2);
+        s += "}";
+        return s;
+    }
 }
