@@ -9,7 +9,7 @@ public class DeclarationRecordType implements Ast{
 		return visitor.visit(this);
 	}
     
-    public Ast id;
+    // public Ast id;
     public ArrayList<Ast> champs = new ArrayList<Ast>();
 
 
@@ -17,9 +17,9 @@ public class DeclarationRecordType implements Ast{
         this.champs = new ArrayList<Ast>();
     }
 
-    public void setId(Ast id) {
-        this.id = id;
-    }
+    // public void setId(Ast id) {
+    //     this.id = id;
+    // }
 
     public void addChamp(Ast champ) {
         this.champs.add(champ);
