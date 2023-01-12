@@ -6,6 +6,7 @@ import ast.*;
 import sl.SymbolLookup;
 import sl.Type;
 import sl.TypeInferer;
+import sl.Primitive;
 
 public class CSemVisitor implements AstVisitor<String> {
     private SymbolLookup table;
@@ -59,8 +60,36 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
 
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        String split[] = left.split(":");
+
+        if (split.length == 1){
+            String s = split[0];
+        if(table.getSymbol(s) != null) {
+            if (!(table.getSymbol(s).getType().equals(new Primitive(Integer.class)))){
+                System.out.println("Symbol " + s + " is not an integer");
+            }
+        }
+        else{ 
+            if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))){
+                System.out.println("Symbol " + s + " is not an integer");
+            }
+        }
+    }
+
+        if(table.getSymbol(right) != null) {
+            if (!(table.getSymbol(right).getType().equals(new Primitive(Integer.class)))){
+                System.out.println("Symbol " + right + " is not an integer");
+            }
+        }
+        else{ 
+            if (!(TypeInferer.inferType(table, right).equals(new Primitive(Integer.class)))){
+                System.out.println("Symbol " + right + " is not an integer");
+            }
+        }
         return left + ":" + right;
     }
+
 
     @Override
     public String visit(Soustraction a) {
