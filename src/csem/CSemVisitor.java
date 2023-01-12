@@ -1,214 +1,221 @@
 package csem;
 
 import ast.*;
+import sl.SymbolLookup;
 
-public class AstVisitor implements ast.AstVisitor<String> {
+public class CSemVisitor implements AstVisitor<Void> {
+    SymbolLookup table;
+
+    public CSemVisitor(SymbolLookup table) {
+        this.table = table;
+    }
+
     @Override
-    public String visit(Program a) {
+    public Void visit(Program a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Expression a) {
+    public Void visit(Expression a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Ou a) {
+    public Void visit(Ou a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Et a) {
+    public Void visit(Et a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Compar a) {
+    public Void visit(Compar a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Addition a) {
+    public Void visit(Addition a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Soustraction a) {
+    public Void visit(Soustraction a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Multiplication a) {
+    public Void visit(Multiplication a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Division a) {
+    public Void visit(Division a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Sequence a) {
+    public Void visit(Sequence a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Negation a) {
+    public Void visit(Negation a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(ID a) {
+    public Void visit(ID a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Int a) {
+    public Void visit(Int a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(ExpressionIdentifiant a) {
+    public Void visit(ExpressionIdentifiant a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(AppelFonction a) {
+    public Void visit(AppelFonction a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(ArgFonction a) {
+    public Void visit(ArgFonction a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(IfThenElse a) {
+    public Void visit(IfThenElse a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(IfThen a) {
+    public Void visit(IfThen a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(While a) {
+    public Void visit(While a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(For a) {
+    public Void visit(For a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Definition a) {
+    public Void visit(Definition a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(DeclarationType a) {
+    public Void visit(DeclarationType a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(DeclarationTypeClassique a) {
+    public Void visit(DeclarationTypeClassique a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(DeclarationArrayType a) {
+    public Void visit(DeclarationArrayType a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(DeclarationRecordType a) {
+    public Void visit(DeclarationRecordType a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(DeclarationChamp a) {
+    public Void visit(DeclarationChamp a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(DeclarationFonction a) {
+    public Void visit(DeclarationFonction a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(DeclarationValeur a) {
+    public Void visit(DeclarationValeur a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(ChaineChr a) {
+    public Void visit(ChaineChr a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Nil a) {
+    public Void visit(Nil a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(Break a) {
+    public Void visit(Break a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(InstanciationType a) {
+    public Void visit(InstanciationType a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(AccesChamp a) {
+    public Void visit(AccesChamp a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(ExpressionArray a) {
+    public Void visit(ExpressionArray a) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String visit(ListeAcces a) {
+    public Void visit(ListeAcces a) {
         // TODO Auto-generated method stub
         return null;
     }
