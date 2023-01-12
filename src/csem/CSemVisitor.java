@@ -61,32 +61,8 @@ public class CSemVisitor implements AstVisitor<String> {
         String right = a.right.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
-        String split[] = left.split(":");
+        OpCSem.checkint(left, right, table);
 
-        if (split.length == 1){
-            String s = split[0];
-        if(table.getSymbol(s) != null) {
-            if (!(table.getSymbol(s).getType().equals(new Primitive(Integer.class)))){
-                System.out.println("Symbol " + s + " is not an integer");
-            }
-        }
-        else{ 
-            if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))){
-                System.out.println("Symbol " + s + " is not an integer");
-            }
-        }
-    }
-
-        if(table.getSymbol(right) != null) {
-            if (!(table.getSymbol(right).getType().equals(new Primitive(Integer.class)))){
-                System.out.println("Symbol " + right + " is not an integer");
-            }
-        }
-        else{ 
-            if (!(TypeInferer.inferType(table, right).equals(new Primitive(Integer.class)))){
-                System.out.println("Symbol " + right + " is not an integer");
-            }
-        }
         return left + ":" + right;
     }
 
@@ -96,6 +72,9 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
 
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        OpCSem.checkint(left, right, table);
+
         return left + ":" + right;
     }
 
@@ -104,13 +83,20 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
 
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        OpCSem.checkint(left, right, table);
+
         return left + ":" + right;
     }
 
     @Override
     public String visit(Division a) {
-        a.left.accept(this);
-        a.right.accept(this);
+        String left = a.left.accept(this);
+        String right = a.right.accept(this);
+
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        OpCSem.checkint(left, right, table);
+
 
         return null;
     }
