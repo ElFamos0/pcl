@@ -17,7 +17,7 @@ public class OpCSem {
         }
         else{ 
             if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))){
-                System.out.println("Symbol " + s + " is not an integer");
+                System.out.println("Value : " + s + " is not an integer");
             }
         }
     }
@@ -29,12 +29,12 @@ public class OpCSem {
         String s2 = split2[0];
         if(table.getSymbol(s2) != null) {
             if (!(table.getSymbol(s2).getType().equals(new Primitive(Integer.class)))){
-                System.out.println("Symbol " + s2 + " is not an integer");
+                System.out.println("Symbol : " + s2 + " is not an integer");
             }
         }
         else{ 
             if (!(TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class)))){
-                System.out.println("Symbol" + s2 + " is not an integer");
+                System.out.println("Value : " + s2 + " is not an integer");
             }
         }
     }

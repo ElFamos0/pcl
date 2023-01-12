@@ -4,5 +4,5 @@ let
     var x1 :int := 5
     var x2 :str := "Test"
 in  
-    x1 + x2 * 8 / feur
+    x1 + x2 * 8 + bonsoir / feur
 end
