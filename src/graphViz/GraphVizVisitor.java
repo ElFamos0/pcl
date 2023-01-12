@@ -340,9 +340,11 @@ public class GraphVizVisitor implements AstVisitor<String> {
     @Override
     public String visit(ExpressionArray expressionarray){
         String nodeIdentifier = this.nextState();
+        String id = expressionarray.getId().accept(this);
         String size = expressionarray.getSize().accept(this);
         String expr = expressionarray.getExpr().accept(this);
         this.addNode(nodeIdentifier, "ExpressionArray");
+        this.addTransition(nodeIdentifier, id);
         this.addTransition(nodeIdentifier, size);
         this.addTransition(nodeIdentifier, expr);
         return nodeIdentifier;

@@ -1,1 +1,8 @@
-(int [10] of 0; A[10]; a.feur;a.feur[10];a[10].feur;jeSuisUneVar)
+let 
+    type t1 = {champ1 : t2, champ2 : int}
+    type t2 = {champ1 : t1, champ2 : int}
+    var a :t1 := {champ1 = nil, champ2 = 3};
+    var b :t2 := {champ1 = a, champ2 = 5};
+in
+    a.champ1 := b
+end
