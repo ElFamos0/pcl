@@ -14,5 +14,5 @@ svg:
 	@dot -Tsvg ./out/tree.dot -o ./out/tree.svg
 	@inkscape ./out/tree.svg
 	
-all: parser compile run svg
-test: run svg
+all: parser compile run 
+test: run 

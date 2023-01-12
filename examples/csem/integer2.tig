@@ -1,0 +1,6 @@
+/* Integer underflow sur a */
+let
+    var a:int := -2147483649
+in  
+
+end

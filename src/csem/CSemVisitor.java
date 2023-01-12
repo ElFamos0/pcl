@@ -60,9 +60,6 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
 
-        SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(left, right, table);
-
         return left + ":" + right;
     }
 
@@ -72,11 +69,6 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
 
-        SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(left, right, table);
-
-        System.out.println(right);
-
         return left + ":" + right;
     }
 
@@ -85,9 +77,6 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
 
-        SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(left, right, table);
-
         return left + ":" + right;
     }
 
@@ -95,9 +84,6 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(Division a) {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
-
-        SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(left, right, table);
 
         // check division by zero
 
@@ -122,10 +108,6 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(Negation a) {
-        String left = a.expression.accept(this);
-        String right = null;
-        SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(left, right, table);
         return a.expression.accept(this);
     }
 
@@ -138,6 +120,9 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(Int a) {
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        OpCSem.checkint(a, table);
+
         String val = String.valueOf(a.valeur);
 
         return val;

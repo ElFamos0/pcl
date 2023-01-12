@@ -1,0 +1,6 @@
+/* Integer overflow sur a */
+let
+    var a:int := 2147483648
+in  
+
+end

@@ -14,6 +14,11 @@ package ast;
 
 import java.util.ArrayList;
 
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.Token;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.Interval;
+
 import parser.exprBaseVisitor;
 import parser.exprParser;
 import parser.exprParser.AppelFonctionContext;
@@ -215,7 +220,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitEntier(EntierContext ctx) {
-        return new Int(Integer.parseInt(ctx.getChild(0).getText()));
+        return new Int(ctx, ctx.getChild(0).getText());
     }
 
     @Override
