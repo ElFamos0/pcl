@@ -3,10 +3,10 @@ package csem;
 import ast.*;
 import sl.SymbolLookup;
 
-public class AstVisitor implements ast.AstVisitor<Void> {
+public class CSemVisitor implements AstVisitor<Void> {
     SymbolLookup table;
 
-    public AstVisitor(SymbolLookup table) {
+    public CSemVisitor(SymbolLookup table) {
         this.table = table;
     }
 
