@@ -1,0 +1,31 @@
+/* Quelques tests sur les types custom (hors déclaration array / utilisation array) */
+let
+    type newType = {val : int, name : string}
+    var a :newType := newType {val = 5, name = "test"}
+    var b :newType := nil
+    var c :newType := newType{val = 5, name = for i:= 0 to 10 do (3) }
+    var e := newType{val = 5, name = 5}
+    var f := newType{val = 5, val2 = 10, name = "test"}
+    var g := newType{val = 5}
+    var k := 5
+
+    type newTypeAllias = int
+    var d :newTypeAllias := "test"
+    var h := newTypeThatDontExist{}
+
+    type newArrayType = array of float
+    type newFalseType = {champ1 : int, champ1 : string}
+    type newFalseType2 = {champ1 : float, champ2 : int}
+    type newTypeAllias2 = float
+    type t1 = int
+    type t1 = int
+    type int = int
+
+in  
+
+    5 + a.name;
+    b.name;
+    a.notAField;
+    k.name
+ 
+end

@@ -1,0 +1,7 @@
+/* test la double définition de variables */
+let
+    var a := 3
+    var a := 4
+in  
+
+end

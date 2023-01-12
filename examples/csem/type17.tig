@@ -1,0 +1,6 @@
+/* Double def d'un type de base*/
+let
+    type int = array of int
+in  
+ 
+end

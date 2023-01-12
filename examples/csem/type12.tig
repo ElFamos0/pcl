@@ -1,0 +1,7 @@
+/* Erreur sur la valeur passée à la déclaration d'une var, elle n'est pas du type dont on a fait l'allias */
+let
+    type newType = int
+    var a :newType := "test"
+in  
+ 
+end

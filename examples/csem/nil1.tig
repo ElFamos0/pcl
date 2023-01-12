@@ -1,0 +1,6 @@
+/* Type de nil indéterminable sur var */
+let
+    var a:= nil
+in  
+
+end

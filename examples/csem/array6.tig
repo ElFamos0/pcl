@@ -1,0 +1,9 @@
+/* Ce programme ne renvoie pas d'erreur ! Définition mutuellement récursive de 2 types array */
+let
+    type t1 = array of t2
+    type t2 = array of t1
+    var a:= t1 [10] of nil
+    var b:= t2 [5] of a
+in  
+ 
+end

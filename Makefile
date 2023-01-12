@@ -15,4 +15,4 @@ svg:
 	@inkscape ./out/tree.svg
 	
 all: parser compile run svg
-test: compile run svg
+test: run svg

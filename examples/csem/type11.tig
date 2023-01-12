@@ -1,0 +1,7 @@
+/* Ce programme ne renvoie pas d'erreur ! On peut instancier les champs dans n'importe quel ordre*/
+let
+    type newType = {val : int, name : string}
+    var a := newType{name = "test",val = 5}
+in  
+ 
+end

@@ -1,0 +1,9 @@
+/* Accès à un field inconnu */
+let
+    type newType = {val : int, name : string}
+    var a :newType := newType{val = 5, name = "test"}
+in  
+
+    a.notAField
+ 
+end

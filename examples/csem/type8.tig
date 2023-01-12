@@ -1,0 +1,7 @@
+/* Tous les champs ne sont pas remplis à la déclaration d'une var*/
+let
+    type newType = {val : int, name : string}
+    var a := newType{val = 5}
+in  
+ 
+end

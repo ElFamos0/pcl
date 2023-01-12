@@ -1,0 +1,6 @@
+/* Type float non def*/
+let
+    type newType = array of float
+in  
+ 
+end

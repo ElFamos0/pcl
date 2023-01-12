@@ -1,0 +1,7 @@
+/* Pas de valeur donnée à l'un des champs */
+let
+    type newType = {val : int, name : string}
+    var a :newType := newType{val = 5, name = for i:= 0 to 10 do (3) }
+in  
+ 
+end

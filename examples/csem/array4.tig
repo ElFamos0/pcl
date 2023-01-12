@@ -1,0 +1,7 @@
+/* La valeur de l'expr n'est pas du bon type (int) */
+let
+    type newArrayType = array of int
+    var a:= newArrayType [10] of "test"
+in  
+ 
+end

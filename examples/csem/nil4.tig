@@ -1,0 +1,6 @@
+/* Nil ne peut pas subir d'opération de base */
+let
+    var a := 5
+in  
+    a + nil
+end

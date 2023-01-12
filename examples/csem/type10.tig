@@ -1,0 +1,7 @@
+/* Pas le bon type fourni au champ*/
+let
+    type newType = {val : int, name : string}
+    var a := newType{val = 5, name = 5}
+in  
+ 
+end

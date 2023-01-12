@@ -1,0 +1,6 @@
+/* première expr n'a pas de valeur*/
+let
+    var a:= 3
+in  
+  while for i:= 0 to 10 do (3) do (3)
+end

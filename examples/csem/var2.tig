@@ -1,0 +1,6 @@
+/* Membre droit de la déclaration ne renvoie pas de valeur */
+let
+    var a := for i:= 0 to 10 do (3)
+in  
+
+end

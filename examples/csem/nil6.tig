@@ -1,0 +1,7 @@
+/* Accès à un elt d'un tableau nil */
+let
+    type newType = array of int
+    var a :newType:= nil
+in  
+    a[0]
+end

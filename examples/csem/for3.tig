@@ -1,0 +1,6 @@
+/* seconde expr n'est pas un int*/
+let
+    var a:= 3
+in  
+  for i:= 0 to "test" do (3)
+end

@@ -1,0 +1,9 @@
+/* Accès à un field d'une var nil */
+let
+    type newType = {val : int, name : string}
+    var a :newType := nil
+in  
+
+    a.name
+ 
+end

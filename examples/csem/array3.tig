@@ -1,0 +1,7 @@
+/* Pas de valeur retournée pour la size */
+let
+    type newArrayType = array of int
+    var a:= newArrayType [for i:= 0 to 10 do (3)] of 0
+in  
+ 
+end

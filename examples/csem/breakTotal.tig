@@ -1,0 +1,7 @@
+/* Quelques tests sur break*/
+let
+    var a:= break
+in  
+  3;
+  break
+end

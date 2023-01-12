@@ -1,0 +1,8 @@
+/* Erreur sur newType2 : allias non défini*/
+let
+    type newType = int
+    type newType3 = newType
+    type newType2 = float
+in  
+ 
+end

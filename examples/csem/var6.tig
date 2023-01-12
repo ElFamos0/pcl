@@ -1,0 +1,7 @@
+/* On affecte à b un mauvais type */
+let
+    var a :int := 3
+    var b := "test"
+in  
+    b:= 5
+end

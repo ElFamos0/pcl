@@ -1,0 +1,6 @@
+/* Type de nil indéterminable dans un appel */
+let
+    var a := 5
+in  
+    nil
+end

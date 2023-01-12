@@ -1,0 +1,6 @@
+/* Type newType non def*/
+let
+    var a := newType{}
+in  
+ 
+end

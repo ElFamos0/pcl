@@ -1,0 +1,7 @@
+/* Double def d'un type */
+let
+    type newType = array of int
+    type newType = array of int
+in  
+ 
+end

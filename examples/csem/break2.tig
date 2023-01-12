@@ -1,0 +1,6 @@
+/* break n'est pas dans une boucle*/
+let
+    var a:= break
+in  
+  3
+end

@@ -1,0 +1,9 @@
+/* Tentative d'accès à un id qui n'est pas un array */
+let
+    type newArrayType = array of int
+    var a:= 5
+in  
+
+    a[2]
+ 
+end

@@ -1,0 +1,6 @@
+/* Type de champ1 non défini*/
+let
+    type newType = {champ1 : float, champ2 : int}
+in  
+ 
+end

@@ -1,0 +1,6 @@
+/* première expr n'est pas un entier*/
+let
+    var a:= 3
+in  
+  while "test" do (3)
+end

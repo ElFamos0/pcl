@@ -132,7 +132,7 @@ POUR TOUTES LES VAR / FUNC / TYPES : LE NOM DOIT ETRE DIFFERENT D'UN MOT CLE DU 
 8) While
     "while expr do expr"
     le premier expr doit renvoyer un entier
-    Le for ne renvoie pas de valeur (même explication que pour le if then)
+    Le while ne renvoie pas de valeur (même explication que pour le if then)
 
 8.5) Break
     Met fin à la boucle for ou while la plus "proche" en terme de profondeur d'imbrication.
@@ -146,6 +146,7 @@ POUR TOUTES LES VAR / FUNC / TYPES : LE NOM DOIT ETRE DIFFERENT D'UN MOT CLE DU 
 
 10) expr-seq
 
+    De même, les contrôles sémantiques ne sont pas à effectuer directement sur le expr-seq
     Pour la valeur de retour : vérifier s'il y a besoin d'une valeur de retour là où on utilise le expr-seq, et dans ce cas vérifier :
         Qu'il est y bien une valeur retournée à la fin du expr-seq
         Que son type corresponde au type requis

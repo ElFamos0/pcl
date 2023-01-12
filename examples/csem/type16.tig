@@ -1,0 +1,9 @@
+/* Accès à un field qui ne renvoit pas une valeur cohérente */
+let
+    type newType = {val : int, name : string}
+    var a :newType := newType {val = 5, name = "test"}
+in  
+
+    5 + a.name
+ 
+end

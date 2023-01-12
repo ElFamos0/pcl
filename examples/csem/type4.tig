@@ -1,0 +1,6 @@
+/* Double def de champ1*/
+let
+    type newType = {champ1 : int, champ1 : string}
+in  
+ 
+end

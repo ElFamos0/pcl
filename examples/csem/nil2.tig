@@ -1,0 +1,6 @@
+/* Type de nil indéterminable dans un if */
+let
+    var a := 5
+in  
+    if nil = nil then (3)
+end

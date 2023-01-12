@@ -1,0 +1,7 @@
+/* int n'est pas un type array*/
+let
+    type newArrayType = array of int
+    var a:= int [10] of 0
+in  
+ 
+end

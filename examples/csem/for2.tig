@@ -1,0 +1,6 @@
+/* première expr n'est pas un int*/
+let
+    var a:= 3
+in  
+  for i:= "test" to 10 do (3)
+end

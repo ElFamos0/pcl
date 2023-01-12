@@ -1,0 +1,6 @@
+/* On évalue pas un entier dans le ifThenElse*/
+let
+    var a:= "test"
+in  
+  if a then 3 else 3
+end

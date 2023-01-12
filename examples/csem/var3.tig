@@ -1,0 +1,6 @@
+/* Membre droit de la déclaration ne renvoie pas le bon type */
+let
+    var a :int := "string"
+in  
+
+end

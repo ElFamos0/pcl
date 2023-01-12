@@ -1,0 +1,10 @@
+/* Accès à un field d'un id qui n'est pas un record */
+let
+    type newType = {val : int, name : string}
+    var a :newType := newType {val = 5, name = "test"}
+    var b:= 4
+in  
+
+    b.name
+ 
+end

@@ -1,0 +1,6 @@
+/* b n'existe pas dans le scope */
+let
+    var a :int := 3
+in  
+    a + b
+end

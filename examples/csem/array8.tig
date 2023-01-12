@@ -1,0 +1,9 @@
+/* Accès à une valeur qui n'est pas un entier d'un array */
+let
+    type newArrayType = array of int
+    var a:= newArrayType [10] of 0
+in  
+
+    a["test"]
+ 
+end

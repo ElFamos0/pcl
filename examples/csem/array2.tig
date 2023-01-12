@@ -1,0 +1,7 @@
+/* La valeur de la size n'est pas un entier */
+let
+    type newArrayType = array of int
+    var a:= newArrayType ["test"] of 0
+in  
+ 
+end

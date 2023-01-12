@@ -1,0 +1,17 @@
+/* Quelques tests d'erreur sur nil */
+let
+    type newType = array of int
+    var a :newType:= nil
+
+    type newType2 = {val : int}
+    var b :newType2 := nil
+
+    var c:= 5
+    var d:= nil
+in  
+    a[0];
+    b.val;
+    c + nil;
+    if nil = nil then (3);
+    nil
+end

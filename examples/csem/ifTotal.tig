@@ -1,0 +1,12 @@
+/* Quelques tests sur les if */
+let
+    var a:= 5
+    var b := "test"
+in  
+  if 1 then 5 else for i:= 0 to 10 do (3);
+  if 1 then 5 else "test";
+  if for i:= 0 to 10 do (3) then 3 else 3;
+  if a then 3 else 3;
+  if for i:= 0 to 10 do (3) then 3;
+  if "test" then 3
+end

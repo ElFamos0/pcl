@@ -1,0 +1,7 @@
+/* Accès à un champ nil */
+let
+    type newType = {val : int}
+    var a :newType:= nil
+in  
+    a.val
+end
