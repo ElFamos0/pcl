@@ -1,32 +1,34 @@
-   1) Operators
+1) Operators
 
-Sur opérande +,-,*,/ : deux entiers de chaque côté. Division par 0 interdite.
-Sur opérande <,> =>, =< : deux entiers OU deux string 
-Sur opérande =, <> : deux objets du même type (qui doivent avoir une valeur !)
+    Sur opérande +,-,*,/ : deux entiers de chaque côté. Division par 0 interdite.
+    Sur opérande - (négation) : une seule expression entière à droite.
+    Sur opérande <,> =>, =< : deux entiers OU deux string 
+    Sur opérande =, <> : deux objets du même type (qui doivent avoir une valeur !)
 
-("The logical operators & and | are lazy logical operators on
-integers. They do not evaluate their right argument if evaluating
-the left determines the result.")
+    ("The logical operators & and | are lazy logical operators on
+    integers. They do not evaluate their right argument if evaluating
+    the left determines the result.")
 
-    2) Functions & Procedures
+2) Functions & Procedures
 
-Déclaration d'une fonction : nom de fonction ne doit pas être pris dans le scope (partagé avec le nom des variables mais pas celui des types !).
-                             Attention aux fonctions définies mutuellement récursives.
-                             Attention aux fonctions de base de tiger : print,printi,flush,.... cf manuel.
-Déclaration d'une fonction : le type des paramètres (et celui de retour pour les fonctions) doit exister. Aucun nom de paramètre en double. Le type de retour de la fonction est bien cohérent avec la valeur renvoyée à la fin de la fonction.
+    Déclaration d'une fonction : nom de fonction ne doit pas être pris dans le scope (partagé avec le nom des variables mais pas celui des types !).
+                                Attention aux fonctions définies mutuellement récursives.
+                                Attention aux fonctions de base de tiger : print,printi,flush,.... cf manuel.
+    Déclaration d'une fonction : le type des paramètres (et celui de retour pour les fonctions) doit exister. Aucun nom de paramètre en double. Le type de retour de la fonction est bien cohérent avec la valeur renvoyée à la fin de la fonction.
 
-Appel d'une fonction / procédure : la fonction doit être définie dans ce scope, on doit lui fournir le bon nombre de paramètres et ils doivent être du bon type / exister (variable définies). Si c'est une fonction : le retour d'une valeur doit être justifié à cet endroit, et le type doit correspondre. Sinon, on doit s'assurer qu'aucune valeur ne devait être renvoyée.
-(Ex : var x :int := add(5,4) est good si add renvoit un int, mais var x :int := print(5) marche pas car print ne renvoie rien)
+    Appel d'une fonction / procédure : la fonction doit être définie dans ce scope, on doit lui fournir le bon nombre de paramètres et ils doivent être du bon type / exister (variable définies). Si c'est une fonction : le retour d'une valeur doit être justifié à cet endroit, et le type doit correspondre. Sinon, on doit s'assurer qu'aucune valeur ne devait être renvoyée.
+    (Ex : var x :int := add(5,4) est good si add renvoit un int, mais var x :int := print(5) marche pas car print ne renvoie rien)
 
-Les fonctions de base (print,....) existent et doivent être reconnues à tout moment
+    Les fonctions de base (print,....) existent et doivent être reconnues à tout moment
 
-    3) Variables
+3) Variables
 
-Déclaration d'une variable : le nom doit être libre dans le scope actuel (Attention, l'espace de noms des types et des variables est séparé, mais celui des variables et des fonctions est commun : si x est un type, alors x peut être une variable (ou une fonction), mais si x est une fonction, x ne peut pas être une variable).
-Déclaration d'une variable : le membre droit de la déclaration doit renvoyer une valeur. De plus, si le type de la variable a été précisé, alors cette valeur doit être du bon type (ex : var x :string := 9  doit renvoyer une erreur, mais var x := 9 est good). Une variable, lorsque déclarée, doit toujours recevoir une valeur d'initialisation ! (nil si besoin, cf pt suivant)
-Utilisation d'une variable : On doit vérifier que la variable existe dans le scope où elle est appelée, et que son type correspond à ce qui est souhaité à cet endroit (si on voulait une valeur à cet endroit).
+    Déclaration d'une variable : le nom doit être libre dans le scope actuel (Attention, l'espace de noms des types et des variables est séparé, mais celui des variables et des fonctions est commun : si x est un type, alors x peut être une variable (ou une fonction), mais si x est une fonction, x ne peut pas être une variable).
+    Déclaration d'une variable : le membre droit de la déclaration doit renvoyer une valeur. De plus, si le type de la variable a été précisé, alors cette valeur doit être du bon type (ex : var x :string := 9  doit renvoyer une erreur, mais var x := 9 est good). Si le type n'est pas précisé, alors on doit le déduire de l'expression de gauche
+    Une variable, lorsque déclarée, doit toujours recevoir une valeur d'initialisation ! (nil si besoin, cf pt suivant)
+    Utilisation d'une variable : On doit vérifier que la variable existe dans le scope où elle est appelée, et que son type correspond à ce qui est souhaité à cet endroit (si on voulait une valeur à cet endroit).
 
-    3.5) nil
+3.5) nil
 
 
     Peut être assigné à n'importe quel variable / champ à la déclaration. 
@@ -42,51 +44,108 @@ Utilisation d'une variable : On doit vérifier que la variable existe dans le sc
 
 
 
-    4) Types custom
+4) Types custom
 
-Les types ont un espace de nom propres à eux
-Déclaration d'un type custom : "'type' type-id = type"
-    type-id ne doit pas être un nom de type utilisé dans le scope
-    le membre droit peut être : 
-        un type qui existe déjà (ex : type newInt = int OK, mais type newFloat = float --> erreur si le type 'float' n'est pas def avant) -> à check via contrôle sémantique
-        un {type-fields *}, où chaque type-field est de la forme "id : type-id" 
-            type-id est un nom de type déjà connu dans le scope (types mutuellement et récusrivement def autorisés)
-            id est un nom de champ (var) non déjà pris par un autre champ du type que l'on définit
-        un 'array of type-id' -> type-id doit être un type qui existe déjà (types mutuellement et récusrivement def autorisés)
+    Les types ont un espace de nom propres à eux
+    Déclaration d'un type custom : "'type' type-id = type"
+        type-id ne doit pas être un nom de type utilisé dans le scope
+        le membre droit peut être : 
+            un type qui existe déjà (ex : type newInt = int OK, mais type newFloat = float --> erreur si le type 'float' n'est pas def avant) -> à check via contrôle sémantique
+            un {type-fields *}, où chaque type-field est de la forme "id : type-id" 
+                type-id est un nom de type déjà connu dans le scope (types mutuellement et récusrivement def autorisés)
+                id est un nom de champ (var) non déjà pris par un autre champ du type que l'on définit
+            un 'array of type-id' -> type-id doit être un type qui existe déjà 
 
-        Ex de types mutuellement et récursivement def : 
-            let 
-            type t1 = {champ1 : t2, champ2 : int}
-            type t2 = {champ1 : t1, champ2 : int}
-            var a :t1 := {champ1 = nil, champ2 = 3};
-            var b :t2 := {champ1 = a, champ2 = 5};
+            Ex de types mutuellement et récursivement def : 
+                let 
+                type t1 = {champ1 : t2, champ2 : int}
+                type t2 = {champ1 : t1, champ2 : int}
+                var a :t1 := t1{champ1 = nil, champ2 = 3};
+                var b :t2 := t2{champ1 = a, champ2 = 5};
+                in
+                a.champ1 := b
+                end
+            si on a le temps on fera les contrôles sémantiques pour ça mais c'est vraiment les plus chiant
+
+    Déclaration d'une var associée à un type custom : 
+        Ex : let
+            type t1 = {champ1 : int, champ2 :string}
+            var a:t1 := t1{champ1 = 3, champ2 = "test};
+            var b:t1 := t1{champ2 = "test", champ1 = 3}
             in
-            a.champ1 := b
             end
-        si on a le temps on fera les contrôles sémantiques pour ça mais c'est vraiment les plus chiant
 
-Déclaration d'une var associée à un type custom : 
-    Ex : let
-         type t1 = {champ1 : int, champ2 :string}
-         var a:t1 := {champ1 = 3, champ2 = "test};
-         var b:t1 := {champ2 = "test", champ1 = 3}
-         in 
-         
-         end
+        le type custom doit existé dans ce scope. 
+
+        Pour les record_Type : le nombre de champ fourni doit être le bon, leur nom doit correspondre, et le type de l'expression qu'on leur associe doit être le même.
+            On peut instancier les champs dans l'ordre qu'on veut, à priori.
+        Pour les allias (type newInt = int, var :a:newInt = 5), le type passé en expression doit être ok par rapport au type dont on a fait allias.
+        Pour les Array, cf pt suivant.
+
+    Utilisation des var types custom :
+        Contrôles classiques 
+        Accès à un champ : vérifier qu'il existe, et que son type correspond à la situation
 
 
+5) Array
 
-    5) Array
+    Déclaration d'une var de type Array :
 
-    6) If
+        Ex :
+        let
+            type intArray = array of int
+            var a:= intArray [10] of 0
+        in
+            a
+        end
 
-    7) For
+        Le type choisi doit être un type custom qui correspond à un array (var a:= int [10] of 0 renvoie une erreur : int n'est pas un type array)
+        L'expression entre crochet doit renvoyer un entier
+        L'expression qui suit le 'of' doit renvoyé une valeur qui correspond au type de l'array
+        (let type stringArray = array of string  in var a:= stringArray [5] of "yo" est valide, mais pas let .... [5] of 0), car 0 n'est pas un string)
 
-    8) While
+    Utilisation d'une var de type array :
+        Contrôles classiques sur les var
+        Accès à l'élément d'un array (a[10] par ex) : 
+            l'expression entre crochet doit renvoyer un entier positif, et cet entier doit être strictement inférieur à la taille de l'array.
 
-    8.5) Break
 
-    9) Let ... in ... end
+6) If
+    "if expr then expr else expr"
 
-    10) expr-seq
+    La première expr doit renvoyé un entier
+    Dans le cadre du if then else, soit l'expr du then et l'expr du else renvoient une valeur du même type, ou ne renvoient rien toutes les deux.
+    Si on a qu'un if then expr, l'expr ne renvoie aucune valeur --> par ex, s'il s'agit d'un expr seq, on ne retourne juste pas sa valeur.
+                                                                    En soit, pour les contrôles sémantiques du if, ça sert à rien de la savoir.
+                                                                    Si je le précise, c'est juste que si on croise un truc du genre
+                                                                    "var a:= if 1 then 3", y a erreur sémantique, mais "var a:= if 1 then 2 else 3" fonctionne.
+
+7) For
+    "for id := expr to expr do expr"
+    id doit être un nom de variable non utilisé auparavant.
+    Les deux premières expr doivent renvoyer une valeur entière.
+    Le for ne renvoie pas de valeur (même explication que pour le if then)
+
+8) While
+    "while expr do expr"
+    le premier expr doit renvoyer un entier
+    Le for ne renvoie pas de valeur (même explication que pour le if then)
+
+8.5) Break
+    Met fin à la boucle for ou while la plus "proche" en terme de profondeur d'imbrication.
+    Ne peut se trouver qu'au sein d'un while ou d'un for.
+    En dehors de ces cas là, il y a erreur sémantique.
+
+9) Let declaration+ in expr-seq end
+
+    Sémantiquement : pas de contrôles.
+    Juste savoir que ça peut return une valeur si le expr-seq en return une, et n'en return pas si le expr-seq n'en return pas.
+
+10) expr-seq
+
+    Pour la valeur de retour : vérifier s'il y a besoin d'une valeur de retour là où on utilise le expr-seq, et dans ce cas vérifier :
+        Qu'il est y bien une valeur retournée à la fin du expr-seq
+        Que son type corresponde au type requis
+    
+    Peut ne pas return de valeur si la dernière expression évaluée n'en return pas.
 
