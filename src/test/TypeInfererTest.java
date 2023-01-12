@@ -15,7 +15,8 @@ public class TypeInfererTest {
     public static void testSeqList(SymbolLookup table) {
         System.out.println("-- Testing sequence lists --");
         String expr = "(5+6; \"yo\"; 13)";
-        Type t = TypeInferer.inferType(table, expr);
+        Type t = null;
+        t = TypeInferer.inferType(table, expr);
 
         if (t instanceof Primitive) {
             Primitive p = (Primitive) t;
@@ -51,7 +52,8 @@ public class TypeInfererTest {
     public static void testArray(SymbolLookup table) {
         System.out.println("-- Testing arrays --");
         String expr = "arrayofint";
-        Type t = TypeInferer.inferType(table, expr);
+        Type t = null;
+        t = TypeInferer.inferType(table, expr);
 
         if (t instanceof Array) {
             Array a = (Array) t;
@@ -73,7 +75,8 @@ public class TypeInfererTest {
     public static void testOp(SymbolLookup table) {
         System.out.println("-- Testing operators --");
         String expr = "5+6";
-        Type t = TypeInferer.inferType(table, expr);
+        Type t = null;
+        t = TypeInferer.inferType(table, expr);
 
         if (t instanceof Primitive) {
             Primitive p = (Primitive) t;
@@ -96,5 +99,9 @@ public class TypeInfererTest {
             Primitive p = (Primitive) a.getType();
             System.out.println("Expected CHAR : " + p.getType());
         }
+
+        expr = "a+b";
+        t = TypeInferer.inferType(table, expr);
+
     }
 }

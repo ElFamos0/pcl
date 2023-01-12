@@ -1,7 +1,5 @@
 import java.io.IOException;
 
-import javax.lang.model.type.PrimitiveType;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

@@ -45,7 +45,6 @@ import sl.Record;
 import parser.exprParser.DeclarationFonctionContext;
 import parser.exprParser.ChaineChrContext;
 import parser.exprParser.BreakContext;
-import parser.exprParser.InstanciationTypeContext;
 import parser.exprParser.ListeAccesContext;
 //import st.*;
 
@@ -79,11 +78,6 @@ public class AstCreator extends exprBaseVisitor<Ast> {
     @Override
     public Ast visitInstanciationType(exprParser.InstanciationTypeContext ctx) {
         InstanciationType ist = new InstanciationType();
-
-        int temp = region;
-        SymbolLookup table = this.table.getSymbolLookup(region);
-        table.addChildren();
-        region++;
 
         boolean endOfArgs = false;
         int count = 1;
@@ -264,19 +258,17 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 return branch;
             } else if (branch instanceof ListeAcces) {
                 ((ListeAcces) branch).setId(child);
-				if(((ListeAcces) branch).getisExpressionArray()) {
-					((ListeAcces) branch).getExpressionArray().setId(child);
-					return ((ListeAcces) branch).getExpressionArray();
-				}
-				else {
-					return branch;
-				}
-                
+                if (((ListeAcces) branch).getisExpressionArray()) {
+                    ((ListeAcces) branch).getExpressionArray().setId(child);
+                    return ((ListeAcces) branch).getExpressionArray();
+                } else {
+                    return branch;
+                }
+
             }
         }
         return child;
     }
-
 
     @Override
     public Ast visitListeAcces(ListeAccesContext ctx) {
@@ -292,109 +284,100 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             acceschamp.setChild(champ);
             acceschamp.setisArrayAccess(false);
             listeacces.addAccesChamp(acceschamp);
-            count ++;
+            count++;
             boolean endOfArgs = false;
-            if (count >= countmax){
+            if (count >= countmax) {
                 endOfArgs = true;
             }
-            while(!endOfArgs){
+            while (!endOfArgs) {
                 String text2 = ctx.getChild(count).getText();
-                if (text2.equals(".")){
-                    count ++;
+                if (text2.equals(".")) {
+                    count++;
                     Ast champ2 = ctx.getChild(count).accept(this);
                     AccesChamp acceschamp2 = new AccesChamp();
                     acceschamp2.setChild(champ2);
                     acceschamp2.setisArrayAccess(false);
                     listeacces.addAccesChamp(acceschamp2);
-                    count ++;
-                }
-                else if (text2.equals("[")){
-                    count ++;
+                    count++;
+                } else if (text2.equals("[")) {
+                    count++;
                     Ast index = ctx.getChild(count).accept(this);
                     AccesChamp acceschamp2 = new AccesChamp();
                     acceschamp2.setChild(index);
                     acceschamp2.setisArrayAccess(true);
                     listeacces.addAccesChamp(acceschamp2);
-                    count ++;
-                    count ++;
-                }
-                else{
+                    count++;
+                    count++;
+                } else {
                     endOfArgs = true;
                 }
-                if (count >= countmax){
+                if (count >= countmax) {
                     endOfArgs = true;
                 }
 
             }
             retour = listeacces;
-        }
-        else if (text.equals("[")) {
+        } else if (text.equals("[")) {
             Ast expression = ctx.getChild(count).accept(this);
             ListeAcces listeacces = new ListeAcces();
             listeacces.setisExpressionArray(false);
             count += 2;
-            if (count >= countmax){
+            if (count >= countmax) {
                 AccesChamp acceschamp = new AccesChamp();
                 acceschamp.setChild(expression);
                 acceschamp.setisArrayAccess(true);
                 listeacces.addAccesChamp(acceschamp);
                 retour = listeacces;
-            }
-            else {
+            } else {
                 String text3 = ctx.getChild(count).getText();
-                if (text3.equals("of")){
+                if (text3.equals("of")) {
                     listeacces.setisExpressionArray(true);
                     listeacces.setExpressionArray(new ExpressionArray());
                     listeacces.getExpressionArray().setSize(expression);
-                    count ++;
+                    count++;
                     Ast expression2 = ctx.getChild(count).accept(this);
                     listeacces.getExpressionArray().setExpr(expression2);
 
                     retour = listeacces;
-                }
-                else{
+                } else {
                     AccesChamp acceschamp = new AccesChamp();
                     acceschamp.setChild(expression);
                     acceschamp.setisArrayAccess(true);
                     listeacces.addAccesChamp(acceschamp);
                     boolean endOfArgs = false;
-                    while(!endOfArgs){
+                    while (!endOfArgs) {
                         String text2 = ctx.getChild(count).getText();
-                        if (text2.equals(".")){
-                            count ++;
+                        if (text2.equals(".")) {
+                            count++;
                             Ast champ2 = ctx.getChild(count).accept(this);
                             AccesChamp acceschamp2 = new AccesChamp();
                             acceschamp2.setChild(champ2);
                             acceschamp2.setisArrayAccess(false);
                             listeacces.addAccesChamp(acceschamp2);
-                            count ++;
-                        }
-                        else if (text2.equals("[")){
-                            count ++;
+                            count++;
+                        } else if (text2.equals("[")) {
+                            count++;
                             Ast index = ctx.getChild(count).accept(this);
                             AccesChamp acceschamp2 = new AccesChamp();
                             acceschamp2.setChild(index);
                             acceschamp2.setisArrayAccess(true);
                             listeacces.addAccesChamp(acceschamp2);
-                            count ++;
-                            count ++;
-                        }
-                        else{
+                            count++;
+                            count++;
+                        } else {
                             endOfArgs = true;
                         }
-                        if (count >= countmax){
+                        if (count >= countmax) {
                             endOfArgs = true;
                         }
-        
+
                     }
                     retour = listeacces;
 
                 }
             }
 
-            
-        }
-        else {
+        } else {
             retour = null;
         }
         return retour;
@@ -438,7 +421,8 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         for (int i = 0; 2 * i + 1 < ctx.getChildCount() - 1; i++) {
             String[] split = ctx.getChild(2 * i + 1).getText().split(":");
-            Variable v = new Variable(split[0], TypeInferer.inferType(table, split[1]));
+            Variable v = null;
+            v = new Variable(split[0], TypeInferer.inferType(table, split[1]));
             rec.addField(v);
             drt.addChamp(ctx.getChild(2 * i + 1).accept(this));
         }
@@ -465,7 +449,6 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             dv.setType(ctx.getChild(3).accept(this));
             dv.setExpr(ctx.getChild(5).accept(this));
         } else {
-            // TODO: System.out.println("expr = " + expr);
             table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
             dv.setExpr(ctx.getChild(3).accept(this));
         }

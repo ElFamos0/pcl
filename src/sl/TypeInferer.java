@@ -8,7 +8,6 @@ public class TypeInferer {
             expr = split[split.length - 1];
         }
         expr = expr.trim();
-        expr = expr.split(" ")[0].split("\\[")[0];
 
         if (table.getSymbol(expr) != null)
             return table.getSymbol(expr).getType();
@@ -19,10 +18,6 @@ public class TypeInferer {
             return new Primitive(Integer.class);
         if (expr.contains("+")) {
             String[] split = expr.split("\\+");
-            System.out.println(inferType(table, split[0]));
-            if (inferType(table, split[0]) != inferType(table, split[1]))
-                throw new RuntimeException(String.format("Type mismatch: %s + %s", split[0], split[1]));
-
             return inferType(table, split[0]);
         }
         if (expr.contains("array"))
