@@ -1,3 +1,6 @@
+POUR TOUTES LES VAR / FUNC / TYPES : LE NOM DOIT ETRE DIFFERENT D'UN MOT CLE DU LANGAGE
+
+
 1) Operators
 
     Sur opérande +,-,*,/ : deux entiers de chaque côté. Division par 0 interdite.
