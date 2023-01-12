@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import ast.*;
 import sl.SymbolLookup;
 
-public class CSemVisitor implements AstVisitor<Void> {
+public class CSemVisitor implements AstVisitor<String> {
     SymbolLookup table;
 
     public CSemVisitor(SymbolLookup table) {
@@ -13,28 +13,20 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(Program a) {
+    public String visit(Program a) {
         a.expression.accept(this);
         return null;
     }
 
     @Override
-    public Void visit(Expression a) {
+    public String visit(Expression a) {
         a.left.accept(this);
         a.right.accept(this);
         return null;
     }
 
     @Override
-    public Void visit(Ou a) {
-        a.left.accept(this);
-        a.right.accept(this);
-
-        return null;
-    }
-
-    @Override
-    public Void visit(Et a) {
+    public String visit(Ou a) {
         a.left.accept(this);
         a.right.accept(this);
 
@@ -42,7 +34,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(Compar a) {
+    public String visit(Et a) {
         a.left.accept(this);
         a.right.accept(this);
 
@@ -50,7 +42,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(Addition a) {
+    public String visit(Compar a) {
         a.left.accept(this);
         a.right.accept(this);
 
@@ -58,7 +50,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(Soustraction a) {
+    public String visit(Addition a) {
         a.left.accept(this);
         a.right.accept(this);
 
@@ -66,7 +58,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(Multiplication a) {
+    public String visit(Soustraction a) {
         a.left.accept(this);
         a.right.accept(this);
 
@@ -74,7 +66,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(Division a) {
+    public String visit(Multiplication a) {
         a.left.accept(this);
         a.right.accept(this);
 
@@ -82,7 +74,15 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(Sequence a) {
+    public String visit(Division a) {
+        a.left.accept(this);
+        a.right.accept(this);
+
+        return null;
+    }
+
+    @Override
+    public String visit(Sequence a) {
         for (Ast ast : a.seqs) {
             ast.accept(this);
         }
@@ -91,28 +91,28 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(Negation a) {
+    public String visit(Negation a) {
         a.expression.accept(this);
 
         return null;
     }
 
     @Override
-    public Void visit(ID a) {
+    public String visit(ID a) {
         String idf = a.nom;
 
         return null;
     }
 
     @Override
-    public Void visit(Int a) {
+    public String visit(Int a) {
         String val = String.valueOf(a.valeur);
 
         return null;
     }
 
     @Override
-    public Void visit(ExpressionIdentifiant a) {
+    public String visit(ExpressionIdentifiant a) {
         a.left.accept(this);
         if (a.right != null)
             a.right.accept(this);
@@ -121,7 +121,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(AppelFonction a) {
+    public String visit(AppelFonction a) {
         a.id.accept(this);
         a.args.accept(this);
 
@@ -129,7 +129,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(ArgFonction a) {
+    public String visit(ArgFonction a) {
         for (Ast ast : a.args) {
             ast.accept(this);
         }
@@ -138,7 +138,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(IfThenElse a) {
+    public String visit(IfThenElse a) {
         a.condition.accept(this);
         a.thenBlock.accept(this);
         a.elseBlock.accept(this);
@@ -147,7 +147,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(IfThen a) {
+    public String visit(IfThen a) {
         a.condition.accept(this);
         a.thenBlock.accept(this);
 
@@ -155,7 +155,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(While a) {
+    public String visit(While a) {
         a.condition.accept(this);
         a.block.accept(this);
 
@@ -163,7 +163,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(For a) {
+    public String visit(For a) {
         a.start.accept(this);
         a.startValue.accept(this);
         a.endValue.accept(this);
@@ -173,7 +173,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(Definition a) {
+    public String visit(Definition a) {
         for (Ast ast : a.declarations) {
             ast.accept(this);
         }
@@ -185,7 +185,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(DeclarationType a) {
+    public String visit(DeclarationType a) {
         a.id.accept(this);
         a.type.accept(this);
 
@@ -193,21 +193,21 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(DeclarationTypeClassique a) {
+    public String visit(DeclarationTypeClassique a) {
         a.id.accept(this);
 
         return null;
     }
 
     @Override
-    public Void visit(DeclarationArrayType a) {
+    public String visit(DeclarationArrayType a) {
         a.id.accept(this);
 
         return null;
     }
 
     @Override
-    public Void visit(DeclarationRecordType a) {
+    public String visit(DeclarationRecordType a) {
         for (Ast ast : a.champs)
             ast.accept(this);
 
@@ -215,7 +215,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(DeclarationChamp a) {
+    public String visit(DeclarationChamp a) {
         a.id.accept(this);
         a.type.accept(this);
 
@@ -223,7 +223,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(DeclarationFonction a) {
+    public String visit(DeclarationFonction a) {
         a.id.accept(this);
         for (Ast ast : a.args)
             ast.accept(this);
@@ -235,7 +235,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(DeclarationValeur a) {
+    public String visit(DeclarationValeur a) {
         a.id.accept(this);
         if (a.getType() != null)
             a.getType().accept(this);
@@ -245,28 +245,28 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(ChaineChr a) {
+    public String visit(ChaineChr a) {
         String val = a.valeur;
 
         return null;
     }
 
     @Override
-    public Void visit(Nil a) {
+    public String visit(Nil a) {
         String val = "nil";
 
         return null;
     }
 
     @Override
-    public Void visit(Break a) {
+    public String visit(Break a) {
         // Nothing to do
 
         return null;
     }
 
     @Override
-    public Void visit(InstanciationType a) {
+    public String visit(InstanciationType a) {
         a.getId().accept(this);
         ArrayList<Ast> idf = a.getIdentifiants();
         ArrayList<Ast> expr = a.getExpressions();
@@ -279,14 +279,14 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(AccesChamp a) {
+    public String visit(AccesChamp a) {
         a.getChild().accept(this);
 
         return null;
     }
 
     @Override
-    public Void visit(ExpressionArray a) {
+    public String visit(ExpressionArray a) {
         a.getId().accept(this);
         a.getSize().accept(this);
         a.getExpr().accept(this);
@@ -295,7 +295,7 @@ public class CSemVisitor implements AstVisitor<Void> {
     }
 
     @Override
-    public Void visit(ListeAcces a) {
+    public String visit(ListeAcces a) {
         a.getId().accept(this);
         if (a.getisExpressionArray())
             a.getExpressionArray().accept(this);
