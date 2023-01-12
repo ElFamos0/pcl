@@ -98,7 +98,7 @@ public class CSemVisitor implements AstVisitor<String> {
         OpCSem.checkint(left, right, table);
 
 
-        return null;
+        return left + ":" + right;
     }
 
     @Override

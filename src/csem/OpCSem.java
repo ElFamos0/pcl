@@ -22,15 +22,21 @@ public class OpCSem {
         }
     }
 
-        if(table.getSymbol(right) != null) {
-            if (!(table.getSymbol(right).getType().equals(new Primitive(Integer.class)))){
-                System.out.println("Symbol droit " + right + " is not an integer");
+
+    String split2[] = right.split(":");
+
+    if (split2.length == 1){
+        String s2 = split2[0];
+        if(table.getSymbol(s2) != null) {
+            if (!(table.getSymbol(s2).getType().equals(new Primitive(Integer.class)))){
+                System.out.println("Symbol " + s2 + " is not an integer");
             }
         }
         else{ 
-            if (!(TypeInferer.inferType(table, right).equals(new Primitive(Integer.class)))){
-                System.out.println("Symbol droit" + right + " is not an integer");
+            if (!(TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class)))){
+                System.out.println("Symbol" + s2 + " is not an integer");
             }
         }
+    }
     }
 }
