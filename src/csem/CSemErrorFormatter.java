@@ -5,6 +5,14 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class CSemErrorFormatter {
 
     public void printError(ParserRuleContext ctx, String error) {
+        printError(ctx, error,0);
+    }
+
+    public void printWarning(ParserRuleContext ctx, String error) {
+        printWarning(ctx, error,0);
+    }
+
+    public void printError(ParserRuleContext ctx, String error, Integer offset) {
         // Print error like this :
         // [error] : integer overflow at line 1 column 1
         // var a:int := 2147483648
@@ -15,13 +23,13 @@ public class CSemErrorFormatter {
         String currentLine = program.split("\n")[ctx.getStart().getLine() - 1];
         System.out.println("   "+currentLine);
         System.out.print("   ");
-        for (int i = 0; i < ctx.getStart().getCharPositionInLine(); i++) {
+        for (int i = 0; i < ctx.getStart().getCharPositionInLine()+offset; i++) {
             System.out.print(" ");
         }
         System.out.println("^");
     }
 
-    public void printWarning(ParserRuleContext ctx, String warning) {
+    public void printWarning(ParserRuleContext ctx, String warning, Integer offset) {
         // Print wa like this :
         // [warning] : integer overflow at line 1 column 1
         // var a:int := 2147483648
@@ -32,7 +40,7 @@ public class CSemErrorFormatter {
         String currentLine = program.split("\n")[ctx.getStart().getLine() - 1];
         System.out.println("   "+currentLine);
         System.out.print("   ");
-        for (int i = 0; i < ctx.getStart().getCharPositionInLine(); i++) {
+        for (int i = 0; i < ctx.getStart().getCharPositionInLine()+offset; i++) {
             System.out.print(" ");
         }
         System.out.println("^");

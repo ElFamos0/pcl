@@ -65,8 +65,7 @@ public class OpCSem {
                 if (!(table.getSymbol(s).getType().equals(new Primitive(Integer.class)))){
                     err.printError(ctx, s+" is not an integer");
                 }
-            }
-            else{   
+            } else{   
                 if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))){
                     err.printError(ctx, s+" is not an integer");
                 }
