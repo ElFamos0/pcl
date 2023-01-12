@@ -1,21 +1,8 @@
-let
-    type intArray = array of int
-    type zebi = int
-    var x := intArray[5] of 0
-
-    var baz : string := "test"
-    var i := 5/2*3
-    var j := i*2
-    var r : zebi := 5
-    var n := r
-    function f() : int = 42
-    function test(x: int, y: int) : int = x + y
+let 
+    type t1 = {champ1 : string, champ2 : int}
+    type t2 = {champ1 : string, champ2 : int}
+    var a :t1 :=  t1 {champ1 = nil, champ2 = 3}
+    var b :t2 := t2 {champ1 = "yo", champ2 = 5}
 in
-    if (i/2 = 0) then (
-        r := multiply(i,j)
-    ) else (
-        r := multiply(i,i)
-    );
-    print(divide(i*j,r));
-    i := 5
+    a.champ1 := b
 end

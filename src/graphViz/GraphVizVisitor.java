@@ -514,8 +514,8 @@ public class GraphVizVisitor implements AstVisitor<String> {
         String nodeIdentifier = this.nextState();
 
         this.addNode(nodeIdentifier, "Record");
-        String nameState = a.id.accept(this);
-        this.addTransition(nodeIdentifier, nameState);
+        // String nameState = a.id.accept(this);
+        // this.addTransition(nodeIdentifier, nameState);
         for (Ast ast : a.champs) {
             String state = ast.accept(this);
             this.addTransition(nodeIdentifier, state);
