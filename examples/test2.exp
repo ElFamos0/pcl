@@ -1,0 +1,72 @@
+let 
+    type intArray = array of int
+    type intTab = array of intArray
+    type record = {val : int, name: string}
+    type newInt = int
+
+    var a:= intArray [8] of 0
+    var board := intTab [8] of a
+    var b:newInt := nil
+
+    function init(board:intTab) =
+        for i := 0 to 7 do
+            for j:= 0 to 7 do
+                (b[i][j] := 0)
+    
+    function setTileValue(board:intTab,case : int, value : int) =
+        let
+            var ligne :int := nil
+            var colonne :int := nil
+        in
+            ligne := (case / 8);
+            colonne := case - ligne*8;
+            board[ligne][colonne] := value
+        end
+    
+    function getTileValue(board:intTab,case:int) :int = 
+        let
+            var ligne :int := nil
+            var colonne :int := nil
+        in
+            ligne := (case / 8);
+            colonne := case - ligne*8;
+            board[ligne][colonne]
+        end
+
+    function findFirstNonZero(board:intTab) :int = 
+        let 
+            var state :int := 0
+            var count :int := 0
+            var temp :int := 0
+            var retour := 0
+        in 
+            while not(state) do
+                (
+                temp := getTileValue(board,count);
+                if temp <> 0
+                    then 
+                        (
+                        retour := count;
+                        state := 1;
+                        break
+                        )
+                    else
+                        (
+                        count := count +1
+                        )
+                ;
+                if count > 63
+                    then
+                    (
+                    retour := -1;
+                    state = 1
+                    )
+                );
+            retour
+        end
+in
+    init(board);
+    setTileValue(board,8,1);
+    printi(getTileValue(board,8));
+    findFirstNonZero(board)
+end
