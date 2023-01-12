@@ -1,8 +1,15 @@
 package csem;
 
 import ast.*;
+import sl.SymbolLookup;
 
 public class AstVisitor implements ast.AstVisitor<Void> {
+    SymbolLookup table;
+
+    public AstVisitor(SymbolLookup table) {
+        this.table = table;
+    }
+
     @Override
     public Void visit(Program a) {
         // TODO Auto-generated method stub
