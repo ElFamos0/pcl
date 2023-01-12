@@ -22,7 +22,9 @@ public class OpCSem {
         }
     }
 
-
+    if (right == null) {
+        return;
+    }
     String split2[] = right.split(":");
 
     if (split2.length == 1){

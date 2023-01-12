@@ -75,6 +75,8 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(left, right, table);
 
+        System.out.println(right);
+
         return left + ":" + right;
     }
 
@@ -97,6 +99,11 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(left, right, table);
 
+        // check division by zero
+
+        if (right.equals("0")) {
+            System.out.println("Division by zero");
+        }
 
         return left + ":" + right;
     }
@@ -115,6 +122,10 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(Negation a) {
+        String left = a.expression.accept(this);
+        String right = null;
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        OpCSem.checkint(left, right, table);
         return a.expression.accept(this);
     }
 
