@@ -81,6 +81,9 @@ public class CSemVisitor implements AstVisitor<String> {
         if (operator.equals("<") || operator.equals(">") || operator.equals(">=") || operator.equals("<=")){
             OpCSem.checkIntOrString(a.ctx, left, right, table);
         }
+        else if (operator.equals("=") || operator.equals("<>")) {
+            OpCSem.checksametype(a.ctx, left, right, table);
+        }
 
         return left + ":" + right;
     }

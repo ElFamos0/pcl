@@ -163,4 +163,33 @@ public class OpCSem {
         }
 
     }
+
+    public static void checksametype(ParserRuleContext ctx, String left, String right, SymbolLookup table) {
+        CSemErrorFormatter err = new CSemErrorFormatter();
+        String split[] = left.split(":");
+        String split2[] = right.split(":");
+        if (split.length == 1 && split2.length == 1){
+            String s = split[0];
+            String s2 = split2[0];
+            if(table.getSymbol(s) != null && table.getSymbol(s2) != null) {
+                if (!(table.getSymbol(s).getType().equals(table.getSymbol(s2).getType()))){
+                    err.printError(ctx, "Cannot compare different types");
+                }
+            } else if (table.getSymbol(s) == null && table.getSymbol(s2) == null){
+                if (!(TypeInferer.inferType(table, s).equals(TypeInferer.inferType(table, s2)))){
+                    err.printError(ctx, "Cannot compare different types");
+                }
+            }
+            else if(table.getSymbol(s) == null && table.getSymbol(s2) != null){
+                if (!(TypeInferer.inferType(table, s).equals(table.getSymbol(s2).getType()))){
+                    err.printError(ctx, "Cannot compare different types");
+                }
+            }
+            else if(table.getSymbol(s2) == null && table.getSymbol(s) != null){
+                if (!(table.getSymbol(s).getType().equals(TypeInferer.inferType(table, s2)))){
+                    err.printError(ctx, "Cannot compare different types");
+                }
+            }
+        }
+    }
 }
