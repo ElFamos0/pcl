@@ -64,14 +64,19 @@ public class OpCSem {
 
         if (split.length == 1){
             String s = split[0];
-            System.out.println(s);
+            //System.out.println(s);
             if(table.getSymbol(s) != null) {
                 if (!(table.getSymbol(s).getType().equals(new Primitive(Integer.class)))){
                     err.printError(ctx, s+" is not an integer");
                 }
             } else{
                 if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))){
+                    if (s == ""){
+                        err.printError(ctx, "Cannot add null");
+                    }
+                    else{
                     err.printError(ctx, s+" is not an integer");
+                    }
                 }
             }
         }
@@ -83,14 +88,19 @@ public class OpCSem {
 
         if (split2.length == 1){
             String s2 = split2[0];
-            System.out.println(s2);
+            //System.out.println(s2);
             if(table.getSymbol(s2) != null) {
                 if (!(table.getSymbol(s2).getType().equals(new Primitive(Integer.class)))){
                     err.printError(ctx, s2+" is not an integer");
                 }
             } else{
                 if (!(TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class)))){
+                    if (s2 == ""){
+                        err.printError(ctx, "Cannot add null");
+                    }
+                    else{
                     err.printError(ctx, s2+" is not an integer");
+                    }
                 }
             }
         }
