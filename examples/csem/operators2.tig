@@ -4,5 +4,5 @@ let
     var x1 :int := 5
     var x2 :int := 0
 in  
-    x1 / x2
+    x1 / 0
 end
