@@ -5,8 +5,12 @@ import sl.*;
 public class TypeInfererTest {
     public static void main(String[] args) {
         SymbolLookup table = new SymbolLookup(null);
-        table.addSymbolVarAndFunc(new Variable("a", new Primitive(Integer.class)));
-        table.addSymbolVarAndFunc(new Variable("b", new Array(new Primitive(Character.class))));
+        try {
+            table.addSymbolVarAndFunc(new Variable("a", new Primitive(Integer.class)));
+            table.addSymbolVarAndFunc(new Variable("b", new Array(new Primitive(Character.class))));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         testSeqList(table);
         testArray(table);
         testOp(table);

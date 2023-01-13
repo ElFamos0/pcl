@@ -84,7 +84,7 @@ public class SymbolLookup {
             return children.get(i);
     }
 
-    public void addSymbolVarAndFunc(Symbol s) {
+    public void addSymbolVarAndFunc(Symbol s) throws Exception {
         if (s instanceof Variable) {
             ((Variable) s).setOffset(varOffset);
 
@@ -96,7 +96,7 @@ public class SymbolLookup {
         }
         Symbol temp = funcAndVar.put(s.getName(), s);
         if (temp != null) {
-            System.out.println("Error: " + s.toString() + " " + s.getName() + " already exists");
+            throw new Exception(s.getName() + " already exists");
         }
     }
 

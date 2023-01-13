@@ -2,6 +2,10 @@ package sl;
 
 public class TypeInferer {
     public static Type inferType(SymbolLookup table, String expr) {
+        if (expr == null) {
+            return new Primitive(Void.class);
+        }
+
         while (expr.contains("(")) {
             expr = expr.substring(expr.indexOf("(") + 1, expr.lastIndexOf(")"));
             String[] split = expr.split(";");

@@ -19,6 +19,7 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 
+import csem.CSemErrorFormatter;
 import parser.exprBaseVisitor;
 import parser.exprParser;
 import parser.exprParser.AppelFonctionContext;
@@ -74,7 +75,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
-            noeudTemporaire = new Expression(noeudTemporaire, ctx.getChild(2 * i + 2).accept(this));
+            noeudTemporaire = new Expression(ctx, noeudTemporaire, ctx.getChild(2 * i + 2).accept(this));
         }
 
         return noeudTemporaire;
@@ -215,7 +216,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitIdentifiant(IdentifiantContext ctx) {
-        return new ID(ctx.getChild(0).getText());
+        return new ID(ctx, ctx.getChild(0).getText());
     }
 
     @Override
@@ -442,19 +443,29 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitDeclarationValeur(DeclarationValeurContext ctx) {
-        DeclarationValeur dv = new DeclarationValeur();
+        DeclarationValeur dv = new DeclarationValeur(ctx);
         dv.setId(ctx.getChild(1).accept(this));
 
         SymbolLookup table = this.table.getSymbolLookup(region);
         String idf = ctx.getChild(1).getText();
         String expr = ctx.getChild(3).getText();
 
+        CSemErrorFormatter err = new CSemErrorFormatter();
+
         if (ctx.getChild(2).getText().equals(":")) {
-            table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
+            try {
+                table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
+            } catch (Exception e) {
+                err.printError(ctx, e.getMessage());
+            }
             dv.setType(ctx.getChild(3).accept(this));
             dv.setExpr(ctx.getChild(5).accept(this));
         } else {
-            table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
+            try {
+                table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
+            } catch (Exception e) {
+                err.printError(ctx, e.getMessage());
+            }
             dv.setExpr(ctx.getChild(3).accept(this));
         }
         return dv;
@@ -508,7 +519,12 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         drf.setExpr(branch);
 
         Function f = new Function(idf, type);
-        table.addSymbolVarAndFunc(f);
+        try {
+            table.addSymbolVarAndFunc(f);
+        } catch (Exception e) {
+            CSemErrorFormatter err = new CSemErrorFormatter();
+            err.printError(ctx, e.getMessage());
+        }
         f.addParams(params);
 
         // Get out of the lookupTable
@@ -615,6 +631,14 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         Ast block = ctx.getChild(7).accept(this);
 
         region = temp;
+
+        CSemErrorFormatter err = new CSemErrorFormatter();
+        // Add init to SLT
+        try {
+            table.addSymbolVarAndFunc(new Variable(ctx.getChild(1).getText(), TypeInferer.inferType(table, "int")));
+        } catch (Exception e) {
+            err.printError(ctx, e.getMessage());
+        }
 
         return new For(init, condition, increment, block);
     }

@@ -33,6 +33,19 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
 
+        // If expression is like `idf := expr` we need to check that expr is the same type as idf
+        if (right != null) {
+            SymbolLookup table = this.table.getSymbolLookup(region);
+            Type t = TypeInferer.inferType(table, right);
+            if (table.getSymbol(left) != null) {
+                Type t2 = table.getSymbol(left).getType();
+                if (!t.equals(t2)) {
+                    new CSemErrorFormatter().printError(a.ctx, "type mismatch between '" + left + "' and '" + right +"' of type " + t + " and " + t2);
+                }
+            }
+        }
+
+
         return left + ":" + right;
     }
 
@@ -136,6 +149,12 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(ID a) {
         String idf = a.nom;
 
+        // Check for existence of the identifier
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        if (table.getSymbol(idf) == null && table.getType(idf) == null) {
+            new CSemErrorFormatter().printError(a.ctx, "Unknown identifier");
+        }
+
         return idf;
     }
 
@@ -152,8 +171,10 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(ExpressionIdentifiant a) {
         a.left.accept(this);
-        if (a.right != null)
+
+        if (a.right != null) {
             a.right.accept(this);
+        }
 
         return null;
     }
@@ -305,10 +326,30 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(DeclarationValeur a) {
-        a.id.accept(this);
-        if (a.getType() != null)
+        String idf = a.id.accept(this);
+        if (a.getType() != null) {
             a.getType().accept(this);
-        a.expr.accept(this);
+        }
+        
+        String expr = a.expr.accept(this);
+
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        Type t = TypeInferer.inferType(table, expr);
+        Type f = table.getSymbol(idf).getType();
+
+        CSemErrorFormatter err = new CSemErrorFormatter();
+
+        // If t is of type void, there is an error
+        if (t.equals(new Primitive(Void.class))) {
+            err.printError(a.ctx, "The return value for the declaration of '" + idf + "' is void");
+            return null;
+        }
+
+        // If they don't match, there is an error
+        if (!t.equals(f)) {
+            err.printError(a.ctx, "Type mismatch in declaration '" + idf + "' : " + t + " != " + f);
+        }
+
 
         return null;
     }
