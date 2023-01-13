@@ -17,6 +17,15 @@ public class Record extends Type {
         fields.add(s);
     }
 
+    public Boolean hasField(String name) {
+        for (Symbol s : fields) {
+            if (s.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Symbol getField(String name) {
         for (Symbol s : fields) {
             if (s.getName().equals(name)) {

@@ -1,6 +1,7 @@
 package csem;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ast.*;
 import sl.Primitive;
@@ -81,8 +82,6 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table);
 
-        System.out.println("Addition: " + left + " + " + right);
-
         return left + ":" + right;
     }
 
@@ -149,12 +148,6 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(ID a) {
         String idf = a.nom;
-
-        // Check for existence of the identifier
-        SymbolLookup table = this.table.getSymbolLookup(region);
-        if (table.getSymbol(idf) == null && table.getType(idf) == null) {
-            new CSemErrorFormatter().printError(a.ctx, "Unknown identifier");
-        }
 
         return idf;
     }
@@ -267,25 +260,55 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(DeclarationType a) {
         a.id.accept(this);
-        a.type.accept(this);
+        String type = a.type.accept(this);
+
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
+        // Check for existence of the type
+        if (table.getType(type) == null) {
+            new CSemErrorFormatter().printError(a.ctx, "Type '"+type+"' not defined");
+        }
 
         return null;
     }
 
     @Override
     public String visit(DeclarationTypeClassique a) {
-        return a.id.accept(this);
+        String idk = a.id.accept(this);
+
+        return idk;
     }
 
     @Override
     public String visit(DeclarationArrayType a) {
-        return a.id.accept(this);
+        String idk = a.id.accept(this);
+
+        return idk;
     }
 
     @Override
     public String visit(DeclarationRecordType a) {
-        for (Ast ast : a.champs)
-            ast.accept(this);
+        List<String> fields = new ArrayList<>();
+        for (Ast ast : a.champs) {
+            String expr = ast.accept(this);
+
+            String[] split = expr.split(":");
+            String idf = split[0];
+            String type = split[1];
+
+            SymbolLookup table = this.table.getSymbolLookup(region);
+
+            // Check for existence of the field
+            if (fields.contains(idf)) {
+                new CSemErrorFormatter().printError(a.ctx, "Field '"+split[0]+"' is redefined in record");
+            }
+            // Check for existence of the type
+            if (table.getType(type) == null) {
+                new CSemErrorFormatter().printError(a.ctx, "Type '"+split[1]+"' is not defined");
+            }
+
+            fields.add(idf);
+        }
 
         return null;
     }

@@ -1,5 +1,7 @@
 package ast;
 
+import parser.exprParser.DeclarationTypeContext;
+
 public class DeclarationType implements Ast{
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
@@ -7,8 +9,10 @@ public class DeclarationType implements Ast{
     
     public Ast id;
     public Ast type;
+    public DeclarationTypeContext ctx;
 
-    public DeclarationType() {
+    public DeclarationType(DeclarationTypeContext ctx) {
+        this.ctx = ctx;
     }
 
     public void setId(Ast id) {

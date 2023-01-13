@@ -391,9 +391,16 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitDeclarationType(DeclarationTypeContext ctx) {
-        DeclarationType dt = new DeclarationType();
+        DeclarationType dt = new DeclarationType(ctx);
 
         idf = ctx.getChild(1).getText();
+
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
+        // Check for existence of the identifier
+        if (table.getType(idf) != null) {
+            new CSemErrorFormatter().printError(ctx, "Type '"+idf+"' already defined");
+        }
 
         dt.setId(ctx.getChild(1).accept(this));
         dt.setType(ctx.getChild(3).accept(this));
@@ -402,8 +409,9 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitDeclarationTypeClassique(DeclarationTypeClassiqueContext ctx) {
-        DeclarationTypeClassique dtc = new DeclarationTypeClassique();
+        DeclarationTypeClassique dtc = new DeclarationTypeClassique(ctx);
         SymbolLookup table = this.table.getSymbolLookup(region);
+
         table.addType(idf, TypeInferer.inferType(table, ctx.getChild(0).getText()));
         dtc.setId(ctx.getChild(0).accept(this));
         return dtc;
@@ -411,9 +419,10 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitDeclarationArrayType(DeclarationArrayTypeContext ctx) {
-        DeclarationArrayType dat = new DeclarationArrayType();
+        DeclarationArrayType dat = new DeclarationArrayType(ctx);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
+
         table.addType(idf, new Array(TypeInferer.inferType(table, ctx.getChild(2).getText())));
 
         dat.setId(ctx.getChild(2).accept(this));
@@ -422,7 +431,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitDeclarationRecordType(DeclarationRecordTypeContext ctx) {
-        DeclarationRecordType drt = new DeclarationRecordType();
+        DeclarationRecordType drt = new DeclarationRecordType(ctx);
         Record rec = new Record();
         SymbolLookup table = this.table.getSymbolLookup(region);
         for (int i = 0; 2 * i + 1 < ctx.getChildCount() - 1; i++) {
