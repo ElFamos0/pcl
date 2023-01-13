@@ -112,6 +112,14 @@ public class SymbolLookup {
 
             varOffset += s.getType().getSize();
         }
+        if (s instanceof Function) {
+            // Get the last children
+            ((Function) s).setTable(getChildren(-1));
+        }
+        Symbol temp = funcAndVar.put(s.getName(), s);
+        if (temp != null) {
+            System.out.println("Error: " + s.toString() + " " + s.getName() + " already exists");
+        }
     }
 
     public void addSymbolParam(Variable s) {

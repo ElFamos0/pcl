@@ -2,6 +2,8 @@ package ast;
 
 import java.util.ArrayList;
 
+import parser.exprParser.DeclarationRecordTypeContext;
+
 // | '{' ( identifiant ':' identifiant ( ',' identifiant ':' identifiant )* )? '}' #DeclarationRecordType
 
 public class DeclarationRecordType implements Ast{
@@ -11,9 +13,11 @@ public class DeclarationRecordType implements Ast{
     
     // public Ast id;
     public ArrayList<Ast> champs = new ArrayList<Ast>();
+    public DeclarationRecordTypeContext ctx;
 
 
-    public DeclarationRecordType() {
+    public DeclarationRecordType(DeclarationRecordTypeContext ctx) {
+        this.ctx = ctx;
         this.champs = new ArrayList<Ast>();
     }
 

@@ -1,6 +1,7 @@
 package csem;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ast.*;
 import sl.Function;
@@ -33,6 +34,19 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(Expression a) {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
+
+        // If expression is like `idf := expr` we need to check that expr is the same type as idf
+        if (right != null) {
+            SymbolLookup table = this.table.getSymbolLookup(region);
+            Type t = TypeInferer.inferType(table, right);
+            if (table.getSymbol(left) != null) {
+                Type t2 = table.getSymbol(left).getType();
+                if (!t.equals(t2)) {
+                    new CSemErrorFormatter().printError(a.ctx, "type mismatch between '" + left + "' and '" + right +"' of type " + t + " and " + t2);
+                }
+            }
+        }
+
 
         return left + ":" + right;
     }
@@ -67,8 +81,6 @@ public class CSemVisitor implements AstVisitor<String> {
         String right = a.right.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table);
-
-        System.out.println("Addition: " + left + " + " + right);
 
         return left + ":" + right;
     }
@@ -153,8 +165,10 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(ExpressionIdentifiant a) {
         a.left.accept(this);
-        if (a.right != null)
+
+        if (a.right != null) {
             a.right.accept(this);
+        }
 
         return null;
     }
@@ -267,25 +281,55 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(DeclarationType a) {
         a.id.accept(this);
-        a.type.accept(this);
+        String type = a.type.accept(this);
+
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
+        // Check for existence of the type
+        if (table.getType(type) == null) {
+            new CSemErrorFormatter().printError(a.ctx, "Type '"+type+"' not defined");
+        }
 
         return null;
     }
 
     @Override
     public String visit(DeclarationTypeClassique a) {
-        return a.id.accept(this);
+        String idk = a.id.accept(this);
+
+        return idk;
     }
 
     @Override
     public String visit(DeclarationArrayType a) {
-        return a.id.accept(this);
+        String idk = a.id.accept(this);
+
+        return idk;
     }
 
     @Override
     public String visit(DeclarationRecordType a) {
-        for (Ast ast : a.champs)
-            ast.accept(this);
+        List<String> fields = new ArrayList<>();
+        for (Ast ast : a.champs) {
+            String expr = ast.accept(this);
+
+            String[] split = expr.split(":");
+            String idf = split[0];
+            String type = split[1];
+
+            SymbolLookup table = this.table.getSymbolLookup(region);
+
+            // Check for existence of the field
+            if (fields.contains(idf)) {
+                new CSemErrorFormatter().printError(a.ctx, "Field '"+split[0]+"' is redefined in record");
+            }
+            // Check for existence of the type
+            if (table.getType(type) == null) {
+                new CSemErrorFormatter().printError(a.ctx, "Type '"+split[1]+"' is not defined");
+            }
+
+            fields.add(idf);
+        }
 
         return null;
     }
