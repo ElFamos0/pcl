@@ -112,11 +112,6 @@ public class SymbolLookup {
 
             varOffset += s.getType().getSize();
         }
-        if (s instanceof Function) {
-            // Get the last children
-            this.addChildren();
-            ((Function) s).setTable(getChildren(-1));
-        }
     }
 
     public void addSymbolParam(Variable s) {

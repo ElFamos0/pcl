@@ -462,6 +462,12 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         int temp = region;
         SymbolLookup table = this.table.getSymbolLookup(region);
+
+        // Add a new SymbolLookup for the function
+        table.addChildren();
+        // Get the id of the new SymbolLookup
+        int id = table.getChildren().size() - 1;
+
         ArrayList<Variable> params = new ArrayList<>();
         region++;
 
@@ -509,6 +515,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         Function f = new Function(idf, type);
         table.addSymbolVarAndFunc(f);
+        f.setTable(table.getChildren(id));
         f.addParams(params);
 
         // Get out of the lookupTable
