@@ -138,7 +138,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
-            noeudTemporaire = new Compar(noeudTemporaire, ctx.getChild(2 * i + 2).accept(this),
+            noeudTemporaire = new Compar(ctx,noeudTemporaire, ctx.getChild(2 * i + 2).accept(this),
                     ctx.getChild(2 * i + 1).getText());
         }
 

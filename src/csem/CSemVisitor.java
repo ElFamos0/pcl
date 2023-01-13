@@ -74,7 +74,14 @@ public class CSemVisitor implements AstVisitor<String> {
         String right = a.right.accept(this);
         String operator = a.operator;
 
-        return null;
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
+        // Check if left and right are integers or string
+
+        OpCSem.checkIntOrString(a.ctx, left, right, table);
+
+
+        return left + ":" + right;
     }
 
     @Override

@@ -105,4 +105,48 @@ public class OpCSem {
             }
         }
     }
+
+    public static void checkIntOrString(ParserRuleContext ctx, String left, String right, SymbolLookup table) {
+        CSemErrorFormatter err = new CSemErrorFormatter();
+        String split[] = left.split(":");
+        boolean isInt = false;
+
+        if (split.length == 1){
+            String s = split[0];
+            //System.out.println(s);
+            if(table.getSymbol(s) != null) {
+                System.out.println(table.getSymbol(s).getType());
+                if (table.getSymbol(s).getType().equals(new Primitive(Integer.class))){
+                    isInt = true;
+                }
+            } else{
+                if (TypeInferer.inferType(table, s).equals(new Primitive(Integer.class))){
+                    isInt = true;
+                    //System.out.println(s + "isInt");
+                }
+            }
+        }
+
+        String split2[] = right.split(":");
+
+        if (split2.length == 1){
+            String s2 = split2[0];
+            //System.out.println(s2);
+            if(table.getSymbol(s2) != null) {
+                if (table.getSymbol(s2).getType().equals(new Primitive(Integer.class))){
+                    if (!isInt){
+                        err.printError(ctx, "Cannot add an integer and a string");
+                    }
+                }
+            } else{
+                if (TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class))){
+                    isInt = true;
+                    if (!isInt){
+                        err.printError(ctx, "Cannot add an integer and a string");
+                    }
+                }
+            }
+        }
+
+    }
 }
