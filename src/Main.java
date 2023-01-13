@@ -10,6 +10,7 @@ import parser.exprParser.ProgramContext;
 import sl.*;
 import ast.*;
 import csem.CSemVisitor;
+import csem.ErrorHandler;
 import graphViz.GraphVizVisitor;
 
 public class Main {
@@ -48,6 +49,13 @@ public class Main {
             // Controle semantique
             CSemVisitor csem = new CSemVisitor(table);
             ast.accept(csem);
+
+            ErrorHandler errorHandler = csem.getErrorHandler();
+
+            if (errorHandler.getErrorCount() > 0) {
+                System.out.println("Compilation failed with " + errorHandler.getErrorCount() + " errors");
+                System.exit(1);
+            }
 
             graphViz.dumpGraph("./out/tree.dot");
 

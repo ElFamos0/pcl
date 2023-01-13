@@ -6,15 +6,20 @@ import ast.*;
 import sl.SymbolLookup;
 import sl.Type;
 import sl.TypeInferer;
-import sl.Primitive;
 
 public class CSemVisitor implements AstVisitor<String> {
     private SymbolLookup table;
     private int region;
+    private ErrorHandler errorHandler;
 
     public CSemVisitor(SymbolLookup table) {
         this.table = table;
         region = 0;
+        errorHandler = new ErrorHandler();
+    }
+
+    public ErrorHandler getErrorHandler() {
+        return errorHandler;
     }
 
     @Override
@@ -62,9 +67,10 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table);
 
+        System.out.println("Addition: " + left + " + " + right);
+
         return left + ":" + right;
     }
-
 
     @Override
     public String visit(Soustraction a) {
@@ -73,7 +79,6 @@ public class CSemVisitor implements AstVisitor<String> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table);
-
 
         return left + ":" + right;
     }
@@ -100,8 +105,7 @@ public class CSemVisitor implements AstVisitor<String> {
         // check division by zero
 
         if (right.equals("0")) {
-            CSemErrorFormatter csemErrorFormatter = new CSemErrorFormatter();
-            csemErrorFormatter.printError(a.ctx, "Division by zero");
+            errorHandler.error(a.ctx, "Division by zero");
         }
 
         return left + ":" + right;

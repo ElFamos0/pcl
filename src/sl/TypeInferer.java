@@ -14,12 +14,8 @@ public class TypeInferer {
         if (table.getType(expr) != null)
             return table.getType(expr);
         if (expr.contains("-") || expr.contains("*") || expr.contains("/")
-                || isNumeric(expr) || expr.equals("int"))
+                || isNumeric(expr) || expr.equals("int") || expr.contains("+"))
             return new Primitive(Integer.class);
-        if (expr.contains("+")) {
-            String[] split = expr.split("\\+");
-            return inferType(table, split[0]);
-        }
         if (expr.contains("array"))
             return new Array(inferType(table, expr.substring(7, expr.length())));
         if (expr.equals("()") || expr.isEmpty())
