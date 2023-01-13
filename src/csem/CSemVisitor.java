@@ -3,6 +3,7 @@ package csem;
 import java.util.ArrayList;
 
 import ast.*;
+import sl.Primitive;
 import sl.SymbolLookup;
 import sl.Type;
 import sl.TypeInferer;
