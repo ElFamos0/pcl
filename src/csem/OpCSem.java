@@ -3,11 +3,13 @@ package csem;
 import sl.SymbolLookup;
 import sl.TypeInferer;
 
+
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import ast.Int;
 import parser.exprParser.NegationContext;
 import sl.Primitive;
+import sl.Array;
 
 public class OpCSem {
     public static void checkint(Int a, SymbolLookup table) {
@@ -114,14 +116,22 @@ public class OpCSem {
         if (split.length == 1){
             String s = split[0];
             //System.out.println(s);
+            //System.out.println(table.getSymbol(s).getType());
             if(table.getSymbol(s) != null) {
                 if (table.getSymbol(s).getType().equals(new Primitive(Integer.class))){
                     isInt = true;
+                }
+                
+                else if (!(table.getSymbol(s).getType().equals(new Array(new Primitive(Character.class))))){
+                    err.printError(ctx, "Invalid type for comparaison");
                 }
             } else{
                 if (TypeInferer.inferType(table, s).equals(new Primitive(Integer.class))){
                     isInt = true;
                     //System.out.println(s + "isInt");
+                }
+                else if (!(TypeInferer.inferType(table, s).equals(new Primitive(String.class)))){
+                    err.printError(ctx, "Invalid type for comparaison");
                 }
             }
         }
@@ -137,11 +147,17 @@ public class OpCSem {
                         err.printError(ctx, "Cannot add an integer and a string");
                     }
                 }
+                else if(!(table.getSymbol(s2).getType().equals(new Array(new Primitive(Character.class))))){
+                    err.printError(ctx, "Invalid type for comparaison");
+                }
             } else{
                 if (TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class))){
                     if (!isInt){
                         err.printError(ctx, "Cannot add an integer and a string");
                     }
+                }
+                else if(!(TypeInferer.inferType(table, s2).equals(new Array(new Primitive(Character.class))))){
+                    err.printError(ctx, "Invalid type for comparaison");
                 }
             }
         }
