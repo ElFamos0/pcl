@@ -78,8 +78,9 @@ public class CSemVisitor implements AstVisitor<String> {
 
         // Check if left and right are integers or string
 
-        OpCSem.checkIntOrString(a.ctx, left, right, table);
-
+        if (operator.equals("<") || operator.equals(">") || operator.equals(">=") || operator.equals("<=")){
+            OpCSem.checkIntOrString(a.ctx, left, right, table);
+        }
 
         return left + ":" + right;
     }
