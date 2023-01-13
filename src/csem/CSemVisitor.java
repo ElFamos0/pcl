@@ -3,6 +3,7 @@ package csem;
 import java.util.ArrayList;
 
 import ast.*;
+import sl.Function;
 import sl.SymbolLookup;
 import sl.Type;
 import sl.TypeInferer;
@@ -12,10 +13,10 @@ public class CSemVisitor implements AstVisitor<String> {
     private int region;
     private ErrorHandler errorHandler;
 
-    public CSemVisitor(SymbolLookup table) {
+    public CSemVisitor(SymbolLookup table, ErrorHandler errorHandler) {
         this.table = table;
         region = 0;
-        errorHandler = new ErrorHandler();
+        this.errorHandler = errorHandler;
     }
 
     public ErrorHandler getErrorHandler() {
@@ -160,19 +161,40 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(AppelFonction a) {
-        a.id.accept(this);
-        a.args.accept(this);
+        String idf = a.id.accept(this);
+        String args = a.args.accept(this);
+        String[] arg = args.split(":");
 
-        return null;
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
+        Function f = (Function) table.getSymbol(idf);
+
+        if (table.getSymbol(idf) == null)
+            errorHandler.error(a.ctx, "Function " + idf + " is not defined");
+
+        if (f != null && !args.equals("") && f.getParamsCount() != arg.length)
+            errorHandler.error(a.ctx, "Function " + idf + " expects " + f.getParamsCount() + " arguments, but "
+                    + arg.length + " were given");
+
+        for (int i = 0; i < arg.length; i++) {
+            Type t = TypeInferer.inferType(table, arg[i]);
+
+            if (f != null && i < f.getParamsCount() && !(t.equals(f.getParams().get(i).getType())))
+                errorHandler.error(a.ctx, "Function " + idf + " expects " + f.getParams().get(i).getType()
+                        + " as argument " + (i + 1) + ", but " + t + " was given");
+        }
+
+        return "function:" + idf;
     }
 
     @Override
     public String visit(ArgFonction a) {
+        String args = "";
         for (Ast ast : a.args) {
-            ast.accept(this);
+            args += ast.accept(this) + ":";
         }
 
-        return null;
+        return args.equals("") ? "" : args.substring(0, args.length() - 1);
     }
 
     @Override
@@ -223,7 +245,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
         region = temp;
 
-        return null;
+        return "";
     }
 
     @Override
@@ -280,23 +302,36 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(DeclarationFonction a) {
         int temp = region;
         region++;
-        SymbolLookup table = this.table.getSymbolLookup(region);
+        SymbolLookup table = this.table.getSymbolLookup(temp);
         String idf = a.id.accept(this);
+        Function f = (Function) table.getSymbol(idf);
+        SymbolLookup fTable = f.getTable();
+
         for (Ast ast : a.args) {
             String field = ast.accept(this);
             String[] split = field.split(":");
-            FuncCSem.checkArgs(split[0], split[1], table);
+            String err = FuncCSem.checkArgs(split[0], split[1], fTable);
+
+            if (err != null)
+                errorHandler.error(a.ctx, err);
         }
         if (a.has_return)
             a.return_type.accept(this);
 
-        Type t = TypeInferer.inferType(table, a.expr.accept(this));
-        Type f = table.getSymbol(idf).getType();
+        String expr = a.expr.accept(this);
+        Type t = TypeInferer.inferType(table, expr);
+        Type ft = table.getSymbol(idf).getType();
 
-        if (!t.equals(f))
-            System.out.println("Type mismatch in function " + idf + " : " + t + " != " + f);
+        if (!t.equals(ft))
+            errorHandler.error(a.ctx, "Type mismatch in function declaration " + idf + " : " + ft + " != " + t);
 
-        FuncCSem.checkFuncFromLib(idf);
+        String err = FuncCSem.checkFuncFromLib(idf);
+
+        if (err != null)
+            errorHandler.error(a.ctx, err);
+
+        if (table.getParent().isMultiDec(idf))
+            errorHandler.error(a.ctx, "Multiple declaration of " + idf);
 
         region = temp;
 
@@ -305,10 +340,31 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(DeclarationValeur a) {
-        a.id.accept(this);
+        String idf = a.id.accept(this);
+        String type = null;
         if (a.getType() != null)
-            a.getType().accept(this);
-        a.expr.accept(this);
+            type = a.getType().accept(this);
+        String expr = a.expr.accept(this);
+        String[] split = null;
+
+        if (expr != null && expr.contains(":")) {
+            split = expr.split(":");
+        }
+
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
+        if (split != null) {
+            if (type != null && split[0].equals("function")) {
+                Type t = table.getSymbol(split[1]).getType();
+
+                if (!t.equals(TypeInferer.inferType(table, type)))
+                    errorHandler.error(a.ctx,
+                            "Type mismatch in variable declaration " + idf + " : " + type + " != " + t);
+            }
+        }
+
+        if (table.isMultiDec(idf))
+            errorHandler.error(a.ctx, "Multiple declaration of " + idf);
 
         return null;
     }

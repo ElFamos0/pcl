@@ -32,6 +32,9 @@ public class Main {
             CommonTokenStream stream = new CommonTokenStream(lexer);
             exprParser parser = new exprParser(stream);
 
+            // Error handling
+            ErrorHandler errorHandler = new ErrorHandler();
+
             // Récupération du noeud program (le noeud à la racine)
             ProgramContext program = parser.program();
 
@@ -47,10 +50,8 @@ public class Main {
             ast.accept(graphViz);
 
             // Controle semantique
-            CSemVisitor csem = new CSemVisitor(table);
+            CSemVisitor csem = new CSemVisitor(table, errorHandler);
             ast.accept(csem);
-
-            ErrorHandler errorHandler = csem.getErrorHandler();
 
             if (errorHandler.getErrorCount() > 0) {
                 System.out.println("Compilation failed with " + errorHandler.getErrorCount() + " errors");

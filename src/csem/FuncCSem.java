@@ -5,22 +5,28 @@ import sl.SymbolLookup;
 import sl.Type;
 
 public class FuncCSem {
-    public static void checkFuncFromLib(String name) {
+    public static String checkFuncFromLib(String name) {
         String[] lib = { "print" };
         for (String s : lib) {
             if (s.equals(name)) {
-                System.out.println("Error: function " + name + " is part of the standard library");
+                return "Error: function " + name + " is part of the standard library";
             }
         }
+
+        return null;
     }
 
-    public static void checkArgs(String arg, String type, SymbolLookup table) {
+    public static String checkArgs(String arg, String type, SymbolLookup table) {
         Symbol s = table.getSymbol(arg);
         Type t = table.getType(type);
 
         if (s == null)
-            System.out.println("Error: variable " + arg + " is not declared");
+            return "Error: variable " + arg + " is not declared";
         if (t == null)
-            System.out.println("Error: type " + type + " is not declared");
+            return "Error: type " + type + " is not declared";
+        if (table.isMultiDec(arg))
+            return "Error: variable " + arg + " is already declared";
+
+        return null;
     }
 }

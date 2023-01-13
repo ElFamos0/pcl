@@ -2,22 +2,25 @@ package ast;
 
 import java.util.ArrayList;
 
+import parser.exprParser.DeclarationFonctionContext;
+
 // function' identifiant '(' ( declarationChamp ( ',' declarationChamp )* )? ')' ( ':' identifiant )? '=' expression 
 
-public class DeclarationFonction implements Ast{
-	public <T> T accept(AstVisitor<T> visitor) {
-		return visitor.visit(this);
-	}
-    
+public class DeclarationFonction implements Ast {
+    public <T> T accept(AstVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     public Ast id;
     public ArrayList<Ast> args = new ArrayList<Ast>();
     public boolean has_return = false;
     public Ast return_type;
     public Ast expr;
+    public DeclarationFonctionContext ctx;
 
-
-    public DeclarationFonction() {
+    public DeclarationFonction(DeclarationFonctionContext ctx) {
         this.args = new ArrayList<Ast>();
+        this.ctx = ctx;
     }
 
     public void setId(Ast id) {

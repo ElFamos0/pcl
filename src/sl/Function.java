@@ -17,6 +17,14 @@ public class Function extends FuncOrVariable {
         this.table = table;
     }
 
+    public int getParamsCount() {
+        return table.getParams().size();
+    }
+
+    public ArrayList<Variable> getParams() {
+        return table.getParams();
+    }
+
     public void addParams(ArrayList<Variable> params) {
         for (Variable param : params) {
             table.addSymbolParam(param);

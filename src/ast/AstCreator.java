@@ -14,11 +14,6 @@ package ast;
 
 import java.util.ArrayList;
 
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.Token;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.Interval;
-
 import parser.exprBaseVisitor;
 import parser.exprParser;
 import parser.exprParser.AppelFonctionContext;
@@ -159,7 +154,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                     noeudTemporaire = new Addition(ctx, noeudTemporaire, right);
                     break;
                 case "-":
-                    noeudTemporaire = new Soustraction(ctx,noeudTemporaire, right);
+                    noeudTemporaire = new Soustraction(ctx, noeudTemporaire, right);
                     break;
                 default:
                     break;
@@ -179,10 +174,10 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
             switch (operation) {
                 case "*":
-                    noeudTemporaire = new Multiplication(ctx,noeudTemporaire, right);
+                    noeudTemporaire = new Multiplication(ctx, noeudTemporaire, right);
                     break;
                 case "/":
-                    noeudTemporaire = new Division(ctx,noeudTemporaire, right);
+                    noeudTemporaire = new Division(ctx, noeudTemporaire, right);
                     break;
                 default:
                     break;
@@ -210,7 +205,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitNegation(NegationContext ctx) {
-        return new Negation(ctx,ctx.getChild(1).accept(this));
+        return new Negation(ctx, ctx.getChild(1).accept(this));
     }
 
     @Override
@@ -245,7 +240,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         for (int i = 0; 2 * i + 1 < ctx.getChildCount() - 1; i++) {
             argFonction.addArg(ctx.getChild(2 * i + 1).accept(this));
         }
-        AppelFonction af = new AppelFonction(argFonction);
+        AppelFonction af = new AppelFonction(argFonction, ctx);
         return af;
     }
 
@@ -442,7 +437,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitDeclarationValeur(DeclarationValeurContext ctx) {
-        DeclarationValeur dv = new DeclarationValeur();
+        DeclarationValeur dv = new DeclarationValeur(ctx);
         dv.setId(ctx.getChild(1).accept(this));
 
         SymbolLookup table = this.table.getSymbolLookup(region);
@@ -463,11 +458,10 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitDeclarationFonction(DeclarationFonctionContext ctx) {
-        DeclarationFonction drf = new DeclarationFonction();
+        DeclarationFonction drf = new DeclarationFonction(ctx);
 
         int temp = region;
         SymbolLookup table = this.table.getSymbolLookup(region);
-        table.addChildren();
         ArrayList<Variable> params = new ArrayList<>();
         region++;
 
@@ -494,7 +488,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         Ast branch = ctx.getChild(count).accept(this);
         String txt = ctx.getChild(count).getText();
-        Type type = new Primitive(Void.class);
+        Type type = null;
 
         if (txt.equals(":")) {
             count++;
@@ -505,6 +499,12 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         }
         count++;
         branch = ctx.getChild(count).accept(this);
+        String b = ctx.getChild(count).getText();
+
+        if (type == null) {
+            type = TypeInferer.inferType(table, b);
+        }
+
         drf.setExpr(branch);
 
         Function f = new Function(idf, type);

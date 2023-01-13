@@ -2,6 +2,7 @@ package sl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class SymbolLookup {
     private HashMap<String, Symbol> funcAndVar;
@@ -13,6 +14,8 @@ public class SymbolLookup {
     private static int regionCount = 0;
     private SymbolLookup parent;
     private ArrayList<SymbolLookup> children;
+    private HashSet<String> multiDec;
+    private ArrayList<Variable> params;
 
     public SymbolLookup(SymbolLookup parent) {
         this.scope = parent != null ? parent.getScope() + 1 : 0;
@@ -21,6 +24,8 @@ public class SymbolLookup {
         funcAndVar = new HashMap<String, Symbol>();
         types = new HashMap<String, Type>();
         children = new ArrayList<SymbolLookup>();
+        multiDec = new HashSet<String>();
+        params = new ArrayList<Variable>();
 
         if (parent == null) {
             initLib();
@@ -84,7 +89,24 @@ public class SymbolLookup {
             return children.get(i);
     }
 
+    public HashSet<String> getMultiDec() {
+        return multiDec;
+    }
+
+    public ArrayList<Variable> getParams() {
+        return params;
+    }
+
+    public boolean isMultiDec(String name) {
+        return multiDec.contains(name);
+    }
+
     public void addSymbolVarAndFunc(Symbol s) {
+        Symbol temp = funcAndVar.put(s.getName(), s);
+        if (temp != null) {
+            multiDec.add(s.getName());
+            return;
+        }
         if (s instanceof Variable) {
             ((Variable) s).setOffset(varOffset);
 
@@ -92,21 +114,19 @@ public class SymbolLookup {
         }
         if (s instanceof Function) {
             // Get the last children
+            this.addChildren();
             ((Function) s).setTable(getChildren(-1));
-        }
-        Symbol temp = funcAndVar.put(s.getName(), s);
-        if (temp != null) {
-            System.out.println("Error: " + s.toString() + " " + s.getName() + " already exists");
         }
     }
 
     public void addSymbolParam(Variable s) {
-        ((Variable) s).setOffset(paramOffset);
+        s.setOffset(paramOffset);
         paramOffset -= s.getType().getSize();
+        params.add(s);
 
         Symbol temp = funcAndVar.put(s.getName(), s);
         if (temp != null) {
-            System.out.println("Error: arg " + s.getName() + " already exists");
+            multiDec.add(s.getName());
         }
     }
 
