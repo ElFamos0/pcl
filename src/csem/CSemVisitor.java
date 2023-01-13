@@ -70,8 +70,9 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(Compar a) {
-        a.left.accept(this);
-        a.right.accept(this);
+        String left = a.left.accept(this);
+        String right = a.right.accept(this);
+        String operator = a.operator;
 
         return null;
     }
@@ -82,6 +83,8 @@ public class CSemVisitor implements AstVisitor<String> {
         String right = a.right.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table);
+
+        // System.out.println("Addition: " + left + " + " + right);
 
         return left + ":" + right;
     }

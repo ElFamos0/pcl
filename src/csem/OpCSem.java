@@ -59,13 +59,17 @@ public class OpCSem {
         CSemErrorFormatter err = new CSemErrorFormatter();
         String split[] = left.split(":");
 
+        // check if an expression return null
+
+
         if (split.length == 1){
             String s = split[0];
+            System.out.println(s);
             if(table.getSymbol(s) != null) {
                 if (!(table.getSymbol(s).getType().equals(new Primitive(Integer.class)))){
                     err.printError(ctx, s+" is not an integer");
                 }
-            } else{   
+            } else{
                 if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))){
                     err.printError(ctx, s+" is not an integer");
                 }
@@ -79,11 +83,12 @@ public class OpCSem {
 
         if (split2.length == 1){
             String s2 = split2[0];
+            System.out.println(s2);
             if(table.getSymbol(s2) != null) {
                 if (!(table.getSymbol(s2).getType().equals(new Primitive(Integer.class)))){
                     err.printError(ctx, s2+" is not an integer");
                 }
-            } else{ 
+            } else{
                 if (!(TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class)))){
                     err.printError(ctx, s2+" is not an integer");
                 }
