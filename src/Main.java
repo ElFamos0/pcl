@@ -42,7 +42,7 @@ public class Main {
             SymbolLookup table = new SymbolLookup(null);
 
             // Visiteur de création de l'AST + création de l'AST
-            AstCreator creator = new AstCreator(table);
+            AstCreator creator = new AstCreator(table, errorHandler);
             Ast ast = program.accept(creator);
 
             // Visiteur de représentation graphique + appel

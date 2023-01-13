@@ -24,8 +24,6 @@ public class FuncCSem {
             return "Error: variable " + arg + " is not declared";
         if (t == null)
             return "Error: type " + type + " is not declared";
-        if (table.isMultiDec(arg))
-            return "Error: variable " + arg + " is already declared";
 
         return null;
     }

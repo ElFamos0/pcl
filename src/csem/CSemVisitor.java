@@ -35,18 +35,19 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
 
-        // If expression is like `idf := expr` we need to check that expr is the same type as idf
+        // If expression is like `idf := expr` we need to check that expr is the same
+        // type as idf
         if (right != null) {
             SymbolLookup table = this.table.getSymbolLookup(region);
             Type t = TypeInferer.inferType(table, right);
             if (table.getSymbol(left) != null) {
                 Type t2 = table.getSymbol(left).getType();
                 if (!t.equals(t2)) {
-                    new CSemErrorFormatter().printError(a.ctx, "type mismatch between '" + left + "' and '" + right +"' of type " + t + " and " + t2);
+                    new CSemErrorFormatter().printError(a.ctx,
+                            "type mismatch between '" + left + "' and '" + right + "' of type " + t + " and " + t2);
                 }
             }
         }
-
 
         return left + ":" + right;
     }
@@ -287,7 +288,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
         // Check for existence of the type
         if (table.getType(type) == null) {
-            new CSemErrorFormatter().printError(a.ctx, "Type '"+type+"' not defined");
+            new CSemErrorFormatter().printError(a.ctx, "Type '" + type + "' not defined");
         }
 
         return null;
@@ -321,11 +322,11 @@ public class CSemVisitor implements AstVisitor<String> {
 
             // Check for existence of the field
             if (fields.contains(idf)) {
-                new CSemErrorFormatter().printError(a.ctx, "Field '"+split[0]+"' is redefined in record");
+                new CSemErrorFormatter().printError(a.ctx, "Field '" + split[0] + "' is redefined in record");
             }
             // Check for existence of the type
             if (table.getType(type) == null) {
-                new CSemErrorFormatter().printError(a.ctx, "Type '"+split[1]+"' is not defined");
+                new CSemErrorFormatter().printError(a.ctx, "Type '" + split[1] + "' is not defined");
             }
 
             fields.add(idf);
@@ -348,6 +349,10 @@ public class CSemVisitor implements AstVisitor<String> {
         region++;
         SymbolLookup table = this.table.getSymbolLookup(temp);
         String idf = a.id.accept(this);
+
+        if (!(table.getSymbol(idf) instanceof Function))
+            return null;
+
         Function f = (Function) table.getSymbol(idf);
         SymbolLookup fTable = f.getTable();
 
@@ -368,14 +373,6 @@ public class CSemVisitor implements AstVisitor<String> {
 
         if (!t.equals(ft))
             errorHandler.error(a.ctx, "Type mismatch in function declaration " + idf + " : " + ft + " != " + t);
-
-        String err = FuncCSem.checkFuncFromLib(idf);
-
-        if (err != null)
-            errorHandler.error(a.ctx, err);
-
-        if (table.getParent().isMultiDec(idf))
-            errorHandler.error(a.ctx, "Multiple declaration of " + idf);
 
         region = temp;
 
@@ -406,9 +403,6 @@ public class CSemVisitor implements AstVisitor<String> {
                             "Type mismatch in variable declaration " + idf + " : " + type + " != " + t);
             }
         }
-
-        if (table.isMultiDec(idf))
-            errorHandler.error(a.ctx, "Multiple declaration of " + idf);
 
         return null;
     }

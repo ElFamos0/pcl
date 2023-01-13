@@ -14,6 +14,8 @@ package ast;
 
 import java.util.ArrayList;
 
+import csem.ErrorHandler;
+import csem.FuncCSem;
 import parser.exprBaseVisitor;
 import parser.exprParser;
 import parser.exprParser.AppelFonctionContext;
@@ -52,10 +54,12 @@ public class AstCreator extends exprBaseVisitor<Ast> {
     private SymbolLookup table;
     private int region;
     private String idf;
+    private ErrorHandler errorHandler;
 
-    public AstCreator(SymbolLookup table) {
+    public AstCreator(SymbolLookup table, ErrorHandler errorHandler) {
         this.table = table;
         region = 0;
+        this.errorHandler = errorHandler;
     }
 
     @Override
@@ -393,7 +397,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         // Check for existence of the identifier
         if (table.getType(idf) != null) {
-            new CSemErrorFormatter().printError(ctx, "Type '"+idf+"' already defined");
+            errorHandler.error(ctx, "Type '" + idf + "' already defined");
         }
 
         dt.setId(ctx.getChild(1).accept(this));
@@ -453,22 +457,22 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         String idf = ctx.getChild(1).getText();
         String expr = ctx.getChild(3).getText();
 
-        CSemErrorFormatter err = new CSemErrorFormatter();
+        Symbol s = table.getSymbol(idf);
 
         if (ctx.getChild(2).getText().equals(":")) {
-            try {
+            if (s != null)
+                errorHandler.error(ctx,
+                        "Variable '" + idf + "' already defined as a " + s.toString() + "in this scope");
+            else
                 table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
-            } catch (Exception e) {
-                err.printError(ctx, e.getMessage());
-            }
             dv.setType(ctx.getChild(3).accept(this));
             dv.setExpr(ctx.getChild(5).accept(this));
         } else {
-            try {
+            if (table.getSymbol(idf) != null)
+                errorHandler.error(ctx,
+                        "Variable '" + idf + "' already defined as a " + s.toString() + "in this scope");
+            else
                 table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
-            } catch (Exception e) {
-                err.printError(ctx, e.getMessage());
-            }
             dv.setExpr(ctx.getChild(3).accept(this));
         }
         return dv;
@@ -532,10 +536,21 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         drf.setExpr(branch);
 
-        Function f = new Function(idf, type);
-        table.addSymbolVarAndFunc(f);
-        f.setTable(table.getChildren(id));
-        f.addParams(params);
+        Symbol s = table.getSymbol(idf);
+
+        if (s != null) {
+            String err = FuncCSem.checkFuncFromLib(idf);
+            if (err != null) {
+                errorHandler.error(ctx, err);
+            } else {
+                errorHandler.error(ctx, "Symbol '" + idf + "' already defined as a " + s.toString() + " in this scope");
+            }
+        } else {
+            Function f = new Function(idf, type);
+            table.addSymbolVarAndFunc(f);
+            f.setTable(table.getChildren(id));
+            f.addParams(params);
+        }
 
         // Get out of the lookupTable
         region = temp;
@@ -642,13 +657,11 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         region = temp;
 
-        CSemErrorFormatter err = new CSemErrorFormatter();
         // Add init to SLT
-        try {
-            table.addSymbolVarAndFunc(new Variable(ctx.getChild(1).getText(), TypeInferer.inferType(table, "int")));
-        } catch (Exception e) {
-            err.printError(ctx, e.getMessage());
-        }
+        if (table.getSymbol(ctx.getChild(1).getText()) != null)
+            errorHandler.error(ctx, "Variable '" + ctx.getChild(1).getText() + "' already defined");
+        else
+            table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, "int")));
 
         return new For(init, condition, increment, block);
     }
