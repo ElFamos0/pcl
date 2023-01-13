@@ -115,7 +115,6 @@ public class OpCSem {
             String s = split[0];
             //System.out.println(s);
             if(table.getSymbol(s) != null) {
-                System.out.println(table.getSymbol(s).getType());
                 if (table.getSymbol(s).getType().equals(new Primitive(Integer.class))){
                     isInt = true;
                 }
@@ -140,7 +139,6 @@ public class OpCSem {
                 }
             } else{
                 if (TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class))){
-                    isInt = true;
                     if (!isInt){
                         err.printError(ctx, "Cannot add an integer and a string");
                     }
