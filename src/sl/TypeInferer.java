@@ -13,10 +13,12 @@ public class TypeInferer {
         }
         expr = expr.trim();
 
-        if (table.getSymbol(expr) != null)
+        if (table.getSymbol(expr) != null) {
             return table.getSymbol(expr).getType();
-        if (table.getType(expr) != null)
+        }
+        if (table.getType(expr) != null) {
             return table.getType(expr);
+        }
         if (expr.contains("-") || expr.contains("*") || expr.contains("/")
                 || isNumeric(expr) || expr.equals("int") || expr.contains("+"))
             return new Primitive(Integer.class);

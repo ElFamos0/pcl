@@ -53,6 +53,14 @@ public class SymbolLookup {
         }
     }
 
+    public Symbol getSymbolInScope(String name) {
+        if (funcAndVar.containsKey(name)) {
+            return funcAndVar.get(name);
+        } else {
+            return null;
+        }
+    }
+
     public Type getType(String name) {
         if (types.containsKey(name)) {
             return types.get(name);

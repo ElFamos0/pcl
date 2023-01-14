@@ -81,10 +81,9 @@ public class CSemVisitor implements AstVisitor<String> {
 
         // Check if left and right are integers or string
 
-        if (operator.equals("<") || operator.equals(">") || operator.equals(">=") || operator.equals("<=")){
+        if (operator.equals("<") || operator.equals(">") || operator.equals(">=") || operator.equals("<=")) {
             OpCSem.checkIntOrString(a.ctx, left, right, table);
-        }
-        else if (operator.equals("=") || operator.equals("<>")) {
+        } else if (operator.equals("=") || operator.equals("<>")) {
             OpCSem.checksametype(a.ctx, left, right, table);
         }
 
@@ -462,7 +461,7 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(InstanciationType a) {
 
         String fidf = a.getId().accept(this);
-        
+
         SymbolLookup table = this.table.getSymbolLookup(region);
         Type t = table.getType(fidf);
         if (t == null) {
@@ -480,7 +479,7 @@ public class CSemVisitor implements AstVisitor<String> {
         for (int i = 0; i < idf.size(); i++) {
             String fieldname = idf.get(i).accept(this);
             String exp = expr.get(i).accept(this);
-            
+
             // Check for existence of the field
             if (r.getField(fieldname) == null) {
                 errorHandler.error(a.ctx, "Field '" + fieldname + "' not defined in type '" + fidf + "'");
@@ -490,7 +489,8 @@ public class CSemVisitor implements AstVisitor<String> {
             Type fieldtype = r.getField(fieldname).getType();
             Type expType = TypeInferer.inferType(table, exp);
             if (!fieldtype.equals(expType)) {
-                errorHandler.error(a.ctx, "Type mismatch in field '" + fieldname + "' : " + fieldtype + " != " + expType);
+                errorHandler.error(a.ctx,
+                        "Type mismatch in field '" + fieldname + "' : " + fieldtype + " != " + expType);
             }
 
             fields.add(fieldname);
@@ -499,11 +499,12 @@ public class CSemVisitor implements AstVisitor<String> {
         // List missing fields
         for (Symbol field : r.getFields()) {
             if (!fields.contains(field.getName())) {
-                errorHandler.error(a.ctx, "Field '" + field.getName() + "' not defined on instanciation of type '" + fidf + "'");
+                errorHandler.error(a.ctx,
+                        "Field '" + field.getName() + "' not defined on instanciation of type '" + fidf + "'");
             }
         }
 
-        return null;
+        return fidf;
     }
 
     @Override

@@ -138,7 +138,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
-            noeudTemporaire = new Compar(ctx,noeudTemporaire, ctx.getChild(2 * i + 2).accept(this),
+            noeudTemporaire = new Compar(ctx, noeudTemporaire, ctx.getChild(2 * i + 2).accept(this),
                     ctx.getChild(2 * i + 1).getText());
         }
 
@@ -457,7 +457,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         String idf = ctx.getChild(1).getText();
         String expr = ctx.getChild(3).getText();
 
-        Symbol s = table.getSymbol(idf);
+        Symbol s = table.getSymbolInScope(idf);
 
         if (ctx.getChild(2).getText().equals(":")) {
             if (s != null)
@@ -468,7 +468,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             dv.setType(ctx.getChild(3).accept(this));
             dv.setExpr(ctx.getChild(5).accept(this));
         } else {
-            if (table.getSymbol(idf) != null)
+            if (s != null)
                 errorHandler.error(ctx,
                         "Variable '" + idf + "' already defined as a " + s.toString() + "in this scope");
             else
@@ -536,15 +536,13 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         drf.setExpr(branch);
 
-        Symbol s = table.getSymbol(idf);
+        Symbol s = table.getSymbolInScope(idf);
+        String err = FuncCSem.checkFuncFromLib(idf);
 
         if (s != null) {
-            String err = FuncCSem.checkFuncFromLib(idf);
-            if (err != null) {
-                errorHandler.error(ctx, err);
-            } else {
-                errorHandler.error(ctx, "Symbol '" + idf + "' already defined as a " + s.toString() + " in this scope");
-            }
+            errorHandler.error(ctx, "Symbol '" + idf + "' already defined as a " + s.toString() + " in this scope");
+        } else if (err != null) {
+            errorHandler.error(ctx, err);
         } else {
             Function f = new Function(idf, type);
             table.addSymbolVarAndFunc(f);
@@ -650,6 +648,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         table.getSymbolLookup(region).addChildren();
         region++;
 
+        String idf = ctx.getChild(1).getText();
         Ast init = ctx.getChild(1).accept(this);
         Ast condition = ctx.getChild(3).accept(this);
         Ast increment = ctx.getChild(5).accept(this);
@@ -657,8 +656,10 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         region = temp;
 
+        Symbol s = table.getSymbolInScope(idf);
+
         // Add init to SLT
-        if (table.getSymbol(ctx.getChild(1).getText()) != null)
+        if (s != null)
             errorHandler.error(ctx, "Variable '" + ctx.getChild(1).getText() + "' already defined");
         else
             table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, "int")));
