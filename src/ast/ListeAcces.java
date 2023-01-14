@@ -1,6 +1,8 @@
 package ast;
 import java.util.ArrayList;
 
+import parser.exprParser.ListeAccesContext;
+
 public class ListeAcces implements Ast{
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
@@ -14,7 +16,10 @@ public class ListeAcces implements Ast{
 
     public ArrayList<Ast> accesChamps;
 
-    public ListeAcces() {
+    public ListeAccesContext ctx;
+
+    public ListeAcces(ListeAccesContext ctx) {
+        this.ctx = ctx;
         this.accesChamps = new ArrayList<Ast>();
         isExpressionArray = false;
     }

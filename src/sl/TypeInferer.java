@@ -26,6 +26,21 @@ public class TypeInferer {
             return new Array(inferType(table, expr.substring(7, expr.length())));
         if (expr.equals("()") || expr.isEmpty())
             return new Primitive(Void.class);
+        if (expr.contains("record")) {
+            Record r = new Record();
+            String[] fields = expr.substring(8, expr.length() - 1).split(",");
+            for (String field : fields) {
+                String[] split = field.split(":");
+                Symbol s = new Variable(split[0].trim(), inferType(table, split[1].trim()));
+                r.addField(s);
+            }
+            return r;
+        }
+        if (expr == "nil") {
+            Record r = new Record();
+            r.setIsNil(true);
+            return r;
+        }
 
         // Default to string
         return new Array(new Primitive(Character.class));

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Record extends Type {
     private ArrayList<Symbol> fields;
+    private Boolean isNil;
 
     public Record() {
         fields = new ArrayList<Symbol>();
@@ -67,5 +68,17 @@ public class Record extends Type {
         s = s.substring(0, s.length() - 2);
         s += "}";
         return s;
+    }
+
+    public void setFields(ArrayList<Symbol> fields) {
+        this.fields = fields;
+    }
+
+    public Boolean getIsNil() {
+        return isNil;
+    }
+
+    public void setIsNil(Boolean isNil) {
+        this.isNil = isNil;
     }
 }

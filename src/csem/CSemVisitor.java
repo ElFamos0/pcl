@@ -45,7 +45,7 @@ public class CSemVisitor implements AstVisitor<String> {
             Type t = TypeInferer.inferType(table, right);
             if (table.getSymbol(left) != null) {
                 Type t2 = table.getSymbol(left).getType();
-                if (!t.equals(t2)) {
+                if (!t.equals(t2) && !t2.equals(TypeInferer.inferType(table, "nil"))) {
                     errorHandler.error(a.ctx,
                             "type mismatch between '" + left + "' and '" + right + "' of type " + t + " and " + t2);
                 }
@@ -387,7 +387,7 @@ public class CSemVisitor implements AstVisitor<String> {
         Type t = TypeInferer.inferType(table, expr);
         Type ft = table.getSymbol(idf).getType();
 
-        if (!t.equals(ft))
+        if (!t.equals(ft) && !ft.equals(TypeInferer.inferType(table, "nil")))
             errorHandler.error(a.ctx, "Type mismatch in function declaration " + idf + " : " + ft + " != " + t);
 
         region = temp;
@@ -417,8 +417,9 @@ public class CSemVisitor implements AstVisitor<String> {
 
         if (split != null && split[0].equals("function")) {
             Type t = table.getSymbol(split[1]).getType();
+            Type t2 = TypeInferer.inferType(table, type);
 
-            if (!t.equals(TypeInferer.inferType(table, type))) {
+            if (!t.equals(t2) && !t2.equals(TypeInferer.inferType(table, "nil"))) {
                 errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + type + " != " + t);
             }
         }
@@ -427,9 +428,8 @@ public class CSemVisitor implements AstVisitor<String> {
         if (t == null) {
             errorHandler.error(a.ctx, "Type '" + type + "' not defined");
         }
-
         Type tExpr = TypeInferer.inferType(table, expr);
-        if (!t.equals(tExpr)) {
+        if (!t.equals(tExpr) && !tExpr.equals(TypeInferer.inferType(table, "nil"))) {
             errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + type + " != " + tExpr);
         }
 
@@ -488,7 +488,7 @@ public class CSemVisitor implements AstVisitor<String> {
             // Check for type of the field
             Type fieldtype = r.getField(fieldname).getType();
             Type expType = TypeInferer.inferType(table, exp);
-            if (!fieldtype.equals(expType)) {
+            if (!fieldtype.equals(expType) && !expType.equals(TypeInferer.inferType(table, "nil"))) {
                 errorHandler.error(a.ctx,
                         "Type mismatch in field '" + fieldname + "' : " + fieldtype + " != " + expType);
             }
@@ -513,9 +513,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(AccesChamp a) {
-        a.getChild().accept(this);
-
-        return null;
+        return a.getChild().accept(this);
     }
 
     @Override
@@ -529,12 +527,21 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(ListeAcces a) {
-        a.getId().accept(this);
-        if (a.getisExpressionArray())
+        String idf = a.getId().accept(this);
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        Type t = table.getSymbol(idf).getType();
+        if (a.getisExpressionArray()) {
             a.getExpressionArray().accept(this);
-        else {
-            for (Ast ast : a.getAccesChamps())
-                ast.accept(this);
+        } else {
+            for (Ast ast : a.getAccesChamps()) {
+                String field = ast.accept(this);
+                Record r = (Record) t;
+                if (r.getField(field) == null) {
+                    errorHandler.error(a.ctx, "Field '" + field + "' not defined in type '" + t + "'");
+                    break;
+                }
+                t = r.getField(field).getType();
+            }
         }
 
         return null;

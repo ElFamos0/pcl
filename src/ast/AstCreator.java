@@ -281,7 +281,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         int countmax = ctx.getChildCount();
         int count = 1;
         if (text.equals(".")) {
-            ListeAcces listeacces = new ListeAcces();
+            ListeAcces listeacces = new ListeAcces(ctx);
             listeacces.setisExpressionArray(false);
             Ast champ = ctx.getChild(count).accept(this);
             AccesChamp acceschamp = new AccesChamp();
@@ -323,7 +323,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             retour = listeacces;
         } else if (text.equals("[")) {
             Ast expression = ctx.getChild(count).accept(this);
-            ListeAcces listeacces = new ListeAcces();
+            ListeAcces listeacces = new ListeAcces(ctx);
             listeacces.setisExpressionArray(false);
             count += 2;
             if (count >= countmax) {
