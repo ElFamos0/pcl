@@ -1,6 +1,7 @@
 package csem;
 
 import sl.SymbolLookup;
+import sl.Type;
 import sl.TypeInferer;
 
 
@@ -101,7 +102,7 @@ public class OpCSem {
                         err.printError(ctx, "Cannot add null");
                     }
                     else{
-                    err.printError(ctx, s2+" is not an integer");
+                        err.printError(ctx, s2+" is not an integer");
                     }
                 }
             }

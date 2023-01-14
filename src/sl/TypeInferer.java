@@ -30,7 +30,7 @@ public class TypeInferer {
             Record r = new Record();
             String[] fields = expr.substring(8, expr.length() - 1).split(",");
             for (String field : fields) {
-                String[] split = field.split(":");
+                String[] split = field.split(":",2);
                 Symbol s = new Variable(split[0].trim(), inferType(table, split[1].trim()));
                 r.addField(s);
             }

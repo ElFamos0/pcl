@@ -97,7 +97,7 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table);
 
-        // System.out.println("Addition: " + left + " + " + right);
+        System.out.println("Addition: " + left + " + " + right);
 
         return left + ":" + right;
     }
@@ -531,20 +531,27 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         Type t = table.getSymbol(idf).getType();
         if (a.getisExpressionArray()) {
-            a.getExpressionArray().accept(this);
+            return a.getExpressionArray().accept(this);
         } else {
+            List<String> fields = new ArrayList<String>();
             for (Ast ast : a.getAccesChamps()) {
                 String field = ast.accept(this);
-                Record r = (Record) t;
-                if (r.getField(field) == null) {
+                try {
+                    Record r = (Record) t;
+                    if (r.getField(field) == null) {
+                        errorHandler.error(a.ctx, "Field '" + field + "' not defined in type '" + t + "'");
+                        break;
+                    }
+                    t = r.getField(field).getType();
+                    fields.add(field);
+                } catch (ClassCastException e) {
                     errorHandler.error(a.ctx, "Field '" + field + "' not defined in type '" + t + "'");
                     break;
                 }
-                t = r.getField(field).getType();
             }
+            // return idf.field1.field2...
+            return idf + "." + String.join(".", fields);
         }
-
-        return null;
     }
 
 }

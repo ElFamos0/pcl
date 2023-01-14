@@ -44,18 +44,60 @@ public class SymbolLookup {
     }
 
     public Symbol getSymbol(String name) {
-        if (funcAndVar.containsKey(name)) {
-            return funcAndVar.get(name);
+        // Split name by .
+        String[] names = name.split("\\.");
+
+        if (funcAndVar.containsKey(names[0])) {
+            // If there is other names we check the fields
+            if (names.length > 1) {
+                // Go as deep as we can
+                Symbol s = funcAndVar.get(names[0]);
+                for (int i = 1; i < names.length; i++) {
+                    if (s.getType() instanceof Record) {
+                        Record r = (Record) s.getType();
+                        if (r.hasField(names[i])) {
+                            s = r.getField(names[i]);
+                        } else {
+                            return null;
+                        }
+                    } else {
+                        return null;
+                    }
+                }
+                return s;
+            } else {
+                return funcAndVar.get(names[0]);
+            }
         } else if (parent != null) {
-            return parent.getSymbol(name);
+            return parent.getSymbol(names[0]);
         } else {
             return null;
         }
     }
 
     public Symbol getSymbolInScope(String name) {
-        if (funcAndVar.containsKey(name)) {
-            return funcAndVar.get(name);
+        String[] names = name.split("\\.");
+        if (funcAndVar.containsKey(names[0])) {
+            // If there is other names we check the fields
+            if (names.length > 1) {
+                // Go as deep as we can
+                Symbol s = funcAndVar.get(names[0]);
+                for (int i = 1; i < names.length; i++) {
+                    if (s.getType() instanceof Record) {
+                        Record r = (Record) s.getType();
+                        if (r.hasField(names[i])) {
+                            s = r.getField(names[i]);
+                        } else {
+                            return null;
+                        }
+                    } else {
+                        return null;
+                    }
+                }
+                return s;
+            } else {
+                return funcAndVar.get(names[0]);
+            }
         } else {
             return null;
         }
