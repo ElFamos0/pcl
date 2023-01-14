@@ -502,6 +502,10 @@ public class CSemVisitor implements AstVisitor<String> {
                 errorHandler.error(a.ctx, "Field '" + field.getName() + "' not defined on instanciation of type '" + fidf + "'");
             }
         }
+        
+        if (t instanceof Record) {
+            return r.toString();
+        }
 
         return null;
     }
