@@ -130,7 +130,7 @@ public class OpCSem {
                     isInt = true;
                     //System.out.println(s + "isInt");
                 }
-                else if (!(TypeInferer.inferType(table, s).equals(new Primitive(String.class)))){
+                else if (!(TypeInferer.inferType(table, s).equals(new Array(new Primitive(Character.class))))){
                     err.printError(ctx, "Invalid type for comparaison");
                 }
             }
@@ -144,20 +144,28 @@ public class OpCSem {
             if(table.getSymbol(s2) != null) {
                 if (table.getSymbol(s2).getType().equals(new Primitive(Integer.class))){
                     if (!isInt){
-                        err.printError(ctx, "Cannot add an integer and a string");
+                        err.printError(ctx, "Cannot compare an integer and a string");
                     }
                 }
-                else if(!(table.getSymbol(s2).getType().equals(new Array(new Primitive(Character.class))))){
-                    err.printError(ctx, "Invalid type for comparaison");
+                else if(table.getSymbol(s2).getType().equals(new Array(new Primitive(Character.class)))){
+                    if (isInt){
+                        err.printError(ctx, "Cannot compare an integer and a string");
+                    }
+                else{
+                    err.printError(ctx, "Invalid type for comparaison");}
                 }
             } else{
                 if (TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class))){
                     if (!isInt){
-                        err.printError(ctx, "Cannot add an integer and a string");
+                        err.printError(ctx, "Cannot compare an integer and a string");
                     }
                 }
-                else if(!(TypeInferer.inferType(table, s2).equals(new Array(new Primitive(Character.class))))){
-                    err.printError(ctx, "Invalid type for comparaison");
+                else if(TypeInferer.inferType(table, s2).equals(new Array(new Primitive(Character.class)))){
+                    if (isInt){
+                        err.printError(ctx, "Cannot compare an integer and a string");
+                    }
+                else{
+                    err.printError(ctx, "Invalid type for comparaison");}
                 }
             }
         }

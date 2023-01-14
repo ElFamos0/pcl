@@ -62,7 +62,7 @@ public class Record extends Type {
     public String toString() {
         String s = "record {";
         for (Symbol field : fields) {
-            s += field.toString() + ", ";
+            s += field.getName() + ":" + field.getType().toString() + ", ";
         }
         s = s.substring(0, s.length() - 2);
         s += "}";
