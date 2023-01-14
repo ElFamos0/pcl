@@ -2,6 +2,8 @@ package ast;
 
 import java.util.ArrayList;
 
+import parser.exprParser.InstanciationTypeContext;
+
 public class InstanciationType implements Ast {
     public <T> T accept(AstVisitor<T> visitor) {
 		return visitor.visit(this);
@@ -9,8 +11,10 @@ public class InstanciationType implements Ast {
     ArrayList<Ast> identifiants;
     ArrayList<Ast> expressions;
     Ast id;
+    public InstanciationTypeContext ctx;
 
-    public InstanciationType(){
+    public InstanciationType(InstanciationTypeContext ctx){
+        this.ctx = ctx;
         this.identifiants = new ArrayList<Ast>();
         this.expressions = new ArrayList<Ast>();
 

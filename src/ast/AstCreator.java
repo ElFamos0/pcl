@@ -81,7 +81,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitInstanciationType(exprParser.InstanciationTypeContext ctx) {
-        InstanciationType ist = new InstanciationType();
+        InstanciationType ist = new InstanciationType(ctx);
 
         boolean endOfArgs = false;
         int count = 1;

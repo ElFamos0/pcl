@@ -5,6 +5,9 @@ import java.util.List;
 
 import ast.*;
 import sl.Function;
+import sl.Primitive;
+import sl.Record;
+import sl.Symbol;
 import sl.SymbolLookup;
 import sl.Type;
 import sl.TypeInferer;
@@ -43,7 +46,7 @@ public class CSemVisitor implements AstVisitor<String> {
             if (table.getSymbol(left) != null) {
                 Type t2 = table.getSymbol(left).getType();
                 if (!t.equals(t2)) {
-                    new CSemErrorFormatter().printError(a.ctx,
+                    errorHandler.error(a.ctx,
                             "type mismatch between '" + left + "' and '" + right + "' of type " + t + " and " + t2);
                 }
             }
@@ -295,14 +298,14 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(DeclarationType a) {
-        a.id.accept(this);
+        String idf = a.id.accept(this);
         String type = a.type.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         // Check for existence of the type
-        if (table.getType(type) == null) {
-            new CSemErrorFormatter().printError(a.ctx, "Type '" + type + "' not defined");
+        if (table.getType(type) == null && table.getType(idf) == null) {
+            errorHandler.error(a.ctx, "Type '" + type + "' not defined");
         }
 
         return null;
@@ -336,11 +339,11 @@ public class CSemVisitor implements AstVisitor<String> {
 
             // Check for existence of the field
             if (fields.contains(idf)) {
-                new CSemErrorFormatter().printError(a.ctx, "Field '" + split[0] + "' is redefined in record");
+                errorHandler.error(a.ctx, "Field '" + split[0] + "' is redefined in record");
             }
             // Check for existence of the type
             if (table.getType(type) == null) {
-                new CSemErrorFormatter().printError(a.ctx, "Type '" + split[1] + "' is not defined");
+                errorHandler.error(a.ctx, "Type '" + split[1] + "' is not defined");
             }
 
             fields.add(idf);
@@ -397,8 +400,9 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(DeclarationValeur a) {
         String idf = a.id.accept(this);
         String type = null;
-        if (a.getType() != null)
+        if (a.getType() != null) {
             type = a.getType().accept(this);
+        }
         String expr = a.expr.accept(this);
         String[] split = null;
 
@@ -408,14 +412,26 @@ public class CSemVisitor implements AstVisitor<String> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        if (split != null) {
-            if (type != null && split[0].equals("function")) {
-                Type t = table.getSymbol(split[1]).getType();
+        if (type == null) {
+            return null;
+        }
 
-                if (!t.equals(TypeInferer.inferType(table, type)))
-                    errorHandler.error(a.ctx,
-                            "Type mismatch in variable declaration " + idf + " : " + type + " != " + t);
+        if (split != null && split[0].equals("function")) {
+            Type t = table.getSymbol(split[1]).getType();
+
+            if (!t.equals(TypeInferer.inferType(table, type))) {
+                errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + type + " != " + t);
             }
+        }
+
+        Type t = table.getType(type);
+        if (t == null) {
+            errorHandler.error(a.ctx, "Type '" + type + "' not defined");
+        }
+
+        Type tExpr = TypeInferer.inferType(table, expr);
+        if (!t.equals(tExpr)) {
+            errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + type + " != " + tExpr);
         }
 
         return null;
@@ -444,12 +460,47 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(InstanciationType a) {
-        a.getId().accept(this);
+
+        String fidf = a.getId().accept(this);
+        
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        Type t = table.getType(fidf);
+        if (t == null) {
+            errorHandler.error(a.ctx, "Type '" + fidf + "' not defined");
+        }
+
+        Record r = new Record();
+        if (t instanceof Record) {
+            r = (Record) t;
+        }
+        List<String> fields = new ArrayList<String>();
+
         ArrayList<Ast> idf = a.getIdentifiants();
         ArrayList<Ast> expr = a.getExpressions();
         for (int i = 0; i < idf.size(); i++) {
-            idf.get(i).accept(this);
-            expr.get(i).accept(this);
+            String fieldname = idf.get(i).accept(this);
+            String exp = expr.get(i).accept(this);
+            
+            // Check for existence of the field
+            if (r.getField(fieldname) == null) {
+                errorHandler.error(a.ctx, "Field '" + fieldname + "' not defined in type '" + fidf + "'");
+                continue;
+            }
+            // Check for type of the field
+            Type fieldtype = r.getField(fieldname).getType();
+            Type expType = TypeInferer.inferType(table, exp);
+            if (!fieldtype.equals(expType)) {
+                errorHandler.error(a.ctx, "Type mismatch in field '" + fieldname + "' : " + fieldtype + " != " + expType);
+            }
+
+            fields.add(fieldname);
+        }
+
+        // List missing fields
+        for (Symbol field : r.getFields()) {
+            if (!fields.contains(field.getName())) {
+                errorHandler.error(a.ctx, "Field '" + field.getName() + "' not defined on instanciation of type '" + fidf + "'");
+            }
         }
 
         return null;
