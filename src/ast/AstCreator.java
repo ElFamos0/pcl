@@ -234,7 +234,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitBreak(BreakContext ctx) {
-        return new Break();
+        return new Break(ctx);
     }
 
     @Override

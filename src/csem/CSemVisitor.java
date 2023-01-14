@@ -3,6 +3,10 @@ package csem;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.tool.Rule;
+
 import ast.*;
 import sl.Function;
 import sl.Primitive;
@@ -11,6 +15,7 @@ import sl.Symbol;
 import sl.SymbolLookup;
 import sl.Type;
 import sl.TypeInferer;
+import parser.exprParser.OperationBoucleContext;
 
 public class CSemVisitor implements AstVisitor<String> {
     private SymbolLookup table;
@@ -452,8 +457,15 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(Break a) {
-        // Nothing to do
-
+        // check if in a loop
+        ParserRuleContext parent = a.ctx.getParent();
+        while (parent != null) {
+            if (parent.getParent() instanceof OperationBoucleContext) {
+                return null;
+            }
+            parent = parent.getParent();
+        }
+        errorHandler.error(a.ctx, "Break outside of loop");
         return null;
     }
 
