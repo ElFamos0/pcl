@@ -26,7 +26,7 @@ public class TypeInferer {
             return new Array(inferType(table, expr.substring(7, expr.length())));
         if (expr.equals("()") || expr.isEmpty())
             return new Primitive(Void.class);
-        if (expr.contains("record")) {
+        if (expr.startsWith("record {")) {
             Record r = new Record();
             String[] fields = expr.substring(8, expr.length() - 1).split(",");
             for (String field : fields) {
