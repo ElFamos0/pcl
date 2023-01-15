@@ -7,6 +7,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import ast.Int;
 import parser.exprParser.NegationContext;
+import parser.exprParser.SiAlorsContext;
+import parser.exprParser.SiAlorsSinonContext;
 import sl.Primitive;
 import sl.Array;
 
@@ -71,7 +73,11 @@ public class OpCSem {
             } else {
                 if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))) {
                     if (s == "") {
-                        err.printError(ctx, "Cannot add null");
+                        if (ctx instanceof SiAlorsContext || ctx instanceof SiAlorsSinonContext) {
+                            err.printError(ctx, "Cannot evaluate null in if statement");
+                        } else {
+                            err.printError(ctx, "Cannot make operation with null");
+                        }
                     } else {
                         err.printError(ctx, s + " is not an integer");
                     }
@@ -94,7 +100,7 @@ public class OpCSem {
             } else {
                 if (!(TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class)))) {
                     if (s2 == "") {
-                        err.printError(ctx, "Cannot add null");
+                        err.printError(ctx, "Cannot make operation with null");
                     } else {
                         err.printError(ctx, s2 + " is not an integer");
                     }
@@ -173,19 +179,35 @@ public class OpCSem {
             String s2 = split2[0];
             if (table.getSymbol(s) != null && table.getSymbol(s2) != null) {
                 if (!(table.getSymbol(s).getType().equals(table.getSymbol(s2).getType()))) {
+                    if (ctx instanceof SiAlorsSinonContext) {
+                        err.printError(ctx, "Not the same value in then and else block");
+                    } else {
                     err.printError(ctx, "Cannot compare different types");
+                    }
                 }
             } else if (table.getSymbol(s) == null && table.getSymbol(s2) == null) {
                 if (!(TypeInferer.inferType(table, s).equals(TypeInferer.inferType(table, s2)))) {
+                    if (ctx instanceof SiAlorsSinonContext) {
+                        err.printError(ctx, "Not the same value in then and else block");
+                    } else {
                     err.printError(ctx, "Cannot compare different types");
+                    }
                 }
             } else if (table.getSymbol(s) == null && table.getSymbol(s2) != null) {
                 if (!(TypeInferer.inferType(table, s).equals(table.getSymbol(s2).getType()))) {
+                    if (ctx instanceof SiAlorsSinonContext) {
+                        err.printError(ctx, "Not the same value in then and else block");
+                    } else {
                     err.printError(ctx, "Cannot compare different types");
+                    }
                 }
             } else if (table.getSymbol(s2) == null && table.getSymbol(s) != null) {
                 if (!(table.getSymbol(s).getType().equals(TypeInferer.inferType(table, s2)))) {
+                    if (ctx instanceof SiAlorsSinonContext) {
+                        err.printError(ctx, "Not the same value in then and else block");
+                    } else {
                     err.printError(ctx, "Cannot compare different types");
+                    }
                 }
             }
         }

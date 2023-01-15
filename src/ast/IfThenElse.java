@@ -1,4 +1,5 @@
 package ast;
+import parser.exprParser.SiAlorsSinonContext;
 
 public class IfThenElse implements Ast{
 
@@ -10,11 +11,13 @@ public class IfThenElse implements Ast{
     public Ast condition;
     public Ast thenBlock;
     public Ast elseBlock; 
+    public SiAlorsSinonContext ctx;
 
-    public IfThenElse(Ast condition,Ast thenBlock,Ast elseBlock){
+    public IfThenElse(SiAlorsSinonContext ctx,Ast condition,Ast thenBlock,Ast elseBlock){
         this.condition = condition;
         this.thenBlock = thenBlock;
         this.elseBlock = elseBlock;
+        this.ctx = ctx;
     }
 
     

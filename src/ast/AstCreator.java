@@ -336,7 +336,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 String text3 = ctx.getChild(count).getText();
                 if (text3.equals("of")) {
                     listeacces.setisExpressionArray(true);
-                    listeacces.setExpressionArray(new ExpressionArray());
+                    listeacces.setExpressionArray(new ExpressionArray(ctx));
                     listeacces.getExpressionArray().setSize(expression);
                     count++;
                     Ast expression2 = ctx.getChild(count).accept(this);
@@ -584,7 +584,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         region = temp;
 
-        return new IfThen(condition, thenBlock);
+        return new IfThen(ctx,condition, thenBlock);
     }
 
     @Override
@@ -625,7 +625,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         region = temp;
 
-        return new IfThenElse(condition, thenBlock, elseBlock);
+        return new IfThenElse(ctx,condition, thenBlock, elseBlock);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package ast;
 
+import parser.exprParser.ListeAccesContext;
+
 public class ExpressionArray implements Ast{
     public <T> T accept(AstVisitor<T> visitor) {
         return visitor.visit(this);
@@ -8,6 +10,7 @@ public class ExpressionArray implements Ast{
     Ast size;
     Ast expr;
     Ast id;
+    public ListeAccesContext ctx;
 
     public Ast getId() {
         return id;
@@ -17,7 +20,8 @@ public class ExpressionArray implements Ast{
         this.id = id;
     }
 
-    public ExpressionArray() {
+    public ExpressionArray(ListeAccesContext ctx) {
+        this.ctx = ctx;
     }
 
     public void setSize(Ast size) {

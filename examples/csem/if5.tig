@@ -3,5 +3,5 @@ let
     var a:= 5
     var b := "test"
 in  
-  if 1 then 5 else "test"
+  if 1 then 5 else a
 end

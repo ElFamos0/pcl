@@ -6,6 +6,7 @@ import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import ast.*;
+import sl.Array;
 import sl.Function;
 import sl.Record;
 import sl.Symbol;
@@ -99,7 +100,7 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table);
 
-        System.out.println("Addition: " + left + " + " + right);
+        //System.out.println("Addition: " + left + " + " + right);
 
         return left + ":" + right;
     }
@@ -161,7 +162,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String right = null;
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table);
-        return a.expression.accept(this);
+        return "-" + a.expression.accept(this);
     }
 
     @Override
@@ -234,9 +235,14 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(IfThenElse a) {
         int temp = region;
         region++;
-        a.condition.accept(this);
-        a.thenBlock.accept(this);
-        a.elseBlock.accept(this);
+        String cond = a.condition.accept(this);
+        String then = a.thenBlock.accept(this);
+        String els = a.elseBlock.accept(this);
+
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
+        OpCSem.checkint(a.ctx, cond, null,table);
+        OpCSem.checksametype(a.ctx, then, els, table);
 
         region = temp;
 
@@ -247,8 +253,12 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(IfThen a) {
         int temp = region;
         region++;
-        a.condition.accept(this);
-        a.thenBlock.accept(this);
+        String cond = a.condition.accept(this);
+        String then = a.thenBlock.accept(this);
+
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
+        OpCSem.checkint(a.ctx, cond, null,table);
 
         region = temp;
 
@@ -547,9 +557,34 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(ExpressionArray a) {
-        a.getId().accept(this);
-        a.getSize().accept(this);
-        a.getExpr().accept(this);
+        String idf = a.getId().accept(this);
+        String size = a.getSize().accept(this);
+        String expr = a.getExpr().accept(this);
+        
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        Type t = table.getType(idf);
+        if (!(t instanceof Array)) {
+            errorHandler.error(a.ctx, "Type '" + idf + "' is not an array type");
+        }
+
+        // Check if size is an integer
+        if (!TypeInferer.inferType(table, size).equals(TypeInferer.inferType(table, "1"))) {
+            errorHandler.error(a.ctx, "Size of array must be an integer");
+        } else {
+            // Check that size is positive
+            if (Integer.parseInt(size) <= 0) {
+                errorHandler.error(a.ctx, "Size of array must be positive");
+            }
+        }
+
+        if (t instanceof Array) {
+            // Check that expression is of the right type
+            Type exprType = TypeInferer.inferType(table, expr);
+            Type arrayType = ((Array) t).getType();
+            if (!exprType.equals(arrayType)) {
+                errorHandler.error(a.ctx, "Type mismatch in array declaration : " + arrayType + " != " + exprType);
+            }
+        }
 
         return null;
     }
@@ -560,26 +595,47 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         Type t = table.getSymbol(idf).getType();
         if (a.getisExpressionArray()) {
-            return a.getExpressionArray().accept(this);
+            String idk = a.getExpressionArray().accept(this);
+            System.out.println(idk);
+            return idk;
         } else {
-            List<String> fields = new ArrayList<String>();
+            String out = "";
             for (Ast ast : a.getAccesChamps()) {
                 String field = ast.accept(this);
-                try {
+                if (t instanceof Record) {
                     Record r = (Record) t;
                     if (r.getField(field) == null) {
                         errorHandler.error(a.ctx, "Field '" + field + "' not defined in type '" + t + "'");
                         break;
                     }
                     t = r.getField(field).getType();
-                    fields.add(field);
-                } catch (ClassCastException e) {
-                    errorHandler.error(a.ctx, "Field '" + field + "' not defined in type '" + t + "'");
+                    out += "." + field;
+                } else if (t instanceof Array) {
+                    Array a1 = (Array) t;
+                    // Check if field is an integer, positive and less than size of array
+                    if (!TypeInferer.inferType(table, field).equals(TypeInferer.inferType(table, "1"))) {
+                        errorHandler.error(a.ctx, "Index of array must be an integer");
+                        break;
+                    } else {
+                        if (Integer.parseInt(field) <= 0) {
+                            errorHandler.error(a.ctx, "Index of array must be positive");
+                            break;
+                        } else {
+                            if (Integer.parseInt(field) > ((Array) t).getSize()) {
+                                errorHandler.error(a.ctx, "Index of array must be less than size of array");
+                                break;
+                            }
+                        }
+                    }
+                    t = a1.getType();
+                    out += "[" + field + "]";
+                } else {
+                    errorHandler.error(a.ctx, "Type '" + t + "' is not a record or an array");
                     break;
                 }
             }
             // return idf.field1.field2...
-            return idf + "." + String.join(".", fields);
+            return idf + out;
         }
     }
 
