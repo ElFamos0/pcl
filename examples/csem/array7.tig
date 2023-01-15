@@ -3,7 +3,6 @@ let
     type newArrayType = array of int
     var a:= newArrayType [10] of 0
 in  
-
+    a[9];
     a[-5]
- 
 end
