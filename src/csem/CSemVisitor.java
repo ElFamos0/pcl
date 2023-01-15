@@ -305,7 +305,7 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         // Check if identifier is a reserved word
-        if (idf.equals("int") || idf.equals("string") || idf.equals("array") || idf.equals("record")) {
+        if (idf.equals("array") || idf.equals("record")) {
             errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
         }
 
@@ -364,7 +364,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String type = a.type.accept(this);
 
         // Check if identifier is a reserved word
-        if (idf.equals("int") || idf.equals("string") || idf.equals("array") || idf.equals("record")) {
+        if (idf.equals("array") || idf.equals("record")) {
             errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
         }
 
@@ -379,7 +379,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String idf = a.id.accept(this);
 
         // Check if identifier is a reserved word
-        if (idf.equals("int") || idf.equals("string") || idf.equals("array") || idf.equals("record")) {
+        if (idf.equals("array") || idf.equals("record")) {
             errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
         }
 
@@ -423,7 +423,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String[] split = null;
 
         // Check if identifier is a reserved word
-        if (idf.equals("int") || idf.equals("string") || idf.equals("array") || idf.equals("record")) {
+        if (idf.equals("array") || idf.equals("record")) {
             errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
         }
 
