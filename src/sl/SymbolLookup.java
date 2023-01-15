@@ -176,10 +176,11 @@ public class SymbolLookup {
         types.put(key, t);
     }
 
-    public void addChildren() {
+    public Integer addChildren() {
         System.out.println("Adding children" + " region " + region + " scope " + scope);
         SymbolLookup child = new SymbolLookup(this);
         children.add(child);
+        return child.getRegion();
     }
 
     private void initLib() {

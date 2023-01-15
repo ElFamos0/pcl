@@ -507,12 +507,11 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         // Add a new SymbolLookup for the function
-        table.addChildren();
+        region = table.addChildren();
         // Get the id of the new SymbolLookup
         int id = table.getChildren().size() - 1;
 
         ArrayList<Variable> params = new ArrayList<>();
-        region++;
 
         drf.setId(ctx.getChild(1).accept(this));
         String idf = ctx.getChild(1).getText();
@@ -571,7 +570,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         }
 
         // Get out of the lookupTable
-        //region = temp;
+        region = temp;
 
         return drf;
 
@@ -583,10 +582,9 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         Ast condition = ctx.getChild(1).accept(this);
 
-        table.getSymbolLookup(region).addChildren();
-        region++;
+        region = table.getSymbolLookup(region).addChildren();
         Ast thenBlock = ctx.getChild(3).accept(this);
-        //region = temp;
+        region = temp;
 
         if (condition instanceof Sequence) {
             ((Sequence) condition).setNom("Condition");
@@ -614,16 +612,14 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         Ast condition = ctx.getChild(1).accept(this);
 
-        table.addChildren();
-        region++;
+        region = table.addChildren();
         Ast thenBlock = ctx.getChild(3).accept(this);
-        //region = temp;
+        region = temp;
 
-        table.addChildren();
         temp = region;
-        region++;
+        region = table.addChildren();
         Ast elseBlock = ctx.getChild(5).accept(this);
-        //region = temp;
+        region = temp;
 
         if (condition instanceof Sequence) {
             ((Sequence) condition).setNom("Condition");
@@ -655,13 +651,12 @@ public class AstCreator extends exprBaseVisitor<Ast> {
     @Override
     public Ast visitTantQue(TantQueContext ctx) {
         int temp = region;
-        table.getSymbolLookup(region).addChildren();
-        region++;
+        region = table.getSymbolLookup(region).addChildren();
 
         Ast condition = ctx.getChild(1).accept(this);
         Ast block = ctx.getChild(3).accept(this);
 
-        //region = temp;
+        region = temp;
 
         return new While(condition, block, ctx);
     }
@@ -670,9 +665,8 @@ public class AstCreator extends exprBaseVisitor<Ast> {
     public Ast visitPour(PourContext ctx) {
         int temp = region;
         SymbolLookup table = this.table.getSymbolLookup(region);
-        table.addChildren();
+        region = table.addChildren();
         table = table.getChildren(-1);
-        region++;
 
         String idf = ctx.getChild(1).getText();
         Ast init = ctx.getChild(1).accept(this);
@@ -690,9 +684,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, "int")));
         }
 
-        //region = temp;
-
-        //region = temp;
+        region = temp;
 
         return new For(init, condition, increment, block, ctx);
     }
@@ -704,8 +696,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         Definition def = new Definition();
 
         int temp = region;
-        table.getSymbolLookup(region).addChildren();
-        region++;
+        region = table.getSymbolLookup(region).addChildren();
 
         for (int i = 0; i < ctx.getChildCount(); i++) {
             if (ctx.getChild(i).getText().equals("in")) {
@@ -722,7 +713,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 def.addDeclaration(ctx.getChild(i).accept(this));
             }
         }
-        //region = temp;
+        region = temp;
         return def;
     }
 
