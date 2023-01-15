@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import ast.Int;
 import parser.exprParser.NegationContext;
 import parser.exprParser.SiAlorsContext;
+import parser.exprParser.SiAlorsSinonContext;
 import sl.Primitive;
 import sl.Array;
 
@@ -72,8 +73,8 @@ public class OpCSem {
             } else {
                 if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))) {
                     if (s == "") {
-                        if (ctx instanceof SiAlorsContext) {
-                            err.printError(ctx, "Cannot evaluate null in condition");
+                        if (ctx instanceof SiAlorsContext || ctx instanceof SiAlorsSinonContext) {
+                            err.printError(ctx, "Cannot evaluate null in if statement");
                         } else {
                             err.printError(ctx, "Cannot make operation with null");
                         }
