@@ -65,7 +65,8 @@ public class Record extends Type {
         for (Symbol field : fields) {
             s += field.getName() + ":" + field.getType().toString() + ", ";
         }
-        s = s.substring(0, s.length() - 2);
+        if (fields.size() > 0)
+            s = s.substring(0, s.length() - 2);
         s += "}";
         return s;
     }
