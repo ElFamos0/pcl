@@ -67,6 +67,7 @@ let
 in
     init(board);
     setTileValue(board,8,1);
-    printi(getTileValue(board,8));
+    b+3;
+    print(getTileValue(board,8));
     findFirstNonZero(board)
 end

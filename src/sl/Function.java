@@ -18,6 +18,9 @@ public class Function extends FuncOrVariable {
     }
 
     public int getParamsCount() {
+        if (table == null) {
+            return 0;
+        }
         return table.getParams().size();
     }
 

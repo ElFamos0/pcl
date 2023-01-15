@@ -396,7 +396,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         // Check for existence of the identifier
-        if (table.getType(idf) != null) {
+        if (table.getTypeScope(idf) != null) {
             errorHandler.error(ctx, "Type '" + idf + "' already defined");
         }
 
@@ -462,7 +462,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         if (ctx.getChild(2).getText().equals(":")) {
             if (s != null)
                 errorHandler.error(ctx,
-                        "Variable '" + idf + "' already defined as a " + s.toString() + "in this scope");
+                        "Variable '" + idf + "' already defined as a " + s.toString() + " in this scope ; t " + table);
             else
                 table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
             dv.setType(ctx.getChild(3).accept(this));
@@ -470,7 +470,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         } else {
             if (s != null)
                 errorHandler.error(ctx,
-                        "Variable '" + idf + "' already defined as a " + s.toString() + "in this scope");
+                        "Variable '" + idf + "' already defined as a " + s.toString() + " in this scope");
             else {
                 Type t = TypeInferer.inferType(table, expr);
 
@@ -571,7 +571,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         }
 
         // Get out of the lookupTable
-        region = temp;
+        //region = temp;
 
         return drf;
 
@@ -586,7 +586,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         table.getSymbolLookup(region).addChildren();
         region++;
         Ast thenBlock = ctx.getChild(3).accept(this);
-        region = temp;
+        //region = temp;
 
         if (condition instanceof Sequence) {
             ((Sequence) condition).setNom("Condition");
@@ -617,13 +617,13 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         table.addChildren();
         region++;
         Ast thenBlock = ctx.getChild(3).accept(this);
-        region = temp;
+        //region = temp;
 
         table.addChildren();
         temp = region;
         region++;
         Ast elseBlock = ctx.getChild(5).accept(this);
-        region = temp;
+        //region = temp;
 
         if (condition instanceof Sequence) {
             ((Sequence) condition).setNom("Condition");
@@ -661,7 +661,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         Ast condition = ctx.getChild(1).accept(this);
         Ast block = ctx.getChild(3).accept(this);
 
-        region = temp;
+        //region = temp;
 
         return new While(condition, block, ctx);
     }
@@ -690,9 +690,9 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, "int")));
         }
 
-        region = temp;
+        //region = temp;
 
-        region = temp;
+        //region = temp;
 
         return new For(init, condition, increment, block, ctx);
     }
@@ -722,7 +722,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 def.addDeclaration(ctx.getChild(i).accept(this));
             }
         }
-        region = temp;
+        //region = temp;
         return def;
     }
 
