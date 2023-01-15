@@ -15,8 +15,8 @@ let
     
     function setTileValue(board:intTab,case : int, value : int) =
         let
-            var ligne :int := nil
-            var colonne :int := nil
+            var ligne :int := 0
+            var colonne :int := 0
         in
             ligne := (case / 8);
             colonne := case - ligne*8;

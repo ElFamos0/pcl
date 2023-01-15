@@ -50,7 +50,7 @@ public class CSemVisitor implements AstVisitor<String> {
                 Type t2 = table.getSymbol(left).getType();
                 if (!t.equals(t2) && !t2.equals(TypeInferer.inferType(table, "nil"))) {
                     errorHandler.error(a.ctx,
-                            "type mismatch between '" + left + "' and '" + right + "' of type " + t + " and " + t2);
+                            "type mismatch between '" + left + "' and '" + right + "' of type " + t2 + " and " + t);
                 }
             }
         }

@@ -20,7 +20,7 @@ public class TypeInferer {
             return table.getType(expr);
         }
         if (expr.contains("-") || expr.contains("*") || expr.contains("/")
-                || isNumeric(expr) || expr.equals("int") || expr.contains("+"))
+                || isNumeric(expr) || expr.equals("int") || expr.contains("+") || expr.contains(":"))
             return new Primitive(Integer.class);
         if (expr.contains("array"))
             return new Array(inferType(table, expr.substring(7, expr.length())));
