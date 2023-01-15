@@ -238,7 +238,10 @@ public class CSemVisitor implements AstVisitor<String> {
         String then = a.thenBlock.accept(this);
         String els = a.elseBlock.accept(this);
 
-        OpCSem.checkint(a.ctx, cond, null,this.table.getSymbolLookup(region));
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
+        OpCSem.checkint(a.ctx, cond, null,table);
+        OpCSem.checksametype(a.ctx, then, els, table);
 
         region = temp;
 
@@ -252,7 +255,9 @@ public class CSemVisitor implements AstVisitor<String> {
         String cond = a.condition.accept(this);
         String then = a.thenBlock.accept(this);
 
-        OpCSem.checkint(a.ctx, cond, null,this.table.getSymbolLookup(region));
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
+        OpCSem.checkint(a.ctx, cond, null,table);
 
         region = temp;
 

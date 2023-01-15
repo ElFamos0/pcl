@@ -179,19 +179,35 @@ public class OpCSem {
             String s2 = split2[0];
             if (table.getSymbol(s) != null && table.getSymbol(s2) != null) {
                 if (!(table.getSymbol(s).getType().equals(table.getSymbol(s2).getType()))) {
+                    if (ctx instanceof SiAlorsSinonContext) {
+                        err.printError(ctx, "Not the same value in then and else block");
+                    } else {
                     err.printError(ctx, "Cannot compare different types");
+                    }
                 }
             } else if (table.getSymbol(s) == null && table.getSymbol(s2) == null) {
                 if (!(TypeInferer.inferType(table, s).equals(TypeInferer.inferType(table, s2)))) {
+                    if (ctx instanceof SiAlorsSinonContext) {
+                        err.printError(ctx, "Not the same value in then and else block");
+                    } else {
                     err.printError(ctx, "Cannot compare different types");
+                    }
                 }
             } else if (table.getSymbol(s) == null && table.getSymbol(s2) != null) {
                 if (!(TypeInferer.inferType(table, s).equals(table.getSymbol(s2).getType()))) {
+                    if (ctx instanceof SiAlorsSinonContext) {
+                        err.printError(ctx, "Not the same value in then and else block");
+                    } else {
                     err.printError(ctx, "Cannot compare different types");
+                    }
                 }
             } else if (table.getSymbol(s2) == null && table.getSymbol(s) != null) {
                 if (!(table.getSymbol(s).getType().equals(TypeInferer.inferType(table, s2)))) {
+                    if (ctx instanceof SiAlorsSinonContext) {
+                        err.printError(ctx, "Not the same value in then and else block");
+                    } else {
                     err.printError(ctx, "Cannot compare different types");
+                    }
                 }
             }
         }
