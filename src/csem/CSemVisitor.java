@@ -100,7 +100,7 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table);
 
-        //System.out.println("Addition: " + left + " + " + right);
+        // System.out.println("Addition: " + left + " + " + right);
 
         return left + ":" + right;
     }
@@ -241,7 +241,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        OpCSem.checkint(a.ctx, cond, null,table);
+        OpCSem.checkint(a.ctx, cond, null, table);
         OpCSem.checksametype(a.ctx, then, els, table);
 
         region = temp;
@@ -258,7 +258,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        OpCSem.checkint(a.ctx, cond, null,table);
+        OpCSem.checkint(a.ctx, cond, null, table);
 
         region = temp;
 
@@ -560,7 +560,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String idf = a.getId().accept(this);
         String size = a.getSize().accept(this);
         String expr = a.getExpr().accept(this);
-        
+
         SymbolLookup table = this.table.getSymbolLookup(region);
         Type t = table.getType(idf);
         if (!(t instanceof Array)) {
@@ -621,7 +621,7 @@ public class CSemVisitor implements AstVisitor<String> {
                             errorHandler.error(a.ctx, "Index of array must be positive");
                             break;
                         } else {
-                            if (Integer.parseInt(field) > ((Array) t).getSize()) {
+                            if (Integer.parseInt(field) > ((Array) t).getOffset()) {
                                 errorHandler.error(a.ctx, "Index of array must be less than size of array");
                                 break;
                             }

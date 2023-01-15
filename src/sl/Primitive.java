@@ -33,7 +33,7 @@ public class Primitive extends Type {
         return type == PrimitiveType.CHAR;
     }
 
-    public Integer getSize() {
+    public Integer getOffset() {
         switch (type) {
             case INT:
                 // Int size

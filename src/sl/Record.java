@@ -36,10 +36,10 @@ public class Record extends Type {
         return null;
     }
 
-    public Integer getSize() {
+    public Integer getOffset() {
         int size = 0;
         for (Symbol s : fields) {
-            size += s.getType().getSize();
+            size += s.getType().getOffset();
         }
         return size;
     }

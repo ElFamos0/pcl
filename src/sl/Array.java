@@ -12,7 +12,15 @@ public class Array extends Type {
         return type;
     }
 
-    public Integer getSize() {
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public Integer getOffset() {
         // Array size is 8 because it is a ptr to the heap
         return 8;
     }

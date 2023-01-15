@@ -471,8 +471,21 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             if (s != null)
                 errorHandler.error(ctx,
                         "Variable '" + idf + "' already defined as a " + s.toString() + "in this scope");
-            else
-                table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
+            else {
+                Type t = TypeInferer.inferType(table, expr);
+
+                if (t instanceof Array) {
+                    String size = expr.substring(expr.indexOf("[") + 1, expr.indexOf("]"));
+
+                    try {
+                        ((Array) t).setSize(Integer.parseInt(size));
+                    } catch (NumberFormatException e) {
+                    }
+                }
+
+                table.addSymbolVarAndFunc(new Variable(idf, t));
+            }
+
             dv.setExpr(ctx.getChild(3).accept(this));
         }
         return dv;
@@ -584,7 +597,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         region = temp;
 
-        return new IfThen(ctx,condition, thenBlock);
+        return new IfThen(ctx, condition, thenBlock);
     }
 
     @Override
@@ -625,7 +638,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         region = temp;
 
-        return new IfThenElse(ctx,condition, thenBlock, elseBlock);
+        return new IfThenElse(ctx, condition, thenBlock, elseBlock);
     }
 
     @Override

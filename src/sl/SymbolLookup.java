@@ -145,7 +145,7 @@ public class SymbolLookup {
         if (s instanceof Variable) {
             ((Variable) s).setOffset(varOffset);
 
-            varOffset += s.getType().getSize();
+            varOffset += s.getType().getOffset();
         }
         if (s instanceof Function) {
             // Get the last children
@@ -155,7 +155,7 @@ public class SymbolLookup {
 
     public void addSymbolParam(Variable s) {
         s.setOffset(paramOffset);
-        paramOffset -= s.getType().getSize();
+        paramOffset -= s.getType().getOffset();
         params.add(s);
 
         funcAndVar.put(s.getName(), s);
