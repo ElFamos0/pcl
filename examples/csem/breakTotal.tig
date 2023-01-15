@@ -3,5 +3,7 @@ let
     var a:= break
 in  
   3;
+  while 3 do break;
+  for i:= 3 to 9 do break;
   break
 end

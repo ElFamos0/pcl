@@ -273,18 +273,31 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(While a) {
         int temp = region;
+        String cond = a.condition.accept(this);
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        BouclesCSem.checkint(a.ctx, cond, table,errorHandler);
+
+        System.out.println("While: " + cond + " +\n ");
         region++;
+
+
         a.condition.accept(this);
         a.block.accept(this);
 
         region = temp;
 
-        return null;
+        return "";
     }
 
     @Override
     public String visit(For a) {
         int temp = region;
+        String start = a.startValue.accept(this);
+        String end = a.endValue.accept(this);
+        String id = a.start.accept(this);
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        BouclesCSem.checkint(a.ctx, start, table,errorHandler);
+        BouclesCSem.checkint(a.ctx, end, table,errorHandler);
         region++;
         a.start.accept(this);
         a.startValue.accept(this);
@@ -293,7 +306,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
         region = temp;
 
-        return "";
+        return "for";
     }
 
     @Override
@@ -309,7 +322,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
         region = temp;
 
-        return null;
+        return "while";
     }
 
     @Override
@@ -490,14 +503,15 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(Break a) {
         // check if in a loop
-        ParserRuleContext parent = a.ctx.getParent();
-        while (parent != null) {
-            if (parent.getParent() instanceof OperationBoucleContext) {
-                return null;
-            }
-            parent = parent.getParent();
-        }
-        errorHandler.error(a.ctx, "Break outside of loop");
+        // ParserRuleContext parent = a.ctx.getParent();
+        // while (parent != null) {
+        //     if (parent.getParent() instanceof OperationBoucleContext) {
+        //         return null;
+        //     }
+        //     parent = parent.getParent();
+        // }
+        // errorHandler.error(a.ctx, "Break outside of loop");
+        BouclesCSem.checkInBoucle(a.ctx, table, errorHandler);
         return null;
     }
 

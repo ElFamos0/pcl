@@ -663,7 +663,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         region = temp;
 
-        return new While(condition, block);
+        return new While(condition, block, ctx);
     }
 
     @Override
@@ -694,7 +694,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         region = temp;
 
-        return new For(init, condition, increment, block);
+        return new For(init, condition, increment, block, ctx);
     }
 
     @Override
