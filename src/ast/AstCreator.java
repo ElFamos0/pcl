@@ -584,7 +584,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         region = temp;
 
-        return new IfThen(condition, thenBlock);
+        return new IfThen(ctx,condition, thenBlock);
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import ast.Int;
 import parser.exprParser.NegationContext;
+import parser.exprParser.SiAlorsContext;
 import sl.Primitive;
 import sl.Array;
 
@@ -71,7 +72,11 @@ public class OpCSem {
             } else {
                 if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))) {
                     if (s == "") {
-                        err.printError(ctx, "Cannot add null");
+                        if (ctx instanceof SiAlorsContext) {
+                            err.printError(ctx, "Cannot evaluate null in condition");
+                        } else {
+                            err.printError(ctx, "Cannot make operation with null");
+                        }
                     } else {
                         err.printError(ctx, s + " is not an integer");
                     }
@@ -94,7 +99,7 @@ public class OpCSem {
             } else {
                 if (!(TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class)))) {
                     if (s2 == "") {
-                        err.printError(ctx, "Cannot add null");
+                        err.printError(ctx, "Cannot make operation with null");
                     } else {
                         err.printError(ctx, s2 + " is not an integer");
                     }

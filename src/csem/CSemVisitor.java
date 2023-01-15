@@ -247,8 +247,10 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(IfThen a) {
         int temp = region;
         region++;
-        a.condition.accept(this);
-        a.thenBlock.accept(this);
+        String cond = a.condition.accept(this);
+        String then = a.thenBlock.accept(this);
+
+        OpCSem.checkint(a.ctx, cond, null,this.table.getSymbolLookup(region));
 
         region = temp;
 
