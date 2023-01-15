@@ -85,9 +85,9 @@ public class CSemVisitor implements AstVisitor<String> {
         // Check if left and right are integers or string
 
         if (operator.equals("<") || operator.equals(">") || operator.equals(">=") || operator.equals("<=")) {
-            OpCSem.checkIntOrString(a.ctx, left, right, table);
+            OpCSem.checkIntOrString(a.ctx, left, right, table,errorHandler);
         } else if (operator.equals("=") || operator.equals("<>")) {
-            OpCSem.checksametype(a.ctx, left, right, table);
+            OpCSem.checksametype(a.ctx, left, right, table,errorHandler);
         }
 
         return left + ":" + right;
@@ -98,7 +98,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table);
+        OpCSem.checkint(a.ctx, left, right, table,errorHandler);
 
         // System.out.println("Addition: " + left + " + " + right);
 
@@ -111,7 +111,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String right = a.right.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table);
+        OpCSem.checkint(a.ctx, left, right, table,errorHandler);
 
         return left + ":" + right;
     }
@@ -122,7 +122,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String right = a.right.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table);
+        OpCSem.checkint(a.ctx, left, right, table, errorHandler);
 
         return left + ":" + right;
     }
@@ -133,7 +133,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String right = a.right.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table);
+        OpCSem.checkint(a.ctx, left, right, table,errorHandler);
 
         // check division by zero
 
@@ -161,7 +161,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.expression.accept(this);
         String right = null;
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table);
+        OpCSem.checkint(a.ctx, left, right, table,errorHandler);
         String data = a.expression.accept(this);
         if (data.startsWith("-")) {
             return data.substring(1);
@@ -180,7 +180,7 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(Int a) {
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a, table);
+        OpCSem.checkint(a, table,errorHandler);
 
         String val = String.valueOf(a.valeur);
 
@@ -246,8 +246,8 @@ public class CSemVisitor implements AstVisitor<String> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        OpCSem.checkint(a.ctx, cond, null, table);
-        OpCSem.checksametype(a.ctx, then, els, table);
+        OpCSem.checkint(a.ctx, cond, null, table,errorHandler);
+        OpCSem.checksametype(a.ctx, then, els, table,errorHandler);
 
         region = temp;
 
@@ -263,7 +263,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        OpCSem.checkint(a.ctx, cond, null, table);
+        OpCSem.checkint(a.ctx, cond, null, table,errorHandler);
 
         region = temp;
 
