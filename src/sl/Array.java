@@ -2,6 +2,7 @@ package sl;
 
 public class Array extends Type {
     private Type type;
+    private int size;
 
     public Array(Type type) {
         this.type = type;
