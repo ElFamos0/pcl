@@ -654,15 +654,17 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         Ast increment = ctx.getChild(5).accept(this);
         Ast block = ctx.getChild(7).accept(this);
 
-        region = temp;
-
         Symbol s = table.getSymbolInScope(idf);
 
         // Add init to SLT
-        if (s != null)
+        if (s != null) {
             errorHandler.error(ctx, "Variable '" + ctx.getChild(1).getText() + "' already defined");
-        else
+        }
+        else {
             table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, "int")));
+        }
+
+        region = temp;
 
         return new For(init, condition, increment, block);
     }
