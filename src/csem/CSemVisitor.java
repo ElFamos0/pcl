@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.tool.Rule;
 
 import ast.*;
 import sl.Function;
-import sl.Primitive;
 import sl.Record;
 import sl.Symbol;
 import sl.SymbolLookup;
@@ -307,6 +304,11 @@ public class CSemVisitor implements AstVisitor<String> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
+        // Check if identifier is a reserved word
+        if (idf.equals("int") || idf.equals("string") || idf.equals("array") || idf.equals("record")) {
+            errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        }
+
         // Check for existence of the type
         if (table.getType(type) == null && table.getType(idf) == null) {
             errorHandler.error(a.ctx, "Type '" + type + "' not defined");
@@ -361,6 +363,11 @@ public class CSemVisitor implements AstVisitor<String> {
         String idf = a.id.accept(this);
         String type = a.type.accept(this);
 
+        // Check if identifier is a reserved word
+        if (idf.equals("int") || idf.equals("string") || idf.equals("array") || idf.equals("record")) {
+            errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        }
+
         return idf + ":" + type;
     }
 
@@ -370,6 +377,11 @@ public class CSemVisitor implements AstVisitor<String> {
         region++;
         SymbolLookup table = this.table.getSymbolLookup(temp);
         String idf = a.id.accept(this);
+
+        // Check if identifier is a reserved word
+        if (idf.equals("int") || idf.equals("string") || idf.equals("array") || idf.equals("record")) {
+            errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        }
 
         if (!(table.getSymbol(idf) instanceof Function))
             return null;
@@ -409,6 +421,11 @@ public class CSemVisitor implements AstVisitor<String> {
         }
         String expr = a.expr.accept(this);
         String[] split = null;
+
+        // Check if identifier is a reserved word
+        if (idf.equals("int") || idf.equals("string") || idf.equals("array") || idf.equals("record")) {
+            errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        }
 
         if (expr != null && expr.contains(":")) {
             split = expr.split(":");
@@ -515,7 +532,7 @@ public class CSemVisitor implements AstVisitor<String> {
                         "Field '" + field.getName() + "' not defined on instanciation of type '" + fidf + "'");
             }
         }
-        
+
         if (t instanceof Record) {
             return r.toString();
         }

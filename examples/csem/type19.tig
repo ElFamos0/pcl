@@ -1,0 +1,7 @@
+/* Definition de key word en temps que type */
+let
+    type record = {val : int, name : string}
+    type array = int
+in
+ 
+end

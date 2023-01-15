@@ -445,7 +445,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitDeclarationChamp(DeclarationChampContext ctx) {
-        return new DeclarationChamp(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+        return new DeclarationChamp(ctx, ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
     }
 
     @Override
