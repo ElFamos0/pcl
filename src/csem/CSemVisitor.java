@@ -162,7 +162,12 @@ public class CSemVisitor implements AstVisitor<String> {
         String right = null;
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table);
-        return "-" + a.expression.accept(this);
+        String data = a.expression.accept(this);
+        if (data.startsWith("-")) {
+            return data.substring(1);
+        } else {
+            return "-" + data;
+        }
     }
 
     @Override

@@ -683,10 +683,14 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         Symbol s = table.getSymbolInScope(idf);
 
         // Add init to SLT
-        if (s != null)
+        if (s != null) {
             errorHandler.error(ctx, "Variable '" + ctx.getChild(1).getText() + "' already defined");
-        else
+        }
+        else {
             table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, "int")));
+        }
+
+        region = temp;
 
         region = temp;
 
