@@ -669,11 +669,11 @@ public class CSemVisitor implements AstVisitor<String> {
                         errorHandler.error(a.ctx, "Index of array must be an integer");
                         break;
                     } else {
-                        if (Integer.parseInt(field) <= 0) {
+                        if (!TypeInferer.inferType(table, field).equals(TypeInferer.inferType(table, "int")) && Integer.parseInt(field) <= 0) {
                             errorHandler.error(a.ctx, "Index of array must be positive");
                             break;
                         } else {
-                            if (Integer.parseInt(field) > ((Array) t).getOffset()) {
+                            if (!TypeInferer.inferType(table, field).equals(TypeInferer.inferType(table, "int")) && Integer.parseInt(field) > ((Array) t).getOffset()) {
                                 errorHandler.error(a.ctx, "Index of array must be less than size of array");
                                 break;
                             }
