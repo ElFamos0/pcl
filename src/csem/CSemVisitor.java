@@ -286,11 +286,11 @@ public class CSemVisitor implements AstVisitor<String> {
         region++;
 
         a.condition.accept(this);
-        a.block.accept(this);
+        String b = a.block.accept(this);
 
         region = temp;
 
-        return "";
+        return "while:" + b;
     }
 
     @Override
@@ -601,7 +601,7 @@ public class CSemVisitor implements AstVisitor<String> {
         }
 
         // Check if size is an integer
-        if ((split != null && split[0].equals("for"))
+        if ((split != null && (split[0].equals("for") || split[0].equals("while")))
                 || !TypeInferer.inferType(table, size).equals(TypeInferer.inferType(table, "int"))) {
             errorHandler.error(a.ctx, "Size of array must be an integer");
         } else {
@@ -617,7 +617,7 @@ public class CSemVisitor implements AstVisitor<String> {
         if (t instanceof Array) {
             // Check that expression is of the right type
             Type exprType = null;
-            if (split != null && split[0].equals("for"))
+            if (split != null && (split[0].equals("for") || split[0].equals("while")))
                 exprType = null;
             else
                 exprType = TypeInferer.inferType(table, expr);
@@ -663,7 +663,7 @@ public class CSemVisitor implements AstVisitor<String> {
                         split = field.split(":");
 
                     // Check if field is an integer, positive and less than size of array
-                    if (split != null && split[0].equals("for")
+                    if (split != null && (split[0].equals("for") || split[0].equals("while"))
                             || !TypeInferer.inferType(table, field).equals(TypeInferer.inferType(table, "1"))) {
                         errorHandler.error(a.ctx, "Index of array must be an integer");
                         break;
