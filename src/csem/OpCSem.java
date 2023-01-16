@@ -62,26 +62,21 @@ public class OpCSem {
 
         // check if an expression return null
 
+
         if (split.length == 1) {
             String s = split[0];
             // System.out.println(s);
-            if (table.getSymbol(s) != null) {
-                if (!(table.getSymbol(s).getType().equals(new Primitive(Integer.class)))) {
-                    errorHandler.error(ctx, s + " is not an integer");
-                }
-            } else {
                 // System.out.println("Je suis la" +ctx.getClass()+" "+s);
-                Type t = TypeInferer.inferType(table, s);
-                if ((t == null) || !(t.equals(new Primitive(Integer.class)))) {
-                    if (s == "" || s.equals("for")) {
-                        if (ctx instanceof SiAlorsContext || ctx instanceof SiAlorsSinonContext) {
-                            errorHandler.error(ctx, "Cannot evaluate null in if statement");
-                        } else {
-                            errorHandler.error(ctx, "Cannot make operation with null");
-                        }
+            Type t = TypeInferer.inferType(table, s);
+            if ((t == null) || !(t.equals(new Primitive(Integer.class)))) {
+                if (s == "" || s.contains("for")) {
+                    if (ctx instanceof SiAlorsContext || ctx instanceof SiAlorsSinonContext) {
+                        errorHandler.error(ctx, "Cannot evaluate null in if statement");
                     } else {
-                        errorHandler.error(ctx, s + " is not an integer");
+                        errorHandler.error(ctx, "Cannot make operation with null");
                     }
+                } else {
+                    errorHandler.error(ctx, s + " is not an integer");
                 }
             }
         }
@@ -93,21 +88,17 @@ public class OpCSem {
 
         if (split2.length == 1) {
             String s2 = split2[0];
-            // System.out.println(s2);
-            if (table.getSymbol(s2) != null) {
-                if (!(table.getSymbol(s2).getType().equals(new Primitive(Integer.class)))) {
+            //System.out.println(s2);
+
+            Type t = TypeInferer.inferType(table, s2);
+            if (t == null || !(t.equals(new Primitive(Integer.class)))) {
+                if (s2 == "" || s2.contains("for")) {
+                    errorHandler.error(ctx, "Cannot make operation with null");
+                } else {
                     errorHandler.error(ctx, s2 + " is not an integer");
                 }
-            } else {
-                Type t = TypeInferer.inferType(table, s2);
-                if (t == null || !(t.equals(new Primitive(Integer.class)))) {
-                    if (s2 == "" || s2.equals("for")) {
-                        errorHandler.error(ctx, "Cannot make operation with null");
-                    } else {
-                        errorHandler.error(ctx, s2 + " is not an integer");
-                    }
-                }
             }
+            
         }
     }
 
@@ -119,22 +110,14 @@ public class OpCSem {
             String s = split[0];
             // System.out.println(s);
             // System.out.println(table.getSymbol(s).getType());
-            if (table.getSymbol(s) != null) {
-                if (table.getSymbol(s).getType().equals(new Primitive(Integer.class))) {
-                    isInt = true;
-                }
 
-                else if (!(table.getSymbol(s).getType().equals(new Array(new Primitive(Character.class))))) {
-                    errorHandler.error(ctx, "Invalid type for comparaison");
-                }
-            } else {
-                if (TypeInferer.inferType(table, s).equals(new Primitive(Integer.class))) {
-                    isInt = true;
+            if (TypeInferer.inferType(table, s).equals(new Primitive(Integer.class))) {
+                isInt = true;
                     // System.out.println(s + "isInt");
-                } else if (!(TypeInferer.inferType(table, s).equals(new Array(new Primitive(Character.class))))) {
-                    errorHandler.error(ctx, "Invalid type for comparaison");
-                }
+            } else if (!(TypeInferer.inferType(table, s).equals(new Array(new Primitive(Character.class))))) {
+                errorHandler.error(ctx, "Invalid type for comparaison");
             }
+            
         }
 
         String split2[] = right.split(":");
@@ -142,20 +125,7 @@ public class OpCSem {
         if (split2.length == 1) {
             String s2 = split2[0];
             // System.out.println(s2);
-            if (table.getSymbol(s2) != null) {
-                if (table.getSymbol(s2).getType().equals(new Primitive(Integer.class))) {
-                    if (!isInt) {
-                        errorHandler.error(ctx, "Cannot compare an integer and a string");
-                    }
-                } else if (table.getSymbol(s2).getType().equals(new Array(new Primitive(Character.class)))) {
-                    if (isInt) {
-                        errorHandler.error(ctx, "Cannot compare an integer and a string");
-                    } else {
-                        errorHandler.error(ctx, "Invalid type for comparaison");
-                    }
-                }
-            } else {
-                if (TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class))) {
+            if (TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class))) {
                     if (!isInt) {
                         errorHandler.error(ctx, "Cannot compare an integer and a string");
                     }
@@ -167,8 +137,6 @@ public class OpCSem {
                     }
                 }
             }
-        }
-
     }
 
     public static void checksametype(ParserRuleContext ctx, String left, String right, SymbolLookup table, ErrorHandler errorHandler) {
@@ -177,38 +145,13 @@ public class OpCSem {
         if (split.length == 1 && split2.length == 1) {
             String s = split[0];
             String s2 = split2[0];
-            if (table.getSymbol(s) != null && table.getSymbol(s2) != null) {
-                if (!(table.getSymbol(s).getType().equals(table.getSymbol(s2).getType()))) {
+            if (!(TypeInferer.inferType(table, s).equals(TypeInferer.inferType(table, s2)))) {
                     if (ctx instanceof SiAlorsSinonContext) {
                         errorHandler.error(ctx, "Not the same value in then and else block");
                     } else {
                     errorHandler.error(ctx, "Cannot compare different types");
                     }
-                }
-            } else if (table.getSymbol(s) == null && table.getSymbol(s2) == null) {
-                if (!(TypeInferer.inferType(table, s).equals(TypeInferer.inferType(table, s2)))) {
-                    if (ctx instanceof SiAlorsSinonContext) {
-                        errorHandler.error(ctx, "Not the same value in then and else block");
-                    } else {
-                    errorHandler.error(ctx, "Cannot compare different types");
-                    }
-                }
-            } else if (table.getSymbol(s) == null && table.getSymbol(s2) != null) {
-                if (!(TypeInferer.inferType(table, s).equals(table.getSymbol(s2).getType()))) {
-                    if (ctx instanceof SiAlorsSinonContext) {
-                        errorHandler.error(ctx, "Not the same value in then and else block");
-                    } else {
-                    errorHandler.error(ctx, "Cannot compare different types");
-                    }
-                }
-            } else if (table.getSymbol(s2) == null && table.getSymbol(s) != null) {
-                if (!(table.getSymbol(s).getType().equals(TypeInferer.inferType(table, s2)))) {
-                    if (ctx instanceof SiAlorsSinonContext) {
-                        errorHandler.error(ctx, "Not the same value in then and else block");
-                    } else {
-                    errorHandler.error(ctx, "Cannot compare different types");
-                    }
-                }
+
             }
         }
     }

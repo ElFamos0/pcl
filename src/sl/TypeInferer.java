@@ -44,6 +44,10 @@ public class TypeInferer {
         if (expr.contains("[")) {
             String[] split = expr.split("\\[");
             String type = split[0];
+            //System.out.println(table);
+            if (table.getSymbol(type) != null) {
+                return table.getSymbol(type).getType();
+            }
             return table.getType(type);
         }
         if (expr.startsWith("`") && expr.endsWith("`")) {
