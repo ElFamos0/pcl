@@ -59,7 +59,7 @@ public class OpCSem {
 
     public static void checkint(ParserRuleContext ctx, String left, String right, SymbolLookup table,
             ErrorHandler errorHandler) {
-        String split[] = left.split(":");
+        String split[] = left.split("0x");
 
         // check if an expression return null
 
@@ -84,7 +84,7 @@ public class OpCSem {
         if (right == null) {
             return;
         }
-        String split2[] = right.split(":");
+        String split2[] = right.split("0x");
 
         if (split2.length == 1 || split2[0].contains("for")) {
             String s2 = split2[0];
@@ -104,7 +104,7 @@ public class OpCSem {
 
     public static void checkIntOrString(ParserRuleContext ctx, String left, String right, SymbolLookup table,
             ErrorHandler errorHandler) {
-        String split[] = left.split(":");
+        String split[] = left.split("0x");
         boolean isInt = false;
 
         if (split.length == 1) {
@@ -121,7 +121,7 @@ public class OpCSem {
 
         }
 
-        String split2[] = right.split(":");
+        String split2[] = right.split("0x");
 
         if (split2.length == 1) {
             String s2 = split2[0];
@@ -142,8 +142,8 @@ public class OpCSem {
 
     public static void checksametype(ParserRuleContext ctx, String left, String right, SymbolLookup table,
             ErrorHandler errorHandler) {
-        String split[] = left.split(":");
-        String split2[] = right.split(":");
+        String split[] = left.split("0x");
+        String split2[] = right.split("0x");
         if (split.length == 1 && split2.length == 1) {
             String s = split[0];
             String s2 = split2[0];
