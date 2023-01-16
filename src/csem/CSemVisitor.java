@@ -51,6 +51,7 @@ public class CSemVisitor implements AstVisitor<String> {
             Type t = TypeInferer.inferType(table, right);
             if (table.getSymbol(left) != null) {
                 Type t2 = table.getSymbol(left).getType();
+                System.out.println(left +" " + t2 + " " + right + " " + t);
                 if (t2 == null || !t.equals(t2)) {
                     errorHandler.error(a.ctx,
                             "Type mismatch between '" + left + "' and '" + right + "' of type " + t2 + " and " + t);
@@ -479,9 +480,10 @@ public class CSemVisitor implements AstVisitor<String> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        if (type == null) {
-            return null;
-        }
+        // if (type == null) {
+        //     errorHandler.error(a.ctx, "Expression '"+type+"' does not evaluate to any type");
+        //     return null;
+        // }
 
         if (split != null && split[0].equals("function")) {
             Type t = table.getSymbol(split[1]).getType();
@@ -493,16 +495,21 @@ public class CSemVisitor implements AstVisitor<String> {
         }
 
         Type t = table.getType(type);
-        if (t == null) {
-            return null;
-        }
+        // if (t == null) {
+        //     return null;
+        // }
         Type tExpr = null;
         if (split != null && split[0].equals("function"))
             tExpr = table.getSymbol(split[1]).getType();
         else
             tExpr = TypeInferer.inferType(table, expr);
 
-        if (!t.equals(tExpr) && !tExpr.equals(TypeInferer.inferType(table, "nil"))) {
+        if (tExpr == null) {
+            errorHandler.error(a.ctx, "Expression does not evaluate to any type");
+            return null;
+        }
+
+        if (t != null && !t.equals(tExpr) && !tExpr.equals(TypeInferer.inferType(table, "nil"))) {
             errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + type + " != " + tExpr);
         }
 

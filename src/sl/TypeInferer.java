@@ -49,6 +49,9 @@ public class TypeInferer {
         if (expr.startsWith("`") && expr.endsWith("`")) {
             return new Array(new Primitive(Character.class));
         }
+        if (expr.startsWith("\"") && expr.endsWith("\"")) {
+            return new Array(new Primitive(Character.class));
+        }
 
         return null;
     }
