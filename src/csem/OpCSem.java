@@ -69,8 +69,9 @@ public class OpCSem {
                     errorHandler.error(ctx, s + " is not an integer");
                 }
             } else {
+                //System.out.println("Je suis la" +ctx.getClass()+" "+s);
                 if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))) {
-                    if (s == "") {
+                    if (s == "" || s.equals("for")) {
                         if (ctx instanceof SiAlorsContext || ctx instanceof SiAlorsSinonContext) {
                             errorHandler.error(ctx, "Cannot evaluate null in if statement");
                         } else {
