@@ -63,7 +63,7 @@ public class OpCSem {
         // check if an expression return null
 
 
-        if (split.length == 1) {
+        if (split.length == 1 || split[0].contains("for")) {
             String s = split[0];
             // System.out.println(s);
                 // System.out.println("Je suis la" +ctx.getClass()+" "+s);
@@ -86,7 +86,7 @@ public class OpCSem {
         }
         String split2[] = right.split(":");
 
-        if (split2.length == 1) {
+        if (split2.length == 1 || split2[0].contains("for")) {
             String s2 = split2[0];
             //System.out.println(s2);
 
