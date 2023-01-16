@@ -45,15 +45,16 @@ public class Record extends Type {
     }
 
     public boolean equals(Type t) {
+        // A record is equal to another if they share the same fields, or if they share the same fields with some fields being nil
         if (t instanceof Record) {
             Record r = (Record) t;
-            if (r.getFields().size() != fields.size()) {
+            if (r.getFields().size() != fields.size())
                 return false;
-            }
-            for (int i = 0; i < fields.size(); i++) {
-                if (!fields.get(i).getType().equals(r.getFields().get(i).getType())) {
+            for (Symbol s : fields) {
+                if (!r.hasField(s.getName()))
                     return false;
-                }
+                if (!s.getType().equals(r.getField(s.getName()).getType()))
+                    return false;
             }
             return true;
         }

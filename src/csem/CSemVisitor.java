@@ -40,6 +40,9 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(Expression a) {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
+        if (left == null || right == null) {
+            return null;
+        }
 
         // If expression is like `idf := expr` we need to check that expr is the same
         // type as idf
@@ -48,9 +51,9 @@ public class CSemVisitor implements AstVisitor<String> {
             Type t = TypeInferer.inferType(table, right);
             if (table.getSymbol(left) != null) {
                 Type t2 = table.getSymbol(left).getType();
-                if (!t.equals(t2) && !t2.equals(TypeInferer.inferType(table, "nil"))) {
+                if (t2 == null || !t.equals(t2)) {
                     errorHandler.error(a.ctx,
-                            "type mismatch between '" + left + "' and '" + right + "' of type " + t2 + " and " + t);
+                            "Type mismatch between '" + left + "' and '" + right + "' of type " + t2 + " and " + t);
                 }
             }
         }
@@ -337,16 +340,9 @@ public class CSemVisitor implements AstVisitor<String> {
         String idf = a.id.accept(this);
         String type = a.type.accept(this);
 
-        SymbolLookup table = this.table.getSymbolLookup(region);
-
         // Check if identifier is a reserved word
         if (idf.equals("array") || idf.equals("record")) {
             errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
-        }
-
-        // Check for existence of the type
-        if (table.getType(type) == null && table.getType(idf) == null) {
-            errorHandler.error(a.ctx, "Type '" + type + "' not defined");
         }
 
         return null;
@@ -354,9 +350,15 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(DeclarationTypeClassique a) {
-        String idk = a.id.accept(this);
+        String type = a.id.accept(this);
 
-        return idk;
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        
+        // Check that type exists
+        if (table.getType(type) == null) {
+            errorHandler.error(a.ctx, "Type '" + type + "' is not defined");
+        }
+        return type;
     }
 
     @Override
@@ -374,17 +376,10 @@ public class CSemVisitor implements AstVisitor<String> {
 
             String[] split = expr.split(":");
             String idf = split[0];
-            String type = split[1];
-
-            SymbolLookup table = this.table.getSymbolLookup(region);
 
             // Check for existence of the field
             if (fields.contains(idf)) {
                 errorHandler.error(a.ctx, "Field '" + split[0] + "' is redefined in record");
-            }
-            // Check for existence of the type
-            if (table.getType(type) == null) {
-                errorHandler.error(a.ctx, "Type '" + split[1] + "' is not defined");
             }
 
             fields.add(idf);
@@ -398,9 +393,16 @@ public class CSemVisitor implements AstVisitor<String> {
         String idf = a.id.accept(this);
         String type = a.type.accept(this);
 
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
         // Check if identifier is a reserved word
         if (idf.equals("array") || idf.equals("record")) {
             errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        }
+
+        // Check for existence of the type
+        if (table.getType(type) == null) {
+            errorHandler.error(a.ctx, "Type '" + type + "' is not defined");
         }
 
         return idf + ":" + type;
@@ -448,7 +450,7 @@ public class CSemVisitor implements AstVisitor<String> {
             t = TypeInferer.inferType(table, expr);
         Type ft = table.getSymbol(idf).getType();
 
-        if (!idf.equals("print") && !t.equals(ft) && !ft.equals(TypeInferer.inferType(table, "nil")))
+        if (ft == null || (!idf.equals("print") && !t.equals(ft) && !ft.equals(TypeInferer.inferType(table, "nil"))))
             errorHandler.error(a.ctx, "Type mismatch in function declaration " + idf + " : " + ft + " != " + t);
 
         region = temp;
@@ -481,9 +483,18 @@ public class CSemVisitor implements AstVisitor<String> {
             return null;
         }
 
+        if (split != null && split[0].equals("function")) {
+            Type t = table.getSymbol(split[1]).getType();
+            Type t2 = TypeInferer.inferType(table, type);
+
+            if (t2 == null || !t.equals(t2)) {
+                errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + type + " != " + t);
+            }
+        }
+
         Type t = table.getType(type);
         if (t == null) {
-            errorHandler.error(a.ctx, "Type '" + type + "' not defined");
+            return null;
         }
         Type tExpr = null;
         if (split != null && split[0].equals("function"))
@@ -536,6 +547,7 @@ public class CSemVisitor implements AstVisitor<String> {
         Type t = table.getType(fidf);
         if (t == null) {
             errorHandler.error(a.ctx, "Type '" + fidf + "' not defined");
+            return fidf;
         }
 
         Record r = new Record();
@@ -558,7 +570,7 @@ public class CSemVisitor implements AstVisitor<String> {
             // Check for type of the field
             Type fieldtype = r.getField(fieldname).getType();
             Type expType = TypeInferer.inferType(table, exp);
-            if (!fieldtype.equals(expType) && !expType.equals(TypeInferer.inferType(table, "nil"))) {
+            if (expType == null || !fieldtype.equals(expType)) {
                 errorHandler.error(a.ctx,
                         "Type mismatch in field '" + fieldname + "' : " + fieldtype + " != " + expType);
             }
@@ -624,7 +636,12 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(ListeAcces a) {
         String idf = a.getId().accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        Type t = table.getSymbol(idf).getType();
+        Symbol s = table.getSymbol(idf);
+        if (s == null) {
+            errorHandler.error(a.ctx, "Variable '" + idf + "' not defined");
+            return null;
+        }
+        Type t = s.getType();
         if (a.getisExpressionArray()) {
             String idk = a.getExpressionArray().accept(this);
             return idk;

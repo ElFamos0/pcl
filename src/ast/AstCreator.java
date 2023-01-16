@@ -396,7 +396,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         // Check for existence of the identifier
-        if (table.getTypeScope(idf) != null) {
+        if (table.getType(idf) != null) {
             errorHandler.error(ctx, "Type '" + idf + "' already defined");
         }
 
@@ -421,8 +421,14 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        Type t = new Array(TypeInferer.inferType(table, ctx.getChild(2).getText()));
-        table.addType(idf, t);
+        String type = ctx.getChild(2).getText();
+        Type t = TypeInferer.inferType(table, type);
+        if (t == null) {
+            errorHandler.error(ctx, "Type '" + type + "' not defined");
+        } else {
+            Type at = new Array(t);
+            table.addType(idf, at);
+        }
 
         dat.setId(ctx.getChild(2).accept(this));
         return dat;
@@ -436,7 +442,12 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         for (int i = 0; 2 * i + 1 < ctx.getChildCount() - 1; i++) {
             String[] split = ctx.getChild(2 * i + 1).getText().split(":");
             Variable v = null;
-            v = new Variable(split[0], TypeInferer.inferType(table, split[1]));
+            Type t = TypeInferer.inferType(table, split[1]);
+            if (t == null) {
+                errorHandler.error(ctx, "Type '" + split[1] + "' not defined");
+                return drt;
+            }
+            v = new Variable(split[0], t);
             rec.addField(v);
             drt.addChamp(ctx.getChild(2 * i + 1).accept(this));
         }
@@ -466,7 +477,11 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                         "Variable '" + idf + "' already defined as a " + s.toString() + " in this scope ; t " + table);
             else {
                 Type t = TypeInferer.inferType(table, expr);
-                table.addSymbolVarAndFunc(new Variable(idf, t));
+                if (t == null) {
+                    errorHandler.error(ctx, "Type '" + expr + "' not defined");
+                } else {
+                    table.addSymbolVarAndFunc(new Variable(idf, t));
+                }
             }
             dv.setType(ctx.getChild(3).accept(this));
             dv.setExpr(ctx.getChild(5).accept(this));
@@ -476,7 +491,9 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                         "Variable '" + idf + "' already defined as a " + s.toString() + " in this scope");
             else {
                 Type t = TypeInferer.inferType(table, expr);
-                table.addSymbolVarAndFunc(new Variable(idf, t));
+                if (t != null) {
+                    table.addSymbolVarAndFunc(new Variable(idf, t));
+                }
 
                 if (t instanceof Array) {
                     int size;
@@ -493,8 +510,6 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
                     ((Array) t).setSize(size);
                 }
-
-                table.addSymbolVarAndFunc(new Variable(idf, t));
             }
 
             dv.setExpr(ctx.getChild(3).accept(this));

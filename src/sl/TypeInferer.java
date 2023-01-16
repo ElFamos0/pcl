@@ -19,13 +19,6 @@ public class TypeInferer {
         if (table.getType(expr) != null) {
             return table.getType(expr);
         }
-        if (expr.contains("-") || expr.contains("*") || expr.contains("/")
-                || isNumeric(expr) || expr.equals("int") || expr.contains("+") || expr.contains(":"))
-            return new Primitive(Integer.class);
-        if (expr.contains("array"))
-            return new Array(inferType(table, expr.substring(7, expr.length())));
-        if (expr.equals("()") || expr.isEmpty())
-            return new Primitive(Void.class);
         if (expr.startsWith("record {")) {
             Record r = new Record();
             String[] fields = expr.substring(8, expr.length() - 1).split(",");
@@ -36,6 +29,13 @@ public class TypeInferer {
             }
             return r;
         }
+        if (expr.contains("-") || expr.contains("*") || expr.contains("/")
+                || isNumeric(expr) || expr.equals("int") || expr.contains("+") || expr.contains(":"))
+            return new Primitive(Integer.class);
+        if (expr.contains("array"))
+            return new Array(inferType(table, expr.substring(7, expr.length())));
+        if (expr.equals("()") || expr.isEmpty())
+            return new Primitive(Void.class);
         if (expr == "nil") {
             Record r = new Record();
             r.setIsNil(true);
@@ -46,9 +46,11 @@ public class TypeInferer {
             String type = split[0];
             return table.getType(type);
         }
+        if (expr.startsWith("`") && expr.endsWith("`")) {
+            return new Array(new Primitive(Character.class));
+        }
 
-        // Default to string
-        return new Array(new Primitive(Character.class));
+        return null;
     }
 
     private static boolean isNumeric(String expr) {
