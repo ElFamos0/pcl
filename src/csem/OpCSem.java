@@ -2,6 +2,7 @@ package csem;
 
 import sl.SymbolLookup;
 import sl.TypeInferer;
+import sl.Type;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -69,8 +70,9 @@ public class OpCSem {
                     errorHandler.error(ctx, s + " is not an integer");
                 }
             } else {
-                //System.out.println("Je suis la" +ctx.getClass()+" "+s);
-                if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))) {
+                // System.out.println("Je suis la" +ctx.getClass()+" "+s);
+                Type t = TypeInferer.inferType(table, s);
+                if ((t == null) || !(t.equals(new Primitive(Integer.class)))) {
                     if (s == "" || s.equals("for")) {
                         if (ctx instanceof SiAlorsContext || ctx instanceof SiAlorsSinonContext) {
                             errorHandler.error(ctx, "Cannot evaluate null in if statement");
@@ -97,7 +99,8 @@ public class OpCSem {
                     errorHandler.error(ctx, s2 + " is not an integer");
                 }
             } else {
-                if (!(TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class)))) {
+                Type t = TypeInferer.inferType(table, s2);
+                if (t == null || !(t.equals(new Primitive(Integer.class)))) {
                     if (s2 == "" || s2.equals("for")) {
                         errorHandler.error(ctx, "Cannot make operation with null");
                     } else {
