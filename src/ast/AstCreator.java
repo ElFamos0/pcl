@@ -559,8 +559,16 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 if (isVar)
                     errorHandler.error(ctx,
                             "Variable '" + split[0] + "' already defined in this scope");
-                else
-                    params.add(new Variable(split[0], TypeInferer.inferType(table, split[1])));
+                else {
+                    Type t = TypeInferer.inferType(table, split[1]);
+
+                    if (t != null) {
+                        table.addSymbolVarAndFunc(new Variable(split[0], t));
+                        params.add(new Variable(split[0], t));
+                    } else {
+                        errorHandler.error(ctx, "Type '" + split[1] + "' not defined");
+                    }
+                }
 
                 drf.addArg(((DeclarationChamp) branch));
                 count++;

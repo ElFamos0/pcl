@@ -3,8 +3,6 @@ package csem;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-
 import ast.*;
 import sl.Array;
 import sl.Function;
@@ -13,7 +11,6 @@ import sl.Symbol;
 import sl.SymbolLookup;
 import sl.Type;
 import sl.TypeInferer;
-import parser.exprParser.OperationBoucleContext;
 
 public class CSemVisitor implements AstVisitor<String> {
     private SymbolLookup table;
@@ -22,7 +19,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
     public CSemVisitor(SymbolLookup table, ErrorHandler errorHandler) {
         this.table = table;
-        region = 0;
+        region = 1;
         this.errorHandler = errorHandler;
     }
 
@@ -212,7 +209,7 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         if (table == null)
-            return "function" + idf;
+            return "function:" + idf;
 
         Function f = (Function) table.getSymbol(idf);
 
@@ -338,7 +335,7 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(DeclarationType a) {
         String idf = a.id.accept(this);
-        String type = a.type.accept(this);
+        a.type.accept(this);
 
         // Check if identifier is a reserved word
         if (idf.equals("array") || idf.equals("record")) {
@@ -353,7 +350,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String type = a.id.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
-        
+
         // Check that type exists
         if (table.getType(type) == null) {
             errorHandler.error(a.ctx, "Type '" + type + "' is not defined");
@@ -393,16 +390,9 @@ public class CSemVisitor implements AstVisitor<String> {
         String idf = a.id.accept(this);
         String type = a.type.accept(this);
 
-        SymbolLookup table = this.table.getSymbolLookup(region);
-
         // Check if identifier is a reserved word
         if (idf.equals("array") || idf.equals("record")) {
             errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
-        }
-
-        // Check for existence of the type
-        if (table.getType(type) == null) {
-            errorHandler.error(a.ctx, "Type '" + type + "' is not defined");
         }
 
         return idf + ":" + type;
@@ -423,17 +413,10 @@ public class CSemVisitor implements AstVisitor<String> {
         if (!(table.getSymbol(idf) instanceof Function))
             return null;
 
-        Function f = (Function) table.getSymbol(idf);
-        SymbolLookup fTable = f.getTable();
-
         for (Ast ast : a.args) {
-            String field = ast.accept(this);
-            String[] split = field.split(":");
-            String err = FuncCSem.checkArgs(split[0], split[1], fTable);
-
-            if (err != null)
-                errorHandler.error(a.ctx, err);
+            ast.accept(this);
         }
+
         if (a.has_return)
             a.return_type.accept(this);
 
@@ -446,11 +429,13 @@ public class CSemVisitor implements AstVisitor<String> {
         Type t = null;
         if (split != null)
             t = table.getSymbol(split[1]).getType();
-        else
+        else {
             t = TypeInferer.inferType(table, expr);
+        }
         Type ft = table.getSymbol(idf).getType();
 
-        if (ft == null || (!idf.equals("print") && !t.equals(ft) && !ft.equals(TypeInferer.inferType(table, "nil"))))
+        if (ft == null || t == null
+                || (!idf.equals("print") && !t.equals(ft) && !ft.equals(TypeInferer.inferType(table, "nil"))))
             errorHandler.error(a.ctx, "Type mismatch in function declaration " + idf + " : " + ft + " != " + t);
 
         region = temp;
@@ -483,20 +468,12 @@ public class CSemVisitor implements AstVisitor<String> {
             return null;
         }
 
-        if (split != null && split[0].equals("function")) {
-            Type t = table.getSymbol(split[1]).getType();
-            Type t2 = TypeInferer.inferType(table, type);
-
-            if (t2 == null || !t.equals(t2)) {
-                errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + type + " != " + t);
-            }
-        }
-
         Type t = table.getType(type);
         if (t == null) {
             return null;
         }
         Type tExpr = null;
+
         if (split != null && split[0].equals("function"))
             tExpr = table.getSymbol(split[1]).getType();
         else
