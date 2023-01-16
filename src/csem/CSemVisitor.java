@@ -180,7 +180,9 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(Int a) {
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a, table, errorHandler);
+
+        if (table != null)
+            OpCSem.checkint(a, table, errorHandler);
 
         String val = String.valueOf(a.valeur);
 
@@ -205,6 +207,9 @@ public class CSemVisitor implements AstVisitor<String> {
         String[] arg = args.split(":");
 
         SymbolLookup table = this.table.getSymbolLookup(region);
+
+        if (table == null)
+            return "function" + idf;
 
         Function f = (Function) table.getSymbol(idf);
 
@@ -294,8 +299,12 @@ public class CSemVisitor implements AstVisitor<String> {
         String end = a.endValue.accept(this);
         String id = a.start.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        BouclesCSem.checkint(a.ctx, start, table, errorHandler);
-        BouclesCSem.checkint(a.ctx, end, table, errorHandler);
+
+        if (table != null) {
+            BouclesCSem.checkint(a.ctx, start, table, errorHandler);
+            BouclesCSem.checkint(a.ctx, end, table, errorHandler);
+        }
+
         region++;
         a.start.accept(this);
         a.startValue.accept(this);

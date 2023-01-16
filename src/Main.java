@@ -53,6 +53,9 @@ public class Main {
             CSemVisitor csem = new CSemVisitor(table, errorHandler);
             ast.accept(csem);
 
+            // Display TDS
+            // System.out.println(table);
+
             if (errorHandler.getErrorCount() > 0) {
                 System.out.println("Compilation failed with " + errorHandler.getErrorCount() + " errors");
                 System.exit(1);

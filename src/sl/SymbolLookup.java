@@ -42,6 +42,7 @@ public class SymbolLookup {
 
     public String toString() {
         String indent = "";
+        ArrayList<Integer> regions = new ArrayList<Integer>();
 
         for (int i = 0; i < scope; i++) {
             indent += "  ";
@@ -52,12 +53,22 @@ public class SymbolLookup {
         for (String name : funcAndVar.keySet()) {
             if (funcAndVar.get(name) instanceof Variable)
                 result += indent + "  " + "variable " + name + " : " + funcAndVar.get(name).getType() + "\n";
-            else
+        }
+
+        result += "\n";
+
+        for (String name : funcAndVar.keySet()) {
+            if (funcAndVar.get(name) instanceof Function) {
+                Function f = (Function) funcAndVar.get(name);
                 result += indent + "  " + "function " + name + " : " + funcAndVar.get(name).getType() + "\n";
+                result += f.getTable().toString();
+                regions.add(f.getTable().getRegion());
+            }
         }
 
         for (SymbolLookup child : children) {
-            result += child.toString();
+            if (!regions.contains(child.getRegion()))
+                result += child.toString();
         }
 
         return result;
@@ -164,6 +175,10 @@ public class SymbolLookup {
             return children.get(i);
     }
 
+    public void removeChildren(int i) {
+        children.remove(i);
+    }
+
     public ArrayList<Variable> getParams() {
         ArrayList<Variable> result = new ArrayList<Variable>();
 
@@ -204,7 +219,10 @@ public class SymbolLookup {
     }
 
     private void initLib() {
-        funcAndVar.put("print", new Function("print", new Primitive(Void.class)));
+        Function print = new Function("print", new Primitive(Void.class));
+        this.addChildren();
+        this.addSymbolVarAndFunc(print);
+
         types.put("int", new Primitive(Integer.class));
         types.put("string", new Array(new Primitive(Character.class)));
         types.put("void", new Primitive(Void.class));

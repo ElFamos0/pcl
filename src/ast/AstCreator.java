@@ -509,7 +509,6 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         int temp = region;
         SymbolLookup table = this.table.getSymbolLookup(region);
-
         // Add a new SymbolLookup for the function
         region = table.addChildren();
         // Get the id of the new SymbolLookup
@@ -572,21 +571,23 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             type = TypeInferer.inferType(table, b);
         }
 
-        drf.setExpr(branch);
-
         Symbol s = table.getSymbolInScope(idf);
         String err = FuncCSem.checkFuncFromLib(idf);
 
         if (s != null) {
             errorHandler.error(ctx, "Symbol '" + idf + "' already defined as a " + s.toString() + " in this scope");
+            table.removeChildren(id);
         } else if (err != null) {
             errorHandler.error(ctx, err);
+            table.removeChildren(id);
         } else {
             Function f = new Function(idf, type);
             table.addSymbolVarAndFunc(f);
             f.setTable(table.getChildren(id));
             f.addParams(params);
         }
+
+        drf.setExpr(branch);
 
         // Get out of the lookupTable
         region = temp;
