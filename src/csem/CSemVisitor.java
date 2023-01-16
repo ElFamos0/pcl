@@ -600,13 +600,16 @@ public class CSemVisitor implements AstVisitor<String> {
             split = size.split(":");
         }
 
+        System.out.println("size = " + size);
+
         // Check if size is an integer
         if ((split != null && (split[0].equals("for") || split[0].equals("while")))
                 || !TypeInferer.inferType(table, size).equals(TypeInferer.inferType(table, "int"))) {
             errorHandler.error(a.ctx, "Size of array must be an integer");
         } else {
             // Check that size is positive
-            if (Integer.parseInt(size) <= 0) {
+            if (!TypeInferer.inferType(table, size).equals(TypeInferer.inferType(table, "int"))
+                    && Integer.parseInt(size) <= 0) {
                 errorHandler.error(a.ctx, "Size of array must be positive");
             }
         }
