@@ -9,11 +9,9 @@ public class SymbolLookup {
     private int scope;
     private int region;
     private int varOffset = 0;
-    private int paramOffset = 0;
     private static int regionCount = 0;
     private SymbolLookup parent;
     private ArrayList<SymbolLookup> children;
-    private ArrayList<Variable> params;
 
     public SymbolLookup(SymbolLookup parent) {
         this.scope = parent != null ? parent.getScope() + 1 : 0;
@@ -22,7 +20,6 @@ public class SymbolLookup {
         funcAndVar = new HashMap<String, Symbol>();
         types = new HashMap<String, Type>();
         children = new ArrayList<SymbolLookup>();
-        params = new ArrayList<Variable>();
 
         if (parent == null) {
             initLib();
@@ -41,6 +38,29 @@ public class SymbolLookup {
             }
         }
         return null;
+    }
+
+    public String toString() {
+        String indent = "";
+
+        for (int i = 0; i < scope; i++) {
+            indent += "  ";
+        }
+
+        String result = indent + "Scope " + scope + " (region " + region + ")\n";
+
+        for (String name : funcAndVar.keySet()) {
+            if (funcAndVar.get(name) instanceof Variable)
+                result += indent + "  " + "variable " + name + " : " + funcAndVar.get(name).getType() + "\n";
+            else
+                result += indent + "  " + "function " + name + " : " + funcAndVar.get(name).getType() + "\n";
+        }
+
+        for (SymbolLookup child : children) {
+            result += child.toString();
+        }
+
+        return result;
     }
 
     public Symbol getSymbol(String name) {
@@ -145,7 +165,15 @@ public class SymbolLookup {
     }
 
     public ArrayList<Variable> getParams() {
-        return params;
+        ArrayList<Variable> result = new ArrayList<Variable>();
+
+        for (Symbol s : funcAndVar.values()) {
+            if (s instanceof Variable && ((Variable) s).getOffset() < 0) {
+                result.add((Variable) s);
+            }
+        }
+
+        return result;
     }
 
     public void addSymbolVarAndFunc(Symbol s) {
@@ -162,10 +190,6 @@ public class SymbolLookup {
     }
 
     public void addSymbolParam(Variable s) {
-        s.setOffset(paramOffset);
-        paramOffset -= s.getType().getOffset();
-        params.add(s);
-
         funcAndVar.put(s.getName(), s);
     }
 

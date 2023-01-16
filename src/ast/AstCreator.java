@@ -532,7 +532,22 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 count++;
             } else {
                 String[] split = txt.split(":");
-                params.add(new Variable(split[0], TypeInferer.inferType(table, split[1])));
+
+                Boolean isVar = false;
+
+                for (Variable v : params) {
+                    if (v.getName().equals(split[0])) {
+                        isVar = true;
+                        break;
+                    }
+                }
+
+                if (isVar)
+                    errorHandler.error(ctx,
+                            "Variable '" + split[0] + "' already defined in this scope");
+                else
+                    params.add(new Variable(split[0], TypeInferer.inferType(table, split[1])));
+
                 drf.addArg(((DeclarationChamp) branch));
                 count++;
             }
@@ -683,8 +698,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         // Add init to SLT
         if (s != null) {
             errorHandler.error(ctx, "Variable '" + ctx.getChild(1).getText() + "' already defined");
-        }
-        else {
+        } else {
             table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, "int")));
         }
 

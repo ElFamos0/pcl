@@ -85,9 +85,9 @@ public class CSemVisitor implements AstVisitor<String> {
         // Check if left and right are integers or string
 
         if (operator.equals("<") || operator.equals(">") || operator.equals(">=") || operator.equals("<=")) {
-            OpCSem.checkIntOrString(a.ctx, left, right, table,errorHandler);
+            OpCSem.checkIntOrString(a.ctx, left, right, table, errorHandler);
         } else if (operator.equals("=") || operator.equals("<>")) {
-            OpCSem.checksametype(a.ctx, left, right, table,errorHandler);
+            OpCSem.checksametype(a.ctx, left, right, table, errorHandler);
         }
 
         return left + ":" + right;
@@ -98,7 +98,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table,errorHandler);
+        OpCSem.checkint(a.ctx, left, right, table, errorHandler);
 
         // System.out.println("Addition: " + left + " + " + right);
 
@@ -111,7 +111,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String right = a.right.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table,errorHandler);
+        OpCSem.checkint(a.ctx, left, right, table, errorHandler);
 
         return left + ":" + right;
     }
@@ -133,7 +133,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String right = a.right.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table,errorHandler);
+        OpCSem.checkint(a.ctx, left, right, table, errorHandler);
 
         // check division by zero
 
@@ -161,7 +161,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.expression.accept(this);
         String right = null;
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table,errorHandler);
+        OpCSem.checkint(a.ctx, left, right, table, errorHandler);
         String data = a.expression.accept(this);
         if (data.startsWith("-")) {
             return data.substring(1);
@@ -180,7 +180,7 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(Int a) {
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a, table,errorHandler);
+        OpCSem.checkint(a, table, errorHandler);
 
         String val = String.valueOf(a.valeur);
 
@@ -246,8 +246,8 @@ public class CSemVisitor implements AstVisitor<String> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        OpCSem.checkint(a.ctx, cond, null, table,errorHandler);
-        OpCSem.checksametype(a.ctx, then, els, table,errorHandler);
+        OpCSem.checkint(a.ctx, cond, null, table, errorHandler);
+        OpCSem.checksametype(a.ctx, then, els, table, errorHandler);
 
         region = temp;
 
@@ -263,7 +263,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        OpCSem.checkint(a.ctx, cond, null, table,errorHandler);
+        OpCSem.checkint(a.ctx, cond, null, table, errorHandler);
 
         region = temp;
 
@@ -275,10 +275,9 @@ public class CSemVisitor implements AstVisitor<String> {
         int temp = region;
         String cond = a.condition.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        BouclesCSem.checkint(a.ctx, cond, table,errorHandler);
+        BouclesCSem.checkint(a.ctx, cond, table, errorHandler);
 
         region++;
-
 
         a.condition.accept(this);
         a.block.accept(this);
@@ -295,8 +294,8 @@ public class CSemVisitor implements AstVisitor<String> {
         String end = a.endValue.accept(this);
         String id = a.start.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        BouclesCSem.checkint(a.ctx, start, table,errorHandler);
-        BouclesCSem.checkint(a.ctx, end, table,errorHandler);
+        BouclesCSem.checkint(a.ctx, start, table, errorHandler);
+        BouclesCSem.checkint(a.ctx, end, table, errorHandler);
         region++;
         a.start.accept(this);
         a.startValue.accept(this);
@@ -428,10 +427,19 @@ public class CSemVisitor implements AstVisitor<String> {
             a.return_type.accept(this);
 
         String expr = a.expr.accept(this);
-        Type t = TypeInferer.inferType(table, expr);
+        String[] split = null;
+
+        if (expr != null && expr.contains(":"))
+            split = expr.split(":");
+
+        Type t = null;
+        if (split != null)
+            t = table.getSymbol(split[1]).getType();
+        else
+            t = TypeInferer.inferType(table, expr);
         Type ft = table.getSymbol(idf).getType();
 
-        if (!t.equals(ft) && !ft.equals(TypeInferer.inferType(table, "nil")))
+        if (!idf.equals("print") && !t.equals(ft) && !ft.equals(TypeInferer.inferType(table, "nil")))
             errorHandler.error(a.ctx, "Type mismatch in function declaration " + idf + " : " + ft + " != " + t);
 
         region = temp;
@@ -464,20 +472,16 @@ public class CSemVisitor implements AstVisitor<String> {
             return null;
         }
 
-        if (split != null && split[0].equals("function")) {
-            Type t = table.getSymbol(split[1]).getType();
-            Type t2 = TypeInferer.inferType(table, type);
-
-            if (!t.equals(t2) && !t2.equals(TypeInferer.inferType(table, "nil"))) {
-                errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + type + " != " + t);
-            }
-        }
-
         Type t = table.getType(type);
         if (t == null) {
             errorHandler.error(a.ctx, "Type '" + type + "' not defined");
         }
-        Type tExpr = TypeInferer.inferType(table, expr);
+        Type tExpr = null;
+        if (split != null && split[0].equals("function"))
+            tExpr = table.getSymbol(split[1]).getType();
+        else
+            tExpr = TypeInferer.inferType(table, expr);
+
         if (!t.equals(tExpr) && !tExpr.equals(TypeInferer.inferType(table, "nil"))) {
             errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + type + " != " + tExpr);
         }
@@ -504,10 +508,10 @@ public class CSemVisitor implements AstVisitor<String> {
         // check if in a loop
         // ParserRuleContext parent = a.ctx.getParent();
         // while (parent != null) {
-        //     if (parent.getParent() instanceof OperationBoucleContext) {
-        //         return null;
-        //     }
-        //     parent = parent.getParent();
+        // if (parent.getParent() instanceof OperationBoucleContext) {
+        // return null;
+        // }
+        // parent = parent.getParent();
         // }
         // errorHandler.error(a.ctx, "Break outside of loop");
         BouclesCSem.checkInBoucle(a.ctx, table, errorHandler);

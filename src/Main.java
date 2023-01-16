@@ -58,6 +58,8 @@ public class Main {
                 System.exit(1);
             }
 
+            System.out.println("Compilation successful");
+
             graphViz.dumpGraph("./out/tree.dot");
 
         } catch (IOException e) {
