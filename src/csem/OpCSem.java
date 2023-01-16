@@ -57,16 +57,16 @@ public class OpCSem {
         }
     }
 
-    public static void checkint(ParserRuleContext ctx, String left, String right, SymbolLookup table, ErrorHandler errorHandler) {
+    public static void checkint(ParserRuleContext ctx, String left, String right, SymbolLookup table,
+            ErrorHandler errorHandler) {
         String split[] = left.split(":");
 
         // check if an expression return null
 
-
         if (split.length == 1 || split[0].contains("for")) {
             String s = split[0];
             // System.out.println(s);
-                // System.out.println("Je suis la" +ctx.getClass()+" "+s);
+            // System.out.println("Je suis la" +ctx.getClass()+" "+s);
             Type t = TypeInferer.inferType(table, s);
             if ((t == null) || !(t.equals(new Primitive(Integer.class)))) {
                 if (s == "" || s.contains("for")) {
@@ -88,7 +88,7 @@ public class OpCSem {
 
         if (split2.length == 1 || split2[0].contains("for")) {
             String s2 = split2[0];
-            //System.out.println(s2);
+            // System.out.println(s2);
 
             Type t = TypeInferer.inferType(table, s2);
             if (t == null || !(t.equals(new Primitive(Integer.class)))) {
@@ -98,11 +98,12 @@ public class OpCSem {
                     errorHandler.error(ctx, s2 + " is not an integer");
                 }
             }
-            
+
         }
     }
 
-    public static void checkIntOrString(ParserRuleContext ctx, String left, String right, SymbolLookup table, ErrorHandler errorHandler) {
+    public static void checkIntOrString(ParserRuleContext ctx, String left, String right, SymbolLookup table,
+            ErrorHandler errorHandler) {
         String split[] = left.split(":");
         boolean isInt = false;
 
@@ -113,11 +114,11 @@ public class OpCSem {
 
             if (TypeInferer.inferType(table, s).equals(new Primitive(Integer.class))) {
                 isInt = true;
-                    // System.out.println(s + "isInt");
+                // System.out.println(s + "isInt");
             } else if (!(TypeInferer.inferType(table, s).equals(new Array(new Primitive(Character.class))))) {
                 errorHandler.error(ctx, "Invalid type for comparaison");
             }
-            
+
         }
 
         String split2[] = right.split(":");
@@ -126,31 +127,32 @@ public class OpCSem {
             String s2 = split2[0];
             // System.out.println(s2);
             if (TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class))) {
-                    if (!isInt) {
-                        errorHandler.error(ctx, "Cannot compare an integer and a string");
-                    }
-                } else if (TypeInferer.inferType(table, s2).equals(new Array(new Primitive(Character.class)))) {
-                    if (isInt) {
-                        errorHandler.error(ctx, "Cannot compare an integer and a string");
-                    } else {
-                        errorHandler.error(ctx, "Invalid type for comparaison");
-                    }
+                if (!isInt) {
+                    errorHandler.error(ctx, "Cannot compare an integer and a string");
+                }
+            } else if (TypeInferer.inferType(table, s2).equals(new Array(new Primitive(Character.class)))) {
+                if (isInt) {
+                    errorHandler.error(ctx, "Cannot compare an integer and a string");
+                } else {
+                    errorHandler.error(ctx, "Invalid type for comparaison");
                 }
             }
+        }
     }
 
-    public static void checksametype(ParserRuleContext ctx, String left, String right, SymbolLookup table, ErrorHandler errorHandler) {
+    public static void checksametype(ParserRuleContext ctx, String left, String right, SymbolLookup table,
+            ErrorHandler errorHandler) {
         String split[] = left.split(":");
         String split2[] = right.split(":");
         if (split.length == 1 && split2.length == 1) {
             String s = split[0];
             String s2 = split2[0];
             if (!(TypeInferer.inferType(table, s).equals(TypeInferer.inferType(table, s2)))) {
-                    if (ctx instanceof SiAlorsSinonContext) {
-                        errorHandler.error(ctx, "Not the same value in then and else block");
-                    } else {
+                if (ctx instanceof SiAlorsSinonContext) {
+                    errorHandler.error(ctx, "Not the same value in then and else block");
+                } else {
                     errorHandler.error(ctx, "Cannot compare different types");
-                    }
+                }
 
             }
         }

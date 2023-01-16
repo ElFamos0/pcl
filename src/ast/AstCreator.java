@@ -563,7 +563,6 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                     Type t = TypeInferer.inferType(table, split[1]);
 
                     if (t != null) {
-                        table.addSymbolVarAndFunc(new Variable(split[0], t));
                         params.add(new Variable(split[0], t));
                     } else {
                         errorHandler.error(ctx, "Type '" + split[1] + "' not defined");
@@ -589,10 +588,10 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         count++;
         branch = ctx.getChild(count).accept(this);
         String b = ctx.getChild(count).getText();
-
-        if (type == null) {
+        if (type == null)
             type = TypeInferer.inferType(table, b);
-        }
+        if (type == null)
+            type = new Primitive(Void.class);
 
         Symbol s = table.getSymbolInScope(idf);
         String err = FuncCSem.checkFuncFromLib(idf);

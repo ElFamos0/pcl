@@ -48,7 +48,6 @@ public class CSemVisitor implements AstVisitor<String> {
             Type t = TypeInferer.inferType(table, right);
             if (table.getSymbol(left) != null) {
                 Type t2 = table.getSymbol(left).getType();
-                System.out.println(left + " " + t2 + " " + right + " " + t);
                 if (t2 == null || !t.equals(t2)) {
                     errorHandler.error(a.ctx,
                             "Type mismatch between '" + left + "' and '" + right + "' of type " + t2 + " and " + t);
@@ -56,7 +55,7 @@ public class CSemVisitor implements AstVisitor<String> {
             }
         }
 
-        return left + ":" + right;
+        return left + "=" + right;
     }
 
     @Override
@@ -69,10 +68,10 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(Et a) {
-        a.left.accept(this);
-        a.right.accept(this);
+        String left = a.left.accept(this);
+        String right = a.right.accept(this);
 
-        return null;
+        return left + "0x87" + right;
     }
 
     @Override
@@ -91,7 +90,7 @@ public class CSemVisitor implements AstVisitor<String> {
             OpCSem.checksametype(a.ctx, left, right, table, errorHandler);
         }
 
-        return left + ":" + right;
+        return left + "0x88" + right;
     }
 
     @Override
@@ -103,7 +102,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
         // System.out.println("Addition: " + left + " + " + right);
 
-        return left + ":" + right;
+        return left + "0x83" + right;
     }
 
     @Override
@@ -114,7 +113,7 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table, errorHandler);
 
-        return left + ":" + right;
+        return left + "0x80" + right;
     }
 
     @Override
@@ -125,7 +124,7 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         OpCSem.checkint(a.ctx, left, right, table, errorHandler);
 
-        return left + ":" + right;
+        return left + "0x81" + right;
     }
 
     @Override
@@ -142,7 +141,7 @@ public class CSemVisitor implements AstVisitor<String> {
             errorHandler.error(a.ctx, "Division by zero");
         }
 
-        return left + ":" + right;
+        return left + "0x82" + right;
     }
 
     @Override
@@ -224,7 +223,7 @@ public class CSemVisitor implements AstVisitor<String> {
         for (int i = 0; i < arg.length; i++) {
             Type t = TypeInferer.inferType(table, arg[i]);
 
-            if (f != null && i < f.getParamsCount() && !(t.equals(f.getParams().get(i).getType())))
+            if (f != null && t != null && i < f.getParamsCount() && !(t.equals(f.getParams().get(i).getType())))
                 errorHandler.error(a.ctx, "Function " + idf + " expects " + f.getParams().get(i).getType()
                         + " as argument " + (i + 1) + ", but " + t + " was given");
         }
@@ -245,9 +244,12 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(IfThenElse a) {
         int temp = region;
-        region++;
         String cond = a.condition.accept(this);
+
+        region++;
         String then = a.thenBlock.accept(this);
+
+        region++;
         String els = a.elseBlock.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
@@ -257,14 +259,14 @@ public class CSemVisitor implements AstVisitor<String> {
 
         region = temp;
 
-        return null;
+        return "ifthen" + then + "else" + els;
     }
 
     @Override
     public String visit(IfThen a) {
         int temp = region;
-        region++;
         String cond = a.condition.accept(this);
+        region++;
         String then = a.thenBlock.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
@@ -273,7 +275,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
         region = temp;
 
-        return null;
+        return "ifthen" + then;
     }
 
     @Override
@@ -402,9 +404,15 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(DeclarationFonction a) {
         int temp = region;
-        region++;
-        SymbolLookup table = this.table.getSymbolLookup(temp);
+        SymbolLookup table = this.table.getNearSymbolLookup(temp);
         String idf = a.id.accept(this);
+
+        if (!(table.getSymbol(idf) instanceof Function)) {
+            return null;
+        }
+
+        Function f = (Function) table.getSymbol(idf);
+        region = f.getTable().getRegion();
 
         // Check if identifier is a reserved word
         if (idf.equals("array") || idf.equals("record")) {
@@ -428,9 +436,10 @@ public class CSemVisitor implements AstVisitor<String> {
             split = expr.split(":");
 
         Type t = null;
-        if (split != null)
-            t = table.getSymbol(split[1]).getType();
-        else {
+        if (split != null && table.getSymbol(split[split.length - 1]) != null) {
+            t = table.getSymbol(split[split.length - 1]).getType();
+        } else {
+            System.out.println(expr);
             t = TypeInferer.inferType(table, expr);
         }
         Type ft = table.getSymbol(idf).getType();
@@ -617,11 +626,7 @@ public class CSemVisitor implements AstVisitor<String> {
 
         if (t instanceof Array) {
             // Check that expression is of the right type
-            Type exprType = null;
-            if (split != null && (split[0].equals("for") || split[0].equals("while")))
-                exprType = null;
-            else
-                exprType = TypeInferer.inferType(table, expr);
+            Type exprType = TypeInferer.inferType(table, expr);
             Type arrayType = ((Array) t).getType();
             if (exprType == null || !exprType.equals(arrayType)) {
                 errorHandler.error(a.ctx, "Type mismatch in array declaration : " + arrayType + " != " + exprType);
@@ -669,11 +674,12 @@ public class CSemVisitor implements AstVisitor<String> {
                         errorHandler.error(a.ctx, "Index of array must be an integer");
                         break;
                     } else {
-                        if (!TypeInferer.inferType(table, field).equals(TypeInferer.inferType(table, "int")) && Integer.parseInt(field) <= 0) {
+                        if (Integer.parseInt(field) <= 0) {
                             errorHandler.error(a.ctx, "Index of array must be positive");
                             break;
                         } else {
-                            if (!TypeInferer.inferType(table, field).equals(TypeInferer.inferType(table, "int")) && Integer.parseInt(field) > ((Array) t).getOffset()) {
+                            if (!TypeInferer.inferType(table, field).equals(TypeInferer.inferType(table, "int"))
+                                    && Integer.parseInt(field) > ((Array) t).getOffset()) {
                                 errorHandler.error(a.ctx, "Index of array must be less than size of array");
                                 break;
                             }

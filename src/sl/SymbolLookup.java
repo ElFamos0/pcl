@@ -40,6 +40,17 @@ public class SymbolLookup {
         return null;
     }
 
+    public SymbolLookup getNearSymbolLookup(int region) {
+        SymbolLookup result = null;
+
+        while (result == null) {
+            result = getSymbolLookup(region);
+            region++;
+        }
+
+        return result;
+    }
+
     public String toString() {
         String indent = "";
         ArrayList<Integer> regions = new ArrayList<Integer>();
@@ -220,8 +231,11 @@ public class SymbolLookup {
 
     private void initLib() {
         Function print = new Function("print", new Primitive(Void.class));
+        ArrayList<Variable> params = new ArrayList<Variable>();
+        params.add(new Variable("string", new Array(new Primitive(Character.class))));
         this.addChildren();
         this.addSymbolVarAndFunc(print);
+        print.addParams(params);
 
         types.put("int", new Primitive(Integer.class));
         types.put("string", new Array(new Primitive(Character.class)));
