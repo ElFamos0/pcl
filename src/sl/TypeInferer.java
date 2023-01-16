@@ -41,6 +41,11 @@ public class TypeInferer {
             r.setIsNil(true);
             return r;
         }
+        if (expr.contains("[")) {
+            String[] split = expr.split("\\[");
+            String type = split[0];
+            return table.getType(type);
+        }
 
         // Default to string
         return new Array(new Primitive(Character.class));

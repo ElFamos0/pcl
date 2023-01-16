@@ -277,7 +277,6 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
         BouclesCSem.checkint(a.ctx, cond, table,errorHandler);
 
-        System.out.println("While: " + cond + " +\n ");
         region++;
 
 
@@ -615,7 +614,6 @@ public class CSemVisitor implements AstVisitor<String> {
         Type t = table.getSymbol(idf).getType();
         if (a.getisExpressionArray()) {
             String idk = a.getExpressionArray().accept(this);
-            System.out.println(idk);
             return idk;
         } else {
             String out = "";

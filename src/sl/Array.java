@@ -40,6 +40,6 @@ public class Array extends Type {
                 return "string";
         }
 
-        return "array of " + type.toString() + "s";
+        return "array of " + type.toString();
     }
 }

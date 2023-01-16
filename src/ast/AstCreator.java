@@ -421,7 +421,8 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        table.addType(idf, new Array(TypeInferer.inferType(table, ctx.getChild(2).getText())));
+        Type t = new Array(TypeInferer.inferType(table, ctx.getChild(2).getText()));
+        table.addType(idf, t);
 
         dat.setId(ctx.getChild(2).accept(this));
         return dat;
@@ -463,8 +464,10 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             if (s != null)
                 errorHandler.error(ctx,
                         "Variable '" + idf + "' already defined as a " + s.toString() + " in this scope ; t " + table);
-            else
-                table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, expr)));
+            else {
+                Type t = TypeInferer.inferType(table, expr);
+                table.addSymbolVarAndFunc(new Variable(idf, t));
+            }
             dv.setType(ctx.getChild(3).accept(this));
             dv.setExpr(ctx.getChild(5).accept(this));
         } else {
@@ -473,6 +476,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                         "Variable '" + idf + "' already defined as a " + s.toString() + " in this scope");
             else {
                 Type t = TypeInferer.inferType(table, expr);
+                table.addSymbolVarAndFunc(new Variable(idf, t));
 
                 if (t instanceof Array) {
                     int size;

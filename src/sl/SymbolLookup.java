@@ -149,7 +149,6 @@ public class SymbolLookup {
     }
 
     public void addSymbolVarAndFunc(Symbol s) {
-        System.out.println("Adding " + s.getName() + " with offset " + varOffset + " region " + region + " scope " + scope + " p " + this);
         funcAndVar.put(s.getName(), s);
         if (s instanceof Variable) {
             ((Variable) s).setOffset(varOffset);
@@ -163,7 +162,6 @@ public class SymbolLookup {
     }
 
     public void addSymbolParam(Variable s) {
-        System.out.println("Adding param " + s.getName() + " with offset " + paramOffset + " region " + region + " scope " + scope);
         s.setOffset(paramOffset);
         paramOffset -= s.getType().getOffset();
         params.add(s);
@@ -172,12 +170,10 @@ public class SymbolLookup {
     }
 
     public void addType(String key, Type t) {
-        System.out.println("Adding type " + key + " region " + region + " scope " + scope);
         types.put(key, t);
     }
 
     public Integer addChildren() {
-        System.out.println("Adding children" + " region " + region + " scope " + scope);
         SymbolLookup child = new SymbolLookup(this);
         children.add(child);
         return child.getRegion();
