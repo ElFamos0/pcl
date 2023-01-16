@@ -48,7 +48,7 @@ public class CSemVisitor implements AstVisitor<String> {
             Type t = TypeInferer.inferType(table, right);
             if (table.getSymbol(left) != null) {
                 Type t2 = table.getSymbol(left).getType();
-                System.out.println(left +" " + t2 + " " + right + " " + t);
+                System.out.println(left + " " + t2 + " " + right + " " + t);
                 if (t2 == null || !t.equals(t2)) {
                     errorHandler.error(a.ctx,
                             "Type mismatch between '" + left + "' and '" + right + "' of type " + t2 + " and " + t);
@@ -310,11 +310,11 @@ public class CSemVisitor implements AstVisitor<String> {
         a.start.accept(this);
         a.startValue.accept(this);
         a.endValue.accept(this);
-        a.block.accept(this);
+        String s = a.block.accept(this);
 
         region = temp;
 
-        return "for";
+        return "for:" + s;
     }
 
     @Override
@@ -466,13 +466,14 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         // if (type == null) {
-        //     errorHandler.error(a.ctx, "Expression '"+type+"' does not evaluate to any type");
-        //     return null;
+        // errorHandler.error(a.ctx, "Expression '"+type+"' does not evaluate to any
+        // type");
+        // return null;
         // }
 
         Type t = table.getType(type);
         // if (t == null) {
-        //     return null;
+        // return null;
         // }
         Type tExpr = null;
 
@@ -587,6 +588,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String idf = a.getId().accept(this);
         String size = a.getSize().accept(this);
         String expr = a.getExpr().accept(this);
+        String[] split = null;
 
         SymbolLookup table = this.table.getSymbolLookup(region);
         Type t = table.getType(idf);
@@ -594,8 +596,13 @@ public class CSemVisitor implements AstVisitor<String> {
             errorHandler.error(a.ctx, "Type '" + idf + "' is not an array type");
         }
 
+        if (size.contains(":")) {
+            split = size.split(":");
+        }
+
         // Check if size is an integer
-        if (!TypeInferer.inferType(table, size).equals(TypeInferer.inferType(table, "1"))) {
+        if ((split != null && split[0].equals("for"))
+                || !TypeInferer.inferType(table, size).equals(TypeInferer.inferType(table, "int"))) {
             errorHandler.error(a.ctx, "Size of array must be an integer");
         } else {
             // Check that size is positive
@@ -604,11 +611,18 @@ public class CSemVisitor implements AstVisitor<String> {
             }
         }
 
+        if (expr.contains(":"))
+            split = expr.split(":");
+
         if (t instanceof Array) {
             // Check that expression is of the right type
-            Type exprType = TypeInferer.inferType(table, expr);
+            Type exprType = null;
+            if (split != null && split[0].equals("for"))
+                exprType = null;
+            else
+                exprType = TypeInferer.inferType(table, expr);
             Type arrayType = ((Array) t).getType();
-            if (!exprType.equals(arrayType)) {
+            if (exprType == null || !exprType.equals(arrayType)) {
                 errorHandler.error(a.ctx, "Type mismatch in array declaration : " + arrayType + " != " + exprType);
             }
         }
@@ -642,9 +656,15 @@ public class CSemVisitor implements AstVisitor<String> {
                     t = r.getField(field).getType();
                     out += "." + field;
                 } else if (t instanceof Array) {
+                    String[] split = null;
                     Array a1 = (Array) t;
+
+                    if (field.contains(":"))
+                        split = field.split(":");
+
                     // Check if field is an integer, positive and less than size of array
-                    if (!TypeInferer.inferType(table, field).equals(TypeInferer.inferType(table, "1"))) {
+                    if (split != null && split[0].equals("for")
+                            || !TypeInferer.inferType(table, field).equals(TypeInferer.inferType(table, "1"))) {
                         errorHandler.error(a.ctx, "Index of array must be an integer");
                         break;
                     } else {
