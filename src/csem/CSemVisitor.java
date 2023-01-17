@@ -224,8 +224,10 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(Int a) {
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        if (table != null)
+        if (table != null && a.alreadySeen == false) {
+            a.alreadySeen = true;
             OpCSem.checkint(a, table, errorHandler);
+        }
 
         String val = String.valueOf(a.valeur);
 
@@ -300,6 +302,10 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(IfThenElse a) {
         int temp = region;
         String cond = a.condition.accept(this);
+        String[] split = null;
+        if (cond.contains(":")) {
+            split = cond.split(":");
+        }
 
         StepOneRegion();
         String then = a.thenBlock.accept(this);
@@ -312,13 +318,13 @@ public class CSemVisitor implements AstVisitor<String> {
         SymbolLookup table = this.table.getSymbolLookup(temp);
         Type condType = tipe.inferType(table, a.condition);
 
-        if (condType == null || !condType.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, cond + " is not an integer");
+        if ((split != null && (split[0].equals("for") || split[0].equals("while"))) || !condType.equals(TypeInferer.inferType(table, "int"))) {
+            errorHandler.error(a.ctx, "Condition is not an integer");
         }
 
         // OpCSem.checksametype(a.ctx, then, els, table, errorHandler);
         if (thenType == null || elseType == null || !thenType.equals(elseType)) {
-            errorHandler.error(a.ctx, "then and else blocks must return the same type");
+            errorHandler.error(a.ctx, "Then and else blocks must return the same type");
         }
 
         region = temp;
@@ -332,12 +338,16 @@ public class CSemVisitor implements AstVisitor<String> {
         String cond = a.condition.accept(this);
         StepOneRegion();
         String then = a.thenBlock.accept(this);
+        String[] split = null;
+        if (cond.contains(":")) {
+            split = cond.split(":");
+        }
 
         SymbolLookup table = this.table.getSymbolLookup(temp);
         Type condType = tipe.inferType(table, a.condition);
 
-        if (condType == null || !condType.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, cond + " is not an integer");
+        if ((split != null && (split[0].equals("for") || split[0].equals("while"))) || !condType.equals(TypeInferer.inferType(table, "int"))) {
+            errorHandler.error(a.ctx, "Condition is not an integer");
         }
 
         region = temp;
@@ -351,9 +361,13 @@ public class CSemVisitor implements AstVisitor<String> {
         String cond = a.condition.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(temp);
         Type condType = tipe.inferType(table, a.condition);
+        String[] split = null;
+        if (cond.contains(":")) {
+            split = cond.split(":");
+        }
 
-        if (condType == null || !condType.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, cond + " is not an integer");
+        if ((split != null && (split[0].equals("for") || split[0].equals("while"))) || !condType.equals(TypeInferer.inferType(table, "int"))) {
+            errorHandler.error(a.ctx, "Condition is not an integer");
         }
 
         StepOneRegion();

@@ -9,7 +9,7 @@ public class Int implements Ast {
 
 	public String valeur;
 	public EntierContext ctx;
-
+	public Boolean alreadySeen = false;
 	public Int(EntierContext ctx, String valeur) {
 		this.ctx = ctx;
 		this.valeur = valeur;
