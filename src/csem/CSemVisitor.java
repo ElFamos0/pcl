@@ -313,13 +313,7 @@ public class CSemVisitor implements AstVisitor<String> {
         Type condType = tipe.inferType(table, a.condition);
 
         if (condType == null || !condType.equals(new Primitive(Integer.class))) {
-            if (condType == null || cond.contains("for")){
-                errorHandler.error(a.ctx, "Condition of if statement cannot be null");
-            }
-            else{
-                errorHandler.error(a.ctx, "Condition of if "+ cond + " is not an integer");
-            }
-            
+            errorHandler.error(a.ctx, cond + " is not an integer");
         }
 
         // OpCSem.checksametype(a.ctx, then, els, table, errorHandler);
@@ -343,12 +337,7 @@ public class CSemVisitor implements AstVisitor<String> {
         Type condType = tipe.inferType(table, a.condition);
 
         if (condType == null || !condType.equals(new Primitive(Integer.class))) {
-            if (condType == null || cond.contains("for")){
-                errorHandler.error(a.ctx, "Condition of if statement cannot be null");
-            }
-            else{
-                errorHandler.error(a.ctx, "Condition of if "+ cond + " is not an integer");
-            }
+            errorHandler.error(a.ctx, cond + " is not an integer");
         }
 
         region = temp;
