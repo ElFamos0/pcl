@@ -44,13 +44,16 @@ import sl.Type;
 
 public class CSemType implements AstVisitor<Type> {
     private SymbolLookup table;
+    private int region;
 
     public CSemType(SymbolLookup table) {
         this.table = table;
+        this.region = 0;
     }
 
     public void setTable(SymbolLookup table) {
         this.table = table;
+        region = table.getRegion();
     }
 
     @Override
@@ -65,22 +68,22 @@ public class CSemType implements AstVisitor<Type> {
             return a.left.accept(this);
         }
 
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
     public Type visit(Ou a) {
-        return null;
+        return new Primitive(Integer.class);
     }
 
     @Override
     public Type visit(Et a) {
-        return null;
+        return new Primitive(Integer.class);
     }
 
     @Override
     public Type visit(Compar a) {
-        return null;
+        return new Primitive(Integer.class);
     }
 
     @Override
@@ -145,7 +148,7 @@ public class CSemType implements AstVisitor<Type> {
 
     @Override
     public Type visit(ID a) {
-        // System.out.println("ID : " + a.nom);
+        SymbolLookup table = this.table.getSymbolLookup(region);
         return table.getSymbol(a.nom) == null ? table.getType(a.nom) : table.getSymbol(a.nom).getType();
     }
 
@@ -172,7 +175,9 @@ public class CSemType implements AstVisitor<Type> {
 
     @Override
     public Type visit(IfThenElse a) {
+        region++;
         Type t1 = a.thenBlock.accept(this);
+        region++;
         Type t2 = a.elseBlock.accept(this);
 
         if (t1 == null || t2 == null || !t1.equals(t2)) {
@@ -200,6 +205,7 @@ public class CSemType implements AstVisitor<Type> {
     @Override
     public Type visit(Definition a) {
         // System.out.println("Definition");
+        region++;
         return a.exprs.get(a.exprs.size() - 1).accept(this);
     }
 
@@ -282,7 +288,7 @@ public class CSemType implements AstVisitor<Type> {
             }
         }
 
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override

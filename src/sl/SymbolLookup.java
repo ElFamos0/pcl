@@ -9,6 +9,7 @@ public class SymbolLookup {
     private int scope;
     private int region;
     private int varOffset = 0;
+    private int libFunc = 0;
     private static int regionCount = 0;
     private SymbolLookup parent;
     private ArrayList<SymbolLookup> children;
@@ -49,6 +50,10 @@ public class SymbolLookup {
         }
 
         return result;
+    }
+
+    public int getLibFunc() {
+        return libFunc;
     }
 
     public String toString() {
@@ -232,10 +237,19 @@ public class SymbolLookup {
     private void initLib() {
         Function print = new Function("print", new Primitive(Void.class));
         ArrayList<Variable> params = new ArrayList<Variable>();
-        params.add(new Variable("string", new Array(new Primitive(Character.class))));
+        params.add(new Variable("string", new Primitive(Any.class)));
         this.addChildren();
         this.addSymbolVarAndFunc(print);
         print.addParams(params);
+
+        Function not = new Function("not", new Primitive(Integer.class));
+        params = new ArrayList<Variable>();
+        params.add(new Variable("int", new Primitive(Integer.class)));
+        this.addChildren();
+        this.addSymbolVarAndFunc(not);
+        not.addParams(params);
+
+        libFunc = 2;
 
         types.put("int", new Primitive(Integer.class));
         types.put("string", new Array(new Primitive(Character.class)));

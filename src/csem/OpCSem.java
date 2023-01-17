@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import ast.Int;
 import parser.exprParser.NegationContext;
+import parser.exprParser.PourContext;
 import parser.exprParser.SiAlorsContext;
 import parser.exprParser.SiAlorsSinonContext;
 import sl.Primitive;
@@ -57,49 +58,33 @@ public class OpCSem {
         }
     }
 
-    public static void checkint(ParserRuleContext ctx, String left, String right, SymbolLookup table,
-            ErrorHandler errorHandler) {
-        String split[] = left.split("0x");
-
+    public static void checkint(ParserRuleContext ctx, Type left, Type right, SymbolLookup table,
+            ErrorHandler errorHandler, String leftExpr, String rightExpr) {
         // check if an expression return null
 
-        if (split.length == 1 || split[0].contains("for")) {
-            String s = split[0];
-            // System.out.println(s);
-            // System.out.println("Je suis la" +ctx.getClass()+" "+s);
-            Type t = TypeInferer.inferType(table, s);
-            if ((t == null) || !(t.equals(new Primitive(Integer.class)))) {
-                if (s == "" || s.contains("for")) {
-                    if (ctx instanceof SiAlorsContext || ctx instanceof SiAlorsSinonContext) {
-                        errorHandler.error(ctx, "Cannot evaluate null in if statement");
-                    } else {
-                        errorHandler.error(ctx, "Cannot make operation with null");
-                    }
-                } else {
-                    errorHandler.error(ctx, s + " is not an integer");
-                }
+        if ((left == null) || !(left.equals(new Primitive(Integer.class)))) {
+            if (ctx instanceof SiAlorsContext || ctx instanceof SiAlorsSinonContext) {
+                errorHandler.error(ctx, "Cannot evaluate null in if statement");
+            } else {
+                errorHandler.error(ctx, "Cannot make operation with null");
             }
+        } else {
+            errorHandler.error(ctx, leftExpr + " is not an integer");
         }
 
-        if (right == null) {
+        if (right == null)
+
+        {
             return;
         }
-        String split2[] = right.split("0x");
-
-        if (split2.length == 1 || split2[0].contains("for")) {
-            String s2 = split2[0];
-            // System.out.println(s2);
-
-            Type t = TypeInferer.inferType(table, s2);
-            if (t == null || !(t.equals(new Primitive(Integer.class)))) {
-                if (s2 == "" || s2.contains("for")) {
-                    errorHandler.error(ctx, "Cannot make operation with null");
-                } else {
-                    errorHandler.error(ctx, s2 + " is not an integer");
-                }
+        if (right == null || !(right.equals(new Primitive(Integer.class)))) {
+            if (ctx instanceof PourContext) {
+                errorHandler.error(ctx, "Cannot make operation with null");
+            } else {
+                errorHandler.error(ctx, rightExpr + " is not an integer");
             }
-
         }
+
     }
 
     public static void checkIntOrString(ParserRuleContext ctx, String left, String right, SymbolLookup table,
