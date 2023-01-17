@@ -100,8 +100,10 @@ public class CSemVisitor implements AstVisitor<String> {
         // Check if left and right are integers or string
 
         if (operator.equals("<") || operator.equals(">") || operator.equals(">=") || operator.equals("<=")) {
-            OpCSem.checkIntOrString(a.ctx, left, right, table, errorHandler);
+            //System.out.println("Compar "+leftType+" "+rightType);
+            OpCSem.checkIntOrString(a.ctx, leftType, rightType, table, errorHandler);
         } else if (operator.equals("=") || operator.equals("<>")) {
+            //System.out.println("Compar "+leftType+" "+rightType);
             if (leftType != null && rightType != null && !leftType.equals(rightType)) {
                 errorHandler.error(a.ctx, "Cannot compare different types");
             }

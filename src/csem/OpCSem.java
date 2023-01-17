@@ -83,25 +83,27 @@ public class OpCSem {
         
     }
 
-    public static void checkIntOrString(ParserRuleContext ctx, String leftExpr, String rightExpr, SymbolLookup table,
+    public static void checkIntOrString(ParserRuleContext ctx, Type left, Type right, SymbolLookup table,
             ErrorHandler errorHandler) {
         boolean isInt = false;
-        if (TypeInferer.inferType(table, leftExpr).equals(new Primitive(Integer.class))) {
+        if (left.equals(new Primitive(Integer.class))) {
             isInt = true;
-        } else if (!(TypeInferer.inferType(table, leftExpr).equals(new Array(new Primitive(Character.class))))) {
+            //System.out.println("left is int");
+        } else if (!left.equals(new Array(new Primitive(Character.class)))) {
             errorHandler.error(ctx, "Invalid type for comparaison");
         }
-        if (TypeInferer.inferType(table, rightExpr).equals(new Primitive(Integer.class))) {
+        if (right.equals(new Primitive(Integer.class))) {
             if (!isInt) {
                 errorHandler.error(ctx, "Cannot compare an integer and a string");
             }
-        } else if (TypeInferer.inferType(table, rightExpr).equals(new Array(new Primitive(Character.class)))) {
+        } else if (right.equals(new Array(new Primitive(Character.class)))) {
             if (isInt) {
                 errorHandler.error(ctx, "Cannot compare an integer and a string");
-            } else {
+            }} 
+        else {
                 errorHandler.error(ctx, "Invalid type for comparaison");
-            }
         }
+        
     }
 
     public static void checksametype(ParserRuleContext ctx, String left, String right, SymbolLookup table,
