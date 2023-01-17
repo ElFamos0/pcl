@@ -3,6 +3,8 @@ package csem;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+
 import ast.*;
 import sl.Array;
 import sl.Function;
@@ -13,7 +15,7 @@ import sl.SymbolLookup;
 import sl.Type;
 import sl.TypeInferer;
 
-public class CSemVisitor implements AstVisitor<String> {
+public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     private SymbolLookup table;
     private int region;
     private int biggestRegion = 0;
