@@ -60,31 +60,18 @@ public class OpCSem {
 
     public static void checkint(ParserRuleContext ctx, Type left, Type right, SymbolLookup table,
             ErrorHandler errorHandler, String leftExpr, String rightExpr) {
-        // check if an expression return null
-
-        if ((left == null) || !(left.equals(new Primitive(Integer.class)))) {
-            if (ctx instanceof SiAlorsContext || ctx instanceof SiAlorsSinonContext) {
-                errorHandler.error(ctx, "Cannot evaluate null in if statement");
-            } else {
-                errorHandler.error(ctx, "Cannot make operation with null");
-            }
-        } else {
-            errorHandler.error(ctx, leftExpr + " is not an integer");
-        }
-
-        if (right == null)
-
-        {
-            return;
-        }
-        if (right == null || !(right.equals(new Primitive(Integer.class)))) {
-            if (ctx instanceof PourContext) {
-                errorHandler.error(ctx, "Cannot make operation with null");
-            } else {
-                errorHandler.error(ctx, rightExpr + " is not an integer");
-            }
-        }
-
+                if (left == null || !left.equals(new Primitive(Integer.class))) {
+                    if (!(leftExpr.contains("+") || leftExpr.contains("-") || leftExpr.contains("*") || leftExpr.contains("/"))) {
+                        errorHandler.error(ctx, leftExpr + " is not an integer");
+                    }
+                }
+        
+                if (right == null || !right.equals(new Primitive(Integer.class))) {
+                    if (!(rightExpr.contains("+") || rightExpr.contains("-") || rightExpr.contains("*") || rightExpr.contains("/"))) {
+                        errorHandler.error(ctx, rightExpr + " is not an integer");
+                    }
+                }
+        
     }
 
     public static void checkIntOrString(ParserRuleContext ctx, String left, String right, SymbolLookup table,

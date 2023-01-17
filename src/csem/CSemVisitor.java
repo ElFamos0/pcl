@@ -119,13 +119,8 @@ public class CSemVisitor implements AstVisitor<String> {
         Type right = tipe.inferType(table, a.right);
 
         // Check if left and right are integers
-        if (left == null || !left.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, leftExpr + " is not an integer");
-        }
 
-        if (right == null || !right.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, rightExpr + " is not an integer");
-        }
+        OpCSem.checkint(a.ctx, left, right, table, errorHandler, leftExpr, rightExpr);
 
         // OpCSem.checkint(a.ctx, left, right, table, errorHandler, leftExpr,
         // rightExpr);
@@ -145,13 +140,8 @@ public class CSemVisitor implements AstVisitor<String> {
         Type right = tipe.inferType(table, a.right);
 
         // Check if left and right are integers
-        if (left == null || !left.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, leftExpr + " is not an integer");
-        }
 
-        if (right == null || !right.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, rightExpr + " is not an integer");
-        }
+        OpCSem.checkint(a.ctx, left, right, table, errorHandler, leftExpr, rightExpr);
 
         return leftExpr + "-" + rightExpr;
     }
@@ -166,13 +156,7 @@ public class CSemVisitor implements AstVisitor<String> {
         Type right = tipe.inferType(table, a.right);
 
         // Check if left and right are integers
-        if (left == null || !left.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, leftExpr + " is not an integer");
-        }
-
-        if (right == null || !right.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, rightExpr + " is not an integer");
-        }
+        OpCSem.checkint(a.ctx, left, right, table, errorHandler, leftExpr, rightExpr);
 
         return leftExpr + "*" + rightExpr;
     }
@@ -187,20 +171,13 @@ public class CSemVisitor implements AstVisitor<String> {
         Type right = tipe.inferType(table, a.right);
 
         // Check if left and right are integers
-        if (left == null || !left.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, leftExpr + " is not an integer");
-        }
-
-        if (right == null || !right.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, rightExpr + " is not an integer");
-        }
-
+        OpCSem.checkint(a.ctx, left, right, table, errorHandler, leftExpr, rightExpr);
         // check division by zero
         if (rightExpr.equals("0")) {
             errorHandler.error(a.ctx, "Division by zero");
         }
 
-        return left + "/" + right;
+        return leftExpr + "/" + rightExpr;
     }
 
     @Override
@@ -560,7 +537,7 @@ public class CSemVisitor implements AstVisitor<String> {
         // }
         Type tExpr = tipe.inferType(table, a.expr);
 
-        if (t != null && !t.equals(tExpr) && !tExpr.equals(TypeInferer.inferType(table, "nil"))) {
+        if (t != null && !t.equals(tExpr) && !tExpr.equals  (TypeInferer.inferType(table, "nil"))) {
             errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + t + " != " + tExpr);
         }
 

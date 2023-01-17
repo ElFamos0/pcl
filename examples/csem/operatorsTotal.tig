@@ -4,12 +4,12 @@ let
     type record1 = {test :int}
     var x1 :int := 5
     var x2 :string := "Test"
-    var x3 :int := nil
+    var x3 :int := 5
     var x4 := record1{test = 0}
     var x5 := 0
     
 in  
-    x1 + x2 + x3 + x4 + x5;
+    x1 + x2 / x3 + x4 + x5;
     x1 + for i:= 0 to 10 do (nil);
     -x2;
     x1 >= x2;
