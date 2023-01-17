@@ -1,7 +1,7 @@
 let 
     type intArray = array of int
     type intTab = array of intArray
-    type record = {val : int, name: string}
+    type r = {val : int, name: string}
     type newInt = int
 
     var a:= intArray [8] of 0
@@ -11,7 +11,7 @@ let
     function init(board:intTab) =
         for i := 0 to 7 do
             for j:= 0 to 7 do
-                (b[i][j] := 0)
+                (board[i][j] := 0)
     
     function setTileValue(board:intTab,case : int, value : int) =
         let
@@ -25,8 +25,8 @@ let
     
     function getTileValue(board:intTab,case:int) :int = 
         let
-            var ligne :int := nil
-            var colonne :int := nil
+            var ligne :int := 0
+            var colonne :int := 0
         in
             ligne := (case / 8);
             colonne := case - ligne*8;

@@ -50,7 +50,7 @@ public class Main {
             ast.accept(graphViz);
 
             // Display TDS
-            // System.out.println(table);
+            System.out.println(table);
 
             // Controle semantique
             CSemVisitor csem = new CSemVisitor(table, errorHandler);

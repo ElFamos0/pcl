@@ -14,6 +14,10 @@ package ast;
 
 import java.util.ArrayList;
 
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+
+import csem.CSemType;
 import csem.ErrorHandler;
 import csem.FuncCSem;
 import parser.exprBaseVisitor;
@@ -27,6 +31,7 @@ import parser.exprParser.DeclarationTypeContext;
 import parser.exprParser.DeclarationValeurContext;
 import parser.exprParser.DefinitionContext;
 import parser.exprParser.EntierContext;
+import parser.exprParser.ExpressionContext;
 import parser.exprParser.ExpressionIdentifiantContext;
 import parser.exprParser.ExpressionUnaireContext;
 import parser.exprParser.IdentifiantContext;
@@ -55,6 +60,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
     private int region;
     private String idf;
     private ErrorHandler errorHandler;
+    private TypeInferer typeInferer = new TypeInferer();
 
     public AstCreator(SymbolLookup table, ErrorHandler errorHandler) {
         this.table = table;
@@ -410,7 +416,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         DeclarationTypeClassique dtc = new DeclarationTypeClassique(ctx);
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        table.addType(idf, TypeInferer.inferType(table, ctx.getChild(0).getText()));
+        table.addType(idf, typeInferer.inferType(table, ctx.getChild(0)));
         dtc.setId(ctx.getChild(0).accept(this));
         return dtc;
     }
@@ -421,10 +427,9 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
-        String type = ctx.getChild(2).getText();
-        Type t = TypeInferer.inferType(table, type);
+        Type t = typeInferer.inferType(table, ctx.getChild(2));
         if (t == null) {
-            errorHandler.error(ctx, "Type '" + type + "' not defined");
+            errorHandler.error(ctx, "Type '" + ctx.getChild(2).getText() + "' not defined");
         } else {
             Type at = new Array(t);
             table.addType(idf, at);
@@ -442,7 +447,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         for (int i = 0; 2 * i + 1 < ctx.getChildCount() - 1; i++) {
             String[] split = ctx.getChild(2 * i + 1).getText().split(":");
             Variable v = null;
-            Type t = TypeInferer.inferType(table, split[1]);
+            Type t = typeInferer.inferType(table, ctx.getChild(2 * i + 1));
             if (t == null) {
                 errorHandler.error(ctx, "Type '" + split[1] + "' not defined");
                 return drt;
@@ -476,7 +481,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 errorHandler.error(ctx,
                         "Variable '" + idf + "' already defined as a " + s.toString() + " in this scope ; t " + table);
             else {
-                Type t = TypeInferer.inferType(table, expr);
+                Type t = typeInferer.inferType(table, ctx.getChild(3));
                 if (t == null) {
                     errorHandler.error(ctx, "Type '" + expr + "' not defined");
                 } else {
@@ -490,7 +495,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 errorHandler.error(ctx,
                         "Variable '" + idf + "' already defined as a " + s.toString() + " in this scope");
             else {
-                Type t = TypeInferer.inferType(table, expr);
+                Type t = typeInferer.inferType(table, ctx.getChild(3));
                 if (t != null) {
                     table.addSymbolVarAndFunc(new Variable(idf, t));
                 }
@@ -560,7 +565,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                     errorHandler.error(ctx,
                             "Variable '" + split[0] + "' already defined in this scope");
                 else {
-                    Type t = TypeInferer.inferType(table, split[1]);
+                    Type t = typeInferer.inferType(table, ctx.getChild(count));
 
                     if (t != null) {
                         params.add(new Variable(split[0], t));
@@ -575,12 +580,12 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         }
 
         Ast branch = ctx.getChild(count).accept(this);
+        // System.out.println("branch = " + ctx.getChild(count + 3).accept(type));
         String txt = ctx.getChild(count).getText();
         Type type = null;
-
         if (txt.equals(":")) {
             count++;
-            type = TypeInferer.inferType(table, ctx.getChild(count).getText());
+            type = typeInferer.inferType(table, ctx.getChild(count));
             branch = ctx.getChild(count).accept(this);
             drf.setReturn(((ID) branch));
             count++;
@@ -589,9 +594,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         branch = ctx.getChild(count).accept(this);
         String b = ctx.getChild(count).getText();
         if (type == null)
-            type = TypeInferer.inferType(table, b);
-        if (type == null)
-            type = new Primitive(Void.class);
+            type = typeInferer.inferType(table, ctx.getChild(count));
 
         Symbol s = table.getSymbolInScope(idf);
         String err = FuncCSem.checkFuncFromLib(idf);
@@ -722,7 +725,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         if (s != null) {
             errorHandler.error(ctx, "Variable '" + ctx.getChild(1).getText() + "' already defined");
         } else {
-            table.addSymbolVarAndFunc(new Variable(idf, TypeInferer.inferType(table, "int")));
+            table.addSymbolVarAndFunc(new Variable(idf, new Primitive(Integer.class)));
         }
 
         region = temp;
