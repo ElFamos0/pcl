@@ -350,6 +350,7 @@ public class CSemVisitor implements AstVisitor<String> {
             errorHandler.error(a.ctx, "Condition is not an integer");
         }
 
+
         region = temp;
 
         return "ifthen" + then;
@@ -565,6 +566,10 @@ public class CSemVisitor implements AstVisitor<String> {
 
         if (t != null && !t.equals(tExpr) && !tExpr.equals  (TypeInferer.inferType(table, "nil"))) {
             errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + t + " != " + tExpr);
+        }
+
+        if (t == null && tExpr == null) {
+            errorHandler.error(a.ctx, "Nil has no type in this context");
         }
 
         return null;
