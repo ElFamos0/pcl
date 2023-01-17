@@ -8,7 +8,7 @@ public class Primitive extends Type {
     }
 
     private enum PrimitiveType {
-        INT, CHAR, BOOL, VOID;
+        INT, CHAR, BOOL, VOID, ANY;
     }
 
     public <T> PrimitiveType classToType(Class<T> classz) {
@@ -20,6 +20,8 @@ public class Primitive extends Type {
             return PrimitiveType.BOOL;
         else if (classz == Void.class)
             return PrimitiveType.VOID;
+        else if (classz == Any.class)
+            return PrimitiveType.ANY;
         else {
             return null;
         }
@@ -40,10 +42,13 @@ public class Primitive extends Type {
                 return 8;
             case CHAR:
                 // String size
-                return 1;
+                return 8;
             case BOOL:
                 // Bool size
                 return 1;
+            case ANY:
+                // Any size
+                return 8;
             default:
                 return null;
         }
@@ -51,6 +56,9 @@ public class Primitive extends Type {
 
     @Override
     public boolean equals(Type t) {
+        if (type == PrimitiveType.ANY)
+            return true;
+
         if (t instanceof Primitive) {
             Primitive p = (Primitive) t;
             return p.getType() == type;
@@ -68,6 +76,8 @@ public class Primitive extends Type {
                 return "bool";
             case VOID:
                 return "void";
+            case ANY:
+                return "any";
             default:
                 return null;
         }

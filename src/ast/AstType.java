@@ -52,30 +52,29 @@ public class AstType extends exprBaseVisitor<Type> {
 
     @Override
     public Type visitProgram(exprParser.ProgramContext ctx) {
+        // System.out.println("Programme");
         return null;
     }
 
     @Override
     public Type visitExpression(exprParser.ExpressionContext ctx) {
-        Type t1 = ctx.getChild(0).accept(this);
-
-        for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
-            Type t2 = ctx.getChild(2 * i + 2).accept(this);
-            if (t1 == null || t2 == null || !t1.equals(t2)) {
-                return null;
-            }
+        // System.out.println("Expression");
+        if (ctx.getChildCount() == 1) {
+            return ctx.getChild(0).accept(this);
+        } else {
+            return new Primitive(Void.class);
         }
-
-        return t1;
     }
 
     @Override
     public Type visitInstanciationType(exprParser.InstanciationTypeContext ctx) {
+        // System.out.println("InstanciationType");
         return null;
     }
 
     @Override
     public Type visitOperationOu(OperationOuContext ctx) {
+        // System.out.println("OperationOu");
         Type t1 = ctx.getChild(0).accept(this);
 
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
@@ -90,6 +89,7 @@ public class AstType extends exprBaseVisitor<Type> {
 
     @Override
     public Type visitOperationEt(OperationEtContext ctx) {
+        // System.out.println("OperationEt");
         Type t1 = ctx.getChild(0).accept(this);
 
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
@@ -104,6 +104,7 @@ public class AstType extends exprBaseVisitor<Type> {
 
     @Override
     public Type visitOperationComparaison(OperationComparaisonContext ctx) {
+        // System.out.println("OperationComparaison");
         Type t1 = ctx.getChild(0).accept(this);
 
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
@@ -118,6 +119,7 @@ public class AstType extends exprBaseVisitor<Type> {
 
     @Override
     public Type visitOperationAddition(OperationAdditionContext ctx) {
+        // System.out.println("OperationAddition");
         Type t1 = ctx.getChild(0).accept(this);
 
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
@@ -132,6 +134,7 @@ public class AstType extends exprBaseVisitor<Type> {
 
     @Override
     public Type visitOperationMultiplication(OperationMultiplicationContext ctx) {
+        // System.out.println("OperationMultiplication");
         Type t1 = ctx.getChild(0).accept(this);
 
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
@@ -146,94 +149,110 @@ public class AstType extends exprBaseVisitor<Type> {
 
     @Override
     public Type visitExpressionUnaire(ExpressionUnaireContext ctx) {
+        // System.out.println("ExpressionUnaire");
         return ctx.getChild(0).accept(this);
     }
 
     @Override
     public Type visitSequence(SequenceContext ctx) {
-        return ctx.getChild(ctx.getChildCount() - 1).accept(this);
+        // System.out.println("Sequence");
+        return ctx.getChild(ctx.getChildCount() - 2).accept(this);
     }
 
     @Override
     public Type visitNegation(NegationContext ctx) {
+        // System.out.println("Negation");
         return ctx.accept(this);
     }
 
     @Override
     public Type visitIdentifiant(IdentifiantContext ctx) {
+        // System.out.println("Identifiant");
         return table.getSymbol(ctx.getText()) == null ? table.getType(ctx.getText())
                 : table.getSymbol(ctx.getText()).getType();
     }
 
     @Override
     public Type visitEntier(EntierContext ctx) {
+        // System.out.println("Entier");
         return new Primitive(Integer.class);
     }
 
     @Override
     public Type visitChaineChr(ChaineChrContext ctx) {
+        // System.out.println("ChaineChr");
         return new Array(new Primitive(Character.class));
     }
 
     @Override
     public Type visitNil(NilContext ctx) {
+        // System.out.println("Nil");
         return null;
     }
 
     @Override
     public Type visitBreak(BreakContext ctx) {
+        // System.out.println("Break");
         return null;
     }
 
     @Override
     public Type visitAppelFonction(AppelFonctionContext ctx) {
+        // System.out.println("Appel fonction");
         return null;
     }
 
     @Override
     public Type visitExpressionIdentifiant(ExpressionIdentifiantContext ctx) {
+        // System.out.println("Expression identifiant");
         return ctx.getChild(0).accept(this);
     }
 
     @Override
     public Type visitListeAcces(ListeAccesContext ctx) {
+        // System.out.println("Liste acces");
         return null;
     }
 
     @Override
     public Type visitDeclarationType(DeclarationTypeContext ctx) {
+        // System.out.println("Declaration type");
         return null;
     }
 
     @Override
     public Type visitDeclarationTypeClassique(DeclarationTypeClassiqueContext ctx) {
+        // System.out.println("Declaration type classique");
         return null;
     }
 
     @Override
     public Type visitDeclarationArrayType(DeclarationArrayTypeContext ctx) {
+        // System.out.println("Declaration array type");
         return null;
     }
 
     @Override
     public Type visitDeclarationRecordType(DeclarationRecordTypeContext ctx) {
+        // System.out.println("Declaration record type");
         return null;
     }
 
     @Override
     public Type visitDeclarationChamp(DeclarationChampContext ctx) {
+        // System.out.println("Declaration champ");
         return ctx.getChild(2).accept(this);
     }
 
     @Override
     public Type visitDeclarationValeur(DeclarationValeurContext ctx) {
-        System.out.println("Declaration valeur");
+        // System.out.println("Declaration valeur");
         return null;
     }
 
     @Override
     public Type visitDeclarationFonction(DeclarationFonctionContext ctx) {
-        System.out.println("Declaration fonction");
+        // System.out.println("Declaration fonction");
         return null;
     }
 
@@ -256,16 +275,19 @@ public class AstType extends exprBaseVisitor<Type> {
 
     @Override
     public Type visitTantQue(TantQueContext ctx) {
+        // System.out.println("TantQue");
         return new Primitive(Void.class);
     }
 
     @Override
     public Type visitPour(PourContext ctx) {
+        // System.out.println("Pour");
         return new Primitive(Void.class);
     }
 
     @Override
     public Type visitDefinition(DefinitionContext ctx) {
+        // System.out.println("Definition");
         for (int i = ctx.getChildCount() - 1; i > -1; i--) {
             if (ctx.getChild(i).getText().equals("let") || ctx.getChild(i).getText().equals("end")
                     || ctx.getChild(i).getText().equals(";")) {

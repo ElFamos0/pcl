@@ -16,13 +16,24 @@ import sl.TypeInferer;
 public class CSemVisitor implements AstVisitor<String> {
     private SymbolLookup table;
     private int region;
+    private int biggestRegion = 0;
     private ErrorHandler errorHandler;
     private TypeInferer tipe = new TypeInferer();
 
     public CSemVisitor(SymbolLookup table, ErrorHandler errorHandler) {
         this.table = table;
-        region = 1;
+        region = table.getLibFunc();
+        biggestRegion = region;
         this.errorHandler = errorHandler;
+    }
+
+    public void StepOneRegion() {
+        biggestRegion++;
+        region = biggestRegion;
+    }
+
+    public void StepDownRegion() {
+        region--;
     }
 
     public ErrorHandler getErrorHandler() {
@@ -83,67 +94,113 @@ public class CSemVisitor implements AstVisitor<String> {
         String operator = a.operator;
 
         SymbolLookup table = this.table.getSymbolLookup(region);
+        Type leftType = tipe.inferType(table, a.left);
+        Type rightType = tipe.inferType(table, a.right);
 
         // Check if left and right are integers or string
 
         if (operator.equals("<") || operator.equals(">") || operator.equals(">=") || operator.equals("<=")) {
             OpCSem.checkIntOrString(a.ctx, left, right, table, errorHandler);
         } else if (operator.equals("=") || operator.equals("<>")) {
-            OpCSem.checksametype(a.ctx, left, right, table, errorHandler);
+            if (leftType != null && rightType != null && !leftType.equals(rightType)) {
+                errorHandler.error(a.ctx, "Cannot compare different types");
+            }
         }
 
-        return left + "0x88" + right;
+        return left + "&&" + right;
     }
 
     @Override
     public String visit(Addition a) {
-        String left = a.left.accept(this);
-        String right = a.right.accept(this);
+        String leftExpr = a.left.accept(this);
+        String rightExpr = a.right.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table, errorHandler);
+        Type left = tipe.inferType(table, a.left);
+        Type right = tipe.inferType(table, a.right);
+
+        // Check if left and right are integers
+        if (left == null || !left.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, leftExpr + " is not an integer");
+        }
+
+        if (right == null || !right.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, rightExpr + " is not an integer");
+        }
+
+        // OpCSem.checkint(a.ctx, left, right, table, errorHandler, leftExpr,
+        // rightExpr);
 
         // System.out.println("Addition: " + left + " + " + right);
 
-        return left + "0x83" + right;
+        return leftExpr + "+" + rightExpr;
     }
 
     @Override
     public String visit(Soustraction a) {
-        String left = a.left.accept(this);
-        String right = a.right.accept(this);
+        String leftExpr = a.left.accept(this);
+        String rightExpr = a.right.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table, errorHandler);
+        Type left = tipe.inferType(table, a.left);
+        Type right = tipe.inferType(table, a.right);
 
-        return left + "0x80" + right;
+        // Check if left and right are integers
+        if (left == null || !left.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, leftExpr + " is not an integer");
+        }
+
+        if (right == null || !right.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, rightExpr + " is not an integer");
+        }
+
+        return leftExpr + "-" + rightExpr;
     }
 
     @Override
     public String visit(Multiplication a) {
-        String left = a.left.accept(this);
-        String right = a.right.accept(this);
+        String leftExpr = a.left.accept(this);
+        String rightExpr = a.right.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table, errorHandler);
+        Type left = tipe.inferType(table, a.left);
+        Type right = tipe.inferType(table, a.right);
 
-        return left + "0x81" + right;
+        // Check if left and right are integers
+        if (left == null || !left.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, leftExpr + " is not an integer");
+        }
+
+        if (right == null || !right.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, rightExpr + " is not an integer");
+        }
+
+        return leftExpr + "*" + rightExpr;
     }
 
     @Override
     public String visit(Division a) {
-        String left = a.left.accept(this);
-        String right = a.right.accept(this);
+        String leftExpr = a.left.accept(this);
+        String rightExpr = a.right.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table, errorHandler);
+        Type left = tipe.inferType(table, a.left);
+        Type right = tipe.inferType(table, a.right);
+
+        // Check if left and right are integers
+        if (left == null || !left.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, leftExpr + " is not an integer");
+        }
+
+        if (right == null || !right.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, rightExpr + " is not an integer");
+        }
 
         // check division by zero
-
-        if (right.equals("0")) {
+        if (rightExpr.equals("0")) {
             errorHandler.error(a.ctx, "Division by zero");
         }
 
-        return left + "0x82" + right;
+        return left + "/" + right;
     }
 
     @Override
@@ -160,10 +217,15 @@ public class CSemVisitor implements AstVisitor<String> {
 
     @Override
     public String visit(Negation a) {
-        String left = a.expression.accept(this);
-        String right = null;
+        String leftExpr = a.expression.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        OpCSem.checkint(a.ctx, left, right, table, errorHandler);
+        Type left = tipe.inferType(table, a.expression);
+
+        // Check if left and right are integers
+        if (left == null || !left.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, leftExpr + " is not an integer");
+        }
+
         String data = a.expression.accept(this);
         if (data.startsWith("-")) {
             return data.substring(1);
@@ -207,11 +269,10 @@ public class CSemVisitor implements AstVisitor<String> {
         String idf = a.id.accept(this);
         String args = a.args.accept(this);
         String[] arg = args.split(":");
-
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         if (table == null)
-            return "function:" + idf;
+            return idf;
 
         Function f = (Function) table.getSymbol(idf);
 
@@ -222,16 +283,17 @@ public class CSemVisitor implements AstVisitor<String> {
             errorHandler.error(a.ctx, "Function " + idf + " expects " + f.getParamsCount() + " arguments, but "
                     + arg.length + " were given");
 
-        for (int i = 0; i < arg.length; i++) {
+        for (int i = 0; i < f.getParamsCount(); i++) {
             Type t = TypeInferer.inferType(table, arg[i]);
+            Type ft = f.getParams().get(f.getParamsCount() - (i + 1)).getType();
 
             if (f != null && t != null && i < f.getParamsCount()
-                    && !(t.equals(f.getParams().get(f.getParamsCount() - i - 1).getType())))
-                errorHandler.error(a.ctx, "Function " + idf + " expects " + f.getParams().get(i).getType()
+                    && !(ft.equals(t)))
+                errorHandler.error(a.ctx, "Function " + idf + " expects " + ft
                         + " as argument " + (i + 1) + ", but " + t + " was given");
         }
 
-        return "function:" + idf;
+        return idf;
     }
 
     @Override
@@ -249,16 +311,25 @@ public class CSemVisitor implements AstVisitor<String> {
         int temp = region;
         String cond = a.condition.accept(this);
 
-        region++;
+        StepOneRegion();
         String then = a.thenBlock.accept(this);
+        Type thenType = tipe.inferType(table.getSymbolLookup(region), a.thenBlock);
 
-        region++;
+        StepOneRegion();
         String els = a.elseBlock.accept(this);
+        Type elseType = tipe.inferType(table.getSymbolLookup(region), a.elseBlock);
 
-        SymbolLookup table = this.table.getSymbolLookup(region);
+        SymbolLookup table = this.table.getSymbolLookup(temp);
+        Type condType = tipe.inferType(table, a.condition);
 
-        OpCSem.checkint(a.ctx, cond, null, table, errorHandler);
-        OpCSem.checksametype(a.ctx, then, els, table, errorHandler);
+        if (condType == null || !condType.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, cond + " is not an integer");
+        }
+
+        // OpCSem.checksametype(a.ctx, then, els, table, errorHandler);
+        if (thenType == null || elseType == null || !thenType.equals(elseType)) {
+            errorHandler.error(a.ctx, "then and else blocks must return the same type");
+        }
 
         region = temp;
 
@@ -269,12 +340,15 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(IfThen a) {
         int temp = region;
         String cond = a.condition.accept(this);
-        region++;
+        StepOneRegion();
         String then = a.thenBlock.accept(this);
 
-        SymbolLookup table = this.table.getSymbolLookup(region);
+        SymbolLookup table = this.table.getSymbolLookup(temp);
+        Type condType = tipe.inferType(table, a.condition);
 
-        OpCSem.checkint(a.ctx, cond, null, table, errorHandler);
+        if (condType == null || !condType.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, cond + " is not an integer");
+        }
 
         region = temp;
 
@@ -284,11 +358,15 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(While a) {
         int temp = region;
-        Type cond = tipe.inferType(table, a.condition);
-        SymbolLookup table = this.table.getSymbolLookup(region);
-        BouclesCSem.checkint(a.ctx, cond, table, errorHandler);
+        String cond = a.condition.accept(this);
+        SymbolLookup table = this.table.getSymbolLookup(temp);
+        Type condType = tipe.inferType(table, a.condition);
 
-        region++;
+        if (condType == null || !condType.equals(new Primitive(Integer.class))) {
+            errorHandler.error(a.ctx, cond + " is not an integer");
+        }
+
+        StepOneRegion();
 
         a.condition.accept(this);
         String b = a.block.accept(this);
@@ -301,17 +379,17 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(For a) {
         int temp = region;
-        Type start = tipe.inferType(table, a.startValue);
-        Type end = tipe.inferType(table, a.endValue);
         String id = a.start.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
+        Type start = tipe.inferType(table, a.startValue);
+        Type end = tipe.inferType(table, a.endValue);
 
         if (table != null) {
             BouclesCSem.checkint(a.ctx, start, table, errorHandler);
             BouclesCSem.checkint(a.ctx, end, table, errorHandler);
         }
 
-        region++;
+        StepOneRegion();
         a.start.accept(this);
         a.startValue.accept(this);
         a.endValue.accept(this);
@@ -325,7 +403,7 @@ public class CSemVisitor implements AstVisitor<String> {
     @Override
     public String visit(Definition a) {
         int temp = region;
-        region++;
+        StepOneRegion();
         for (Ast ast : a.declarations) {
             ast.accept(this);
         }
@@ -408,14 +486,14 @@ public class CSemVisitor implements AstVisitor<String> {
     public String visit(DeclarationFonction a) {
         int temp = region;
         SymbolLookup table = this.table.getNearSymbolLookup(temp);
+        StepOneRegion();
         String idf = a.id.accept(this);
 
         if (!(table.getSymbol(idf) instanceof Function)) {
             return null;
         }
 
-        Function f = (Function) table.getSymbol(idf);
-        region = f.getTable().getRegion();
+        table = this.table.getSymbolLookup(region);
 
         // Check if identifier is a reserved word
         if (idf.equals("array") || idf.equals("record")) {
@@ -481,8 +559,6 @@ public class CSemVisitor implements AstVisitor<String> {
         // return null;
         // }
         Type tExpr = tipe.inferType(table, a.expr);
-
-        System.out.println("tExpr = " + expr);
 
         if (t != null && !t.equals(tExpr) && !tExpr.equals(TypeInferer.inferType(table, "nil"))) {
             errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + t + " != " + tExpr);

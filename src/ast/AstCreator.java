@@ -592,7 +592,6 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         }
         count++;
         branch = ctx.getChild(count).accept(this);
-        String b = ctx.getChild(count).getText();
         if (type == null)
             type = typeInferer.inferType(table, ctx.getChild(count));
 
