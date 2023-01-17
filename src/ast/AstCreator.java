@@ -486,6 +486,22 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                     errorHandler.error(ctx, "Type '" + expr + "' not defined");
                 } else {
                     table.addSymbolVarAndFunc(new Variable(idf, t));
+                    if (t instanceof Array) {
+                        int size;
+                        if (expr.contains("[")) {
+                            String temp = expr.substring(expr.indexOf("[") + 1, expr.indexOf("]"));
+                            
+                            try {
+                                size = Integer.parseInt(temp);
+                            } catch (NumberFormatException e) {
+                                size = 0;
+                            }
+                        } else {
+                            size = expr.length();
+                        }
+    
+                        ((Array) t).setSize(size);
+                    }
                 }
             }
             dv.setType(ctx.getChild(3).accept(this));
@@ -504,6 +520,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                     int size;
                     if (expr.contains("[")) {
                         String temp = expr.substring(expr.indexOf("[") + 1, expr.indexOf("]"));
+                        
                         try {
                             size = Integer.parseInt(temp);
                         } catch (NumberFormatException e) {

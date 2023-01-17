@@ -1,5 +1,7 @@
 package sl;
 
+import javax.net.ssl.TrustManagerFactorySpi;
+
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import ast.Ast;
@@ -56,6 +58,11 @@ public class TypeInferer {
                 Symbol s = new Variable(split[0].trim(), inferType(table, split[1].trim()));
                 r.addField(s);
             }
+            return r;
+        }
+        if (expr.startsWith("nil")) {
+            Record r = new Record();
+            r.setIsNil(true);
             return r;
         }
         if (expr.contains("0x88")) {

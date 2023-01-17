@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Record extends Type {
     private ArrayList<Symbol> fields;
-    private Boolean isNil;
+    private Boolean isNil = false;
 
     public Record() {
         fields = new ArrayList<Symbol>();
@@ -48,6 +48,9 @@ public class Record extends Type {
         // A record is equal to another if they share the same fields, or if they share the same fields with some fields being nil
         if (t instanceof Record) {
             Record r = (Record) t;
+            if (r.getIsNil()) {
+                return true;
+            }
             if (r.getFields().size() != fields.size())
                 return false;
             for (Symbol s : fields) {

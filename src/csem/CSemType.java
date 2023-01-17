@@ -41,6 +41,7 @@ import sl.Array;
 import sl.Primitive;
 import sl.SymbolLookup;
 import sl.Type;
+import sl.Record;
 
 public class CSemType implements AstVisitor<Type> {
     private SymbolLookup table;
@@ -218,36 +219,36 @@ public class CSemType implements AstVisitor<Type> {
     @Override
     public Type visit(DeclarationTypeClassique a) {
         // System.out.println("DeclarationTypeClassique");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
     public Type visit(DeclarationArrayType a) {
         // System.out.println("DeclarationArrayType");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
     public Type visit(DeclarationRecordType a) {
         // System.out.println("DeclarationRecordType");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
     public Type visit(DeclarationChamp a) {
         // System.out.println("DeclarationChamp");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
     public Type visit(DeclarationFonction a) {
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
     public Type visit(DeclarationValeur a) {
         // System.out.println("DeclarationValeur");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
@@ -257,20 +258,21 @@ public class CSemType implements AstVisitor<Type> {
 
     @Override
     public Type visit(Nil a) {
-        // TODO Auto-generated method stub
-        return null;
+        Record nil = new Record();
+        nil.setIsNil(true);
+        return nil;
     }
 
     @Override
     public Type visit(Break a) {
         // TODO Auto-generated method stub
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
     public Type visit(InstanciationType a) {
         // System.out.println("InstanciationType");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override

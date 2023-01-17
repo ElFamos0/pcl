@@ -700,8 +700,14 @@ public class CSemVisitor implements AstVisitor<String> {
             // Check that expression is of the right type
             Type exprType = tipe.inferType(table, a.getExpr());
             Type arrayType = ((Array) t).getType();
-            if (exprType == null || !exprType.equals(arrayType)) {
-                errorHandler.error(a.ctx, "Type mismatch in array declaration : " + arrayType + " != " + exprType);
+            boolean state = true;
+            if (exprType == null || !exprType.equals(arrayType )) {
+                if (exprType instanceof Record && arrayType instanceof Record) {
+                    state = ! ((Record) exprType).getIsNil();
+                }
+                if (state) {
+                    errorHandler.error(a.ctx, "Type mismatch in array declaration : " + arrayType + " != " + exprType);
+                }
             }
         }
 
@@ -725,14 +731,20 @@ public class CSemVisitor implements AstVisitor<String> {
             String out = "";
             for (Ast ast : a.getAccesChamps()) {
                 String field = ast.accept(this);
+                
                 if (t instanceof Record) {
-                    Record r = (Record) t;
-                    if (r.getField(field) == null) {
-                        errorHandler.error(a.ctx, "Field '" + field + "' not defined in type '" + t + "'");
+                    if(((Record) t).getIsNil()) {
+                        errorHandler.error(a.ctx, idf + out + "' is nil");
                         break;
+                    } else {
+                        Record r = (Record) t;
+                        if (r.getField(field) == null) {
+                            errorHandler.error(a.ctx, "Field '" + field + "' not defined in type '" + t + "'");
+                            break;
+                        }
+                        t = r.getField(field).getType();
+                        out += "." + field;
                     }
-                    t = r.getField(field).getType();
-                    out += "." + field;
                 } else if (t instanceof Array) {
                     Array a1 = (Array) t;
                     // Check if field is an integer, positive and less than size of array
@@ -740,7 +752,7 @@ public class CSemVisitor implements AstVisitor<String> {
                         errorHandler.error(a.ctx, "Index of array must be an integer");
                         break;
                     } else {
-                        if (TypeInferer.isNumeric(field) && Integer.parseInt(field) <= 0) {
+                        if (TypeInferer.isNumeric(field) && Integer.parseInt(field) < 0) {
                             errorHandler.error(a.ctx, "Index of array must be positive");
                             break;
                         } else {

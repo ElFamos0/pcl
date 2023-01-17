@@ -1,17 +1,18 @@
 /* Quelques tests d'erreur sur nil */
 let
-    type newType = array of int
-    var a :newType:= nil
-
     type newType2 = {val : int}
     var b :newType2 := nil
+
+    type newType = array of newType2
+    var a :newType:= newType [5] of nil
 
     var c:= 5
     var d:= nil
 in  
-    a[0];
+    a[0].val;
     b.val;
     c + nil;
     if nil = nil then (3);
+    if b = nil then (3);
     nil
 end
