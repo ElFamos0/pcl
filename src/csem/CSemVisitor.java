@@ -100,6 +100,7 @@ public class CSemVisitor implements AstVisitor<String> {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
+        // Salut thibo
         OpCSem.checkint(a.ctx, left, right, table, errorHandler);
 
         // System.out.println("Addition: " + left + " + " + right);
