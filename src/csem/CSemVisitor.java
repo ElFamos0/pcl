@@ -43,13 +43,13 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(Program a) {
+    public ParserRuleContext visit(Program a) {
         a.expression.accept(this);
         return null;
     }
 
     @Override
-    public String visit(Expression a) {
+    public ParserRuleContext visit(Expression a) {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
         if (left == null || right == null) {
@@ -74,7 +74,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(Ou a) {
+    public ParserRuleContext visit(Ou a) {
         a.left.accept(this);
         a.right.accept(this);
 
@@ -82,7 +82,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(Et a) {
+    public ParserRuleContext visit(Et a) {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
 
@@ -90,7 +90,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(Compar a) {
+    public ParserRuleContext visit(Compar a) {
         String left = a.left.accept(this);
         String right = a.right.accept(this);
         String operator = a.operator;
@@ -115,7 +115,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(Addition a) {
+    public ParserRuleContext visit(Addition a) {
         String leftExpr = a.left.accept(this);
         String rightExpr = a.right.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
@@ -135,7 +135,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(Soustraction a) {
+    public ParserRuleContext visit(Soustraction a) {
         String leftExpr = a.left.accept(this);
         String rightExpr = a.right.accept(this);
 
@@ -151,7 +151,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(Multiplication a) {
+    public ParserRuleContext visit(Multiplication a) {
         String leftExpr = a.left.accept(this);
         String rightExpr = a.right.accept(this);
 
@@ -166,7 +166,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(Division a) {
+    public ParserRuleContext visit(Division a) {
         String leftExpr = a.left.accept(this);
         String rightExpr = a.right.accept(this);
 
@@ -185,7 +185,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(Sequence a) {
+    public ParserRuleContext visit(Sequence a) {
         String seq = "";
         for (Ast ast : a.seqs) {
             seq += ast.accept(this) + ":";
@@ -197,7 +197,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(Negation a) {
+    public ParserRuleContext visit(Negation a) {
         String leftExpr = a.expression.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
         Type left = tipe.inferType(table, a.expression);
@@ -216,14 +216,14 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(ID a) {
+    public ParserRuleContext visit(ID a) {
         String idf = a.nom;
 
         return idf;
     }
 
     @Override
-    public String visit(Int a) {
+    public ParserRuleContext visit(Int a) {
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         if (table != null && a.alreadySeen == false) {
@@ -237,7 +237,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(ExpressionIdentifiant a) {
+    public ParserRuleContext visit(ExpressionIdentifiant a) {
         a.left.accept(this);
 
         if (a.right != null) {
@@ -248,7 +248,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(AppelFonction a) {
+    public ParserRuleContext visit(AppelFonction a) {
         String idf = a.id.accept(this);
         String args = a.args.accept(this);
         String[] arg = args.split(":");
@@ -291,7 +291,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(ArgFonction a) {
+    public ParserRuleContext visit(ArgFonction a) {
         String args = "";
         for (Ast ast : a.args) {
             args += ast.accept(this) + ":";
@@ -301,7 +301,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(IfThenElse a) {
+    public ParserRuleContext visit(IfThenElse a) {
         int temp = region;
         String cond = a.condition.accept(this);
         String[] split = null;
@@ -335,7 +335,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(IfThen a) {
+    public ParserRuleContext visit(IfThen a) {
         int temp = region;
         String cond = a.condition.accept(this);
         StepOneRegion();
@@ -359,7 +359,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(While a) {
+    public ParserRuleContext visit(While a) {
         int temp = region;
         String cond = a.condition.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(temp);
@@ -384,7 +384,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(For a) {
+    public ParserRuleContext visit(For a) {
         int temp = region;
         String id = a.start.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
@@ -408,7 +408,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(Definition a) {
+    public ParserRuleContext visit(Definition a) {
         int temp = region;
         StepOneRegion();
         for (Ast ast : a.declarations) {
@@ -424,7 +424,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(DeclarationType a) {
+    public ParserRuleContext visit(DeclarationType a) {
         String idf = a.id.accept(this);
         a.type.accept(this);
 
@@ -437,7 +437,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(DeclarationTypeClassique a) {
+    public ParserRuleContext visit(DeclarationTypeClassique a) {
         String type = a.id.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(region);
@@ -450,14 +450,14 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(DeclarationArrayType a) {
+    public ParserRuleContext visit(DeclarationArrayType a) {
         String idk = a.id.accept(this);
 
         return idk;
     }
 
     @Override
-    public String visit(DeclarationRecordType a) {
+    public ParserRuleContext visit(DeclarationRecordType a) {
         List<String> fields = new ArrayList<>();
         for (Ast ast : a.champs) {
             String expr = ast.accept(this);
@@ -477,7 +477,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(DeclarationChamp a) {
+    public ParserRuleContext visit(DeclarationChamp a) {
         String idf = a.id.accept(this);
         String type = a.type.accept(this);
 
@@ -490,7 +490,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(DeclarationFonction a) {
+    public ParserRuleContext visit(DeclarationFonction a) {
         int temp = region;
         SymbolLookup table = this.table.getNearSymbolLookup(temp);
         StepOneRegion();
@@ -540,7 +540,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(DeclarationValeur a) {
+    public ParserRuleContext visit(DeclarationValeur a) {
         String idf = a.id.accept(this);
         Type t = null;
         if (a.getType() != null) {
@@ -578,21 +578,21 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(ChaineChr a) {
+    public ParserRuleContext visit(ChaineChr a) {
         String val = a.valeur;
 
         return val;
     }
 
     @Override
-    public String visit(Nil a) {
+    public ParserRuleContext visit(Nil a) {
         String val = "nil";
 
         return val;
     }
 
     @Override
-    public String visit(Break a) {
+    public ParserRuleContext visit(Break a) {
         // check if in a loop
         // ParserRuleContext parent = a.ctx.getParent();
         // while (parent != null) {
@@ -607,7 +607,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(InstanciationType a) {
+    public ParserRuleContext visit(InstanciationType a) {
 
         String fidf = a.getId().accept(this);
 
@@ -662,12 +662,12 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(AccesChamp a) {
+    public ParserRuleContext visit(AccesChamp a) {
         return a.getChild().accept(this);
     }
 
     @Override
-    public String visit(ExpressionArray a) {
+    public ParserRuleContext visit(ExpressionArray a) {
         String idf = a.getId().accept(this);
         String size = a.getSize().accept(this);
         String expr = a.getExpr().accept(this);
@@ -717,7 +717,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public String visit(ListeAcces a) {
+    public ParserRuleContext visit(ListeAcces a) {
         String idf = a.getId().accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
         Symbol s = table.getSymbol(idf);
