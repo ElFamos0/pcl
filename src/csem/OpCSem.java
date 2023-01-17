@@ -60,54 +60,46 @@ public class OpCSem {
 
     public static void checkint(ParserRuleContext ctx, Type left, Type right, SymbolLookup table,
             ErrorHandler errorHandler, String leftExpr, String rightExpr) {
+
                 if (left == null || !left.equals(new Primitive(Integer.class))) {
                     if (!(leftExpr.contains("+") || leftExpr.contains("-") || leftExpr.contains("*") || leftExpr.contains("/"))) {
-                        errorHandler.error(ctx, leftExpr + " is not an integer");
+                        if (leftExpr.contains("for:") || left==null) {
+                            errorHandler.error(ctx, "Cannot add null to an integer");
+                        } else {
+                            errorHandler.error(ctx, leftExpr + " is not an integer");
+                        }
                     }
                 }
         
                 if (right == null || !right.equals(new Primitive(Integer.class))) {
                     if (!(rightExpr.contains("+") || rightExpr.contains("-") || rightExpr.contains("*") || rightExpr.contains("/"))) {
-                        errorHandler.error(ctx, rightExpr + " is not an integer");
+                        if(rightExpr.contains("for:") || right==null) {
+                            errorHandler.error(ctx, "Cannot add null to an integer");
+                        } else {
+                            errorHandler.error(ctx, rightExpr + " is not an integer");
+                        }
                     }
                 }
         
     }
 
-    public static void checkIntOrString(ParserRuleContext ctx, String left, String right, SymbolLookup table,
+    public static void checkIntOrString(ParserRuleContext ctx, String leftExpr, String rightExpr, SymbolLookup table,
             ErrorHandler errorHandler) {
-        String split[] = left.split("0x");
         boolean isInt = false;
-
-        if (split.length == 1) {
-            String s = split[0];
-            // System.out.println(s);
-            // System.out.println(table.getSymbol(s).getType());
-
-            if (TypeInferer.inferType(table, s).equals(new Primitive(Integer.class))) {
-                isInt = true;
-                // System.out.println(s + "isInt");
-            } else if (!(TypeInferer.inferType(table, s).equals(new Array(new Primitive(Character.class))))) {
-                errorHandler.error(ctx, "Invalid type for comparaison");
-            }
-
+        if (TypeInferer.inferType(table, leftExpr).equals(new Primitive(Integer.class))) {
+            isInt = true;
+        } else if (!(TypeInferer.inferType(table, leftExpr).equals(new Array(new Primitive(Character.class))))) {
+            errorHandler.error(ctx, "Invalid type for comparaison");
         }
-
-        String split2[] = right.split("0x");
-
-        if (split2.length == 1) {
-            String s2 = split2[0];
-            // System.out.println(s2);
-            if (TypeInferer.inferType(table, s2).equals(new Primitive(Integer.class))) {
-                if (!isInt) {
-                    errorHandler.error(ctx, "Cannot compare an integer and a string");
-                }
-            } else if (TypeInferer.inferType(table, s2).equals(new Array(new Primitive(Character.class)))) {
-                if (isInt) {
-                    errorHandler.error(ctx, "Cannot compare an integer and a string");
-                } else {
-                    errorHandler.error(ctx, "Invalid type for comparaison");
-                }
+        if (TypeInferer.inferType(table, rightExpr).equals(new Primitive(Integer.class))) {
+            if (!isInt) {
+                errorHandler.error(ctx, "Cannot compare an integer and a string");
+            }
+        } else if (TypeInferer.inferType(table, rightExpr).equals(new Array(new Primitive(Character.class)))) {
+            if (isInt) {
+                errorHandler.error(ctx, "Cannot compare an integer and a string");
+            } else {
+                errorHandler.error(ctx, "Invalid type for comparaison");
             }
         }
     }
