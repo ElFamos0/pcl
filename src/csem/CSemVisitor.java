@@ -255,21 +255,32 @@ public class CSemVisitor implements AstVisitor<String> {
 
         Function f = (Function) table.getSymbol(idf);
 
-        if (table.getSymbol(idf) == null)
+        if (table.getSymbol(idf) == null) {
             errorHandler.error(a.ctx, "Function " + idf + " is not defined");
+            return idf;
+        }
 
-        if (f != null && !args.equals("") && f.getParamsCount() != arg.length)
+        if (f != null && !args.equals("") && f.getParamsCount() != arg.length) {
             errorHandler.error(a.ctx, "Function " + idf + " expects " + f.getParamsCount() + " arguments, but "
                     + arg.length + " were given");
+            return idf;
+        }
+        
+        if (arg.length == 1 && arg[0].equals("")) {
+            if (f.getParamsCount() != 0) {
+                errorHandler.error(a.ctx, "Function " + idf + " expects " + f.getParamsCount() + " arguments, but none were given");
+            }
+            return idf;
+        }
 
-        for (int i = 0; i < f.getParamsCount(); i++) {
+        // Check params the other way around
+        for (int i = 0; i < arg.length; i++) {
             Type t = TypeInferer.inferType(table, arg[i]);
-            Type ft = f.getParams().get(f.getParamsCount() - (i + 1)).getType();
+            Type ft = f.getParams().get(i).getType();
 
-            if (f != null && t != null && i < f.getParamsCount()
-                    && !(ft.equals(t)))
-                errorHandler.error(a.ctx, "Function " + idf + " expects " + ft
-                        + " as argument " + (i + 1) + ", but " + t + " was given");
+            if (f != null && t != null && i < f.getParamsCount()&& !(ft.equals(t))) {
+                errorHandler.error(a.ctx, "Function " + idf + " expects " + ft + " as argument " + (i + 1) + ", but " + t + " was given");
+            }
         }
 
         return idf;
@@ -489,7 +500,6 @@ public class CSemVisitor implements AstVisitor<String> {
         if (idf.equals("array") || idf.equals("record")) {
             errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
         }
-
         if (!(table.getSymbol(idf) instanceof Function))
             return null;
 
@@ -726,7 +736,7 @@ public class CSemVisitor implements AstVisitor<String> {
                             errorHandler.error(a.ctx, "Index of array must be positive");
                             break;
                         } else {
-                            if (TypeInferer.isNumeric(field) && Integer.parseInt(field) > ((Array) t).getOffset()) {
+                            if (TypeInferer.isNumeric(field) && Integer.parseInt(field) >= ((Array) t).getSize()) {
                                 errorHandler.error(a.ctx, "Index of array must be less than size of array");
                                 break;
                             }

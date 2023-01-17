@@ -3,7 +3,7 @@
 let
     function a(x:int, y:string) :string = b()
         
-    function b() : string = a(0,"")
+    function b(i:int) : string = a(0,"")
 in  
 
 end

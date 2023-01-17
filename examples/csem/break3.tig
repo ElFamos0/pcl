@@ -1,0 +1,11 @@
+/* pas d'erreur a priori */
+let
+  var a := 10
+in  
+  for i := 0 to 10 do (
+    a = a + 1;
+    if a = 15 then (
+      break
+    )
+  )
+end

@@ -600,10 +600,11 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         if (s != null) {
             errorHandler.error(ctx, "Symbol '" + idf + "' already defined as a " + s.toString() + " in this scope");
-            table.removeChildren(id);
+            // Je sais pas pourquoi tu remove le symbol, mais j'ai enlever le remove du symbole pour éiter les erreurs pendant le parcourt de l'arbre ensuite blblblbl
+            // table.removeChildren(id);
         } else if (err != null) {
             errorHandler.error(ctx, err);
-            table.removeChildren(id);
+            // table.removeChildren(id);
         } else {
             Function f = new Function(idf, type);
             table.addSymbolVarAndFunc(f);
