@@ -10,7 +10,7 @@ public class FuncCSem {
     public static String checkFuncFromLib(String name) {
         for (String s : lib) {
             if (s.equals(name)) {
-                return "Error: function " + name + " is part of the standard library";
+                return "function " + name + " is part of the standard library";
             }
         }
 
@@ -32,9 +32,9 @@ public class FuncCSem {
         Type t = table.getType(type);
 
         if (s == null)
-            return "Error: variable " + arg + " is not declared";
+            return "variable " + arg + " is not declared";
         if (t == null)
-            return "Error: type " + type + " is not declared";
+            return "type " + type + " is not declared";
 
         return null;
     }
