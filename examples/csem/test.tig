@@ -1,0 +1,7 @@
+let 
+    var x:= 3
+    function f(x:int) = nil
+    var y:= x:=f("yo)
+in
+
+end

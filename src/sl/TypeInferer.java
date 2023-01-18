@@ -14,13 +14,11 @@ public class TypeInferer {
 
     public Type inferType(SymbolLookup table, Ast expr) {
         cSemType.setTable(table);
-
         return expr.accept(cSemType);
     }
 
     public Type inferType(SymbolLookup table, ParseTree expr) {
         astType.setTable(table);
-
         return expr.accept(astType);
     }
 

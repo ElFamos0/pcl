@@ -21,9 +21,9 @@ let
     function b() : string = a(0,"")
 in  
     notAFunction();
-    a1(3,"Test",3);
-    a1(3,3);
-    a1(3)
+    f(3,"Test",3);
+    f(3,3);
+    f(3)
 end
 
 /* 14 errors */

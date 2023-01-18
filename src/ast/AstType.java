@@ -38,12 +38,19 @@ import sl.SymbolLookup;
 import sl.Type;
 import sl.TypeInferer;
 import sl.Variable;
+import sl.Record;
 
 public class AstType extends exprBaseVisitor<Type> {
     private SymbolLookup table;
+    private int region;
 
     public AstType(SymbolLookup table) {
         this.table = table;
+        if (table != null) {
+            region = table.getRegion();
+        } else {
+            region = 0;
+        }
     }
 
     public void setTable(SymbolLookup table) {
@@ -69,7 +76,7 @@ public class AstType extends exprBaseVisitor<Type> {
     @Override
     public Type visitInstanciationType(exprParser.InstanciationTypeContext ctx) {
         // System.out.println("InstanciationType");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
@@ -80,7 +87,7 @@ public class AstType extends exprBaseVisitor<Type> {
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
             Type t2 = ctx.getChild(2 * i + 2).accept(this);
             if (t1 == null || t2 == null || !t1.equals(t2)) {
-                return null;
+                return new Primitive(Void.class);
             }
         }
 
@@ -95,7 +102,7 @@ public class AstType extends exprBaseVisitor<Type> {
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
             Type t2 = ctx.getChild(2 * i + 2).accept(this);
             if (t1 == null || t2 == null || !t1.equals(t2)) {
-                return null;
+                return new Primitive(Void.class);
             }
         }
 
@@ -110,7 +117,7 @@ public class AstType extends exprBaseVisitor<Type> {
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
             Type t2 = ctx.getChild(2 * i + 2).accept(this);
             if (t1 == null || t2 == null || !t1.equals(t2)) {
-                return null;
+                return new Primitive(Void.class);
             }
         }
 
@@ -125,7 +132,7 @@ public class AstType extends exprBaseVisitor<Type> {
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
             Type t2 = ctx.getChild(2 * i + 2).accept(this);
             if (t1 == null || t2 == null || !t1.equals(t2)) {
-                return null;
+                return new Primitive(Void.class);
             }
         }
 
@@ -140,7 +147,7 @@ public class AstType extends exprBaseVisitor<Type> {
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
             Type t2 = ctx.getChild(2 * i + 2).accept(this);
             if (t1 == null || t2 == null || !t1.equals(t2)) {
-                return null;
+                return new Primitive(Void.class);
             }
         }
 
@@ -168,8 +175,15 @@ public class AstType extends exprBaseVisitor<Type> {
     @Override
     public Type visitIdentifiant(IdentifiantContext ctx) {
         // System.out.println("Identifiant");
-        return table.getSymbol(ctx.getText()) == null ? table.getType(ctx.getText())
-                : table.getSymbol(ctx.getText()).getType();
+        SymbolLookup table = this.table;
+        region = table.getRegion();
+        if (table.getSymbol(ctx.getText()) == null) {
+            if (table.getType(ctx.getText()) == null) {
+                return new Primitive(Void.class);
+            }
+            return table.getType(ctx.getText());
+        }
+        return table.getSymbol(ctx.getText()).getType();
     }
 
     @Override
@@ -186,20 +200,21 @@ public class AstType extends exprBaseVisitor<Type> {
 
     @Override
     public Type visitNil(NilContext ctx) {
-        // System.out.println("Nil");
-        return null;
+        Record nil = new Record();
+        nil.setIsNil(true);
+        return nil;
     }
 
     @Override
     public Type visitBreak(BreakContext ctx) {
         // System.out.println("Break");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
     public Type visitAppelFonction(AppelFonctionContext ctx) {
         // System.out.println("Appel fonction");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
@@ -217,25 +232,25 @@ public class AstType extends exprBaseVisitor<Type> {
     @Override
     public Type visitDeclarationType(DeclarationTypeContext ctx) {
         // System.out.println("Declaration type");
-        return null;
+        return ctx.getChild(1).accept(this);
     }
 
     @Override
     public Type visitDeclarationTypeClassique(DeclarationTypeClassiqueContext ctx) {
         // System.out.println("Declaration type classique");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
     public Type visitDeclarationArrayType(DeclarationArrayTypeContext ctx) {
         // System.out.println("Declaration array type");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
     public Type visitDeclarationRecordType(DeclarationRecordTypeContext ctx) {
         // System.out.println("Declaration record type");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
@@ -247,13 +262,13 @@ public class AstType extends exprBaseVisitor<Type> {
     @Override
     public Type visitDeclarationValeur(DeclarationValeurContext ctx) {
         // System.out.println("Declaration valeur");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
     public Type visitDeclarationFonction(DeclarationFonctionContext ctx) {
         // System.out.println("Declaration fonction");
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
