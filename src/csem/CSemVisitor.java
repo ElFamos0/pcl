@@ -360,7 +360,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
             a.right.accept(this);
         }
 
-        return null;
+        return a.ctx;
     }
 
     @Override
@@ -602,7 +602,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         ID idf = (ID) a.id;
 
         if (!(table.getSymbol(idf.nom) instanceof Function)) {
-            return null;
+            return a.ctx;
         }
 
         table = this.table.getSymbolLookup(region);
@@ -612,7 +612,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         //     errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
         // }
         if (!(table.getSymbol(idf.nom) instanceof Function))
-            return null;
+            return a.ctx;
 
         for (Ast ast : a.args) {
             ast.accept(this);
@@ -788,7 +788,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
             }
         }
 
-        return null;
+        return a.ctx;
     }
 
     @Override
@@ -799,7 +799,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         Symbol s = table.getSymbol(idf.nom);
         if (s == null) {
             errorHandler.error(idfCtx, "Variable '" + idf + "' not defined");
-            return null;
+            return a.ctx;
         }
         Type t = s.getType();
         if (a.getisExpressionArray()) {
