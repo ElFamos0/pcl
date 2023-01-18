@@ -428,7 +428,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         Type t = typeInferer.inferType(table, ctx.getChild(2));
-        if (t == null) {
+        if (t == null || t.equals(new Primitive(Void.class))) {
             errorHandler.error(ctx, "Type '" + ctx.getChild(2).getText() + "' not defined");
         } else {
             Type at = new Array(t);
@@ -448,7 +448,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             String[] split = ctx.getChild(2 * i + 1).getText().split(":");
             Variable v = null;
             Type t = typeInferer.inferType(table, ctx.getChild(2 * i + 1));
-            if (t == null) {
+            if (t == null || t.equals(new Primitive(Void.class))) {
                 errorHandler.error(ctx, "Type '" + split[1] + "' not defined");
                 return drt;
             }
