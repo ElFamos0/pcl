@@ -5,8 +5,9 @@ import sl.SymbolLookup;
 import sl.Type;
 
 public class FuncCSem {
+    private static String[] lib = { "print", "not" };
+
     public static String checkFuncFromLib(String name) {
-        String[] lib = { "print" };
         for (String s : lib) {
             if (s.equals(name)) {
                 return "Error: function " + name + " is part of the standard library";
@@ -14,6 +15,16 @@ public class FuncCSem {
         }
 
         return null;
+    }
+
+    public static boolean isFuncFromLib(String name) {
+        for (String s : lib) {
+            if (s.equals(name)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static String checkArgs(String arg, String type, SymbolLookup table) {

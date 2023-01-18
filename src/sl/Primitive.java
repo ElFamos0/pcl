@@ -61,6 +61,10 @@ public class Primitive extends Type {
 
         if (t instanceof Primitive) {
             Primitive p = (Primitive) t;
+
+            if (p.getType() == PrimitiveType.ANY)
+                return true;
+
             return p.getType() == type;
         }
         return false;

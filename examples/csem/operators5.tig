@@ -1,4 +1,4 @@
-/*Type différents pour le '=>'*/
+/*Type différents pour le '>='*/
 
 let
     var x1 :string := "Non"

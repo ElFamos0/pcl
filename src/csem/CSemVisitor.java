@@ -45,7 +45,8 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     public Boolean isOp(Ast a) {
-        if (a instanceof Ou || a instanceof Et || a instanceof Compar || a instanceof Addition || a instanceof Soustraction
+        if (a instanceof Ou || a instanceof Et || a instanceof Compar || a instanceof Addition
+                || a instanceof Soustraction
                 || a instanceof Multiplication || a instanceof Division) {
             return true;
         }
@@ -87,7 +88,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
         Boolean rightIsOp = isOp(a.right);
         Boolean leftIsOp = isOp(a.left);
-        
+
         if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
             if (a.left instanceof ID) {
                 ID id = (ID) a.left;
@@ -121,7 +122,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
         Boolean rightIsOp = isOp(a.right);
         Boolean leftIsOp = isOp(a.left);
-        
+
         if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
             if (a.left instanceof ID) {
                 ID id = (ID) a.left;
@@ -178,7 +179,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
         Boolean rightIsOp = isOp(a.right);
         Boolean leftIsOp = isOp(a.left);
-        
+
         if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
             if (a.left instanceof ID) {
                 ID id = (ID) a.left;
@@ -209,11 +210,10 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         Type rightType = tipe.inferType(table, a.right);
 
         // Check if left and right are integers
-        
-        
+
         Boolean rightIsOp = isOp(a.right);
         Boolean leftIsOp = isOp(a.left);
-        
+
         if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
             if (a.left instanceof ID) {
                 ID id = (ID) a.left;
@@ -231,7 +231,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
                 errorHandler.error(right, "this expression is not an integer");
             }
         }
-        
+
         return a.ctx;
     }
 
@@ -244,10 +244,10 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         Type rightType = tipe.inferType(table, a.right);
 
         // Check if left and right are integers
-        
+
         Boolean rightIsOp = isOp(a.right);
         Boolean leftIsOp = isOp(a.left);
-        
+
         if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
             if (a.left instanceof ID) {
                 ID id = (ID) a.left;
@@ -278,10 +278,10 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         Type rightType = tipe.inferType(table, a.right);
 
         // Check if left and right are integers
-        
+
         Boolean rightIsOp = isOp(a.right);
         Boolean leftIsOp = isOp(a.left);
-        
+
         if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
             if (a.left instanceof ID) {
                 ID id = (ID) a.left;
@@ -299,7 +299,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
                 errorHandler.error(right, "this expression is not an integer");
             }
         }
-        
+
         // check division by zero
         if (a.right instanceof Int && ((Int) a.right).valeur.equals("0")) {
             errorHandler.error(right, "Division by zero");
@@ -384,19 +384,20 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         }
 
         // Verify that the function is not called with too many arguments
-        if (args.size() > f.getParamsCount()) {
-            errorHandler.error(argCtx, "Function " + id.nom + " expects " + f.getParamsCount() + " arguments, but " + args.size() + " were given");
+        if (args.size() != f.getParamsCount()) {
+            errorHandler.error(argCtx, "Function " + id.nom + " expects " + f.getParamsCount() + " arguments, but "
+                    + args.size() + " were given");
             return a.ctx;
         }
 
         // Verify params in inverted order
         for (int i = 0; i < args.size(); i++) {
             Type t = tipe.inferType(table, args.get(i));
-            Type ft = f.getParams().get(args.size()-1-i).getType();
-            String param = f.getParams().get(args.size()-1-i).getName();
+            Type ft = f.getParams().get(args.size() - 1 - i).getType();
 
-            if (i < f.getParamsCount() && !(ft.equals(t))) {
-                errorHandler.error(argCtx, "Function " + id.nom + " expects argument " + (i + 1) + " to be of type " + ft + ", but " + t + " was given");
+            if (!(ft.equals(t))) {
+                errorHandler.error(argCtx, "Function " + id.nom + " expects argument " + (i + 1) + " to be of type "
+                        + ft + ", but " + t + " was given");
             }
         }
 
@@ -429,7 +430,6 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         ParserRuleContext els = a.elseBlock.accept(this);
         Type elseType = tipe.inferType(table.getSymbolLookup(region), a.elseBlock);
 
-
         // Check if condition is an integer
         if (!condType.equals(new Primitive(Integer.class))) {
             errorHandler.error(cond, "Condition is not an integer");
@@ -460,7 +460,6 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         if (!condType.equals(new Primitive(Integer.class))) {
             errorHandler.error(cond, "Condition is not an integer");
         }
-
 
         region = temp;
 
@@ -536,7 +535,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
         // Check if identifier is a reserved word
         // if (idf.equals("array") || idf.equals("record")) {
-        //     errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        // errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
         // }
 
         return a.ctx;
@@ -558,7 +557,14 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(DeclarationArrayType a) {
-        ParserRuleContext idk = a.id.accept(this);
+        ParserRuleContext idf = a.id.accept(this);
+
+        Type t = tipe.inferType(this.table.getSymbolLookup(region), a.id);
+
+        if (t.equals(new Primitive(Void.class))) {
+            errorHandler.error(idf, "Type '" + idf.getText() + "' is not defined");
+        }
+
         return a.ctx;
     }
 
@@ -589,8 +595,14 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
         // Check if identifier is a reserved word
         // if (idf.equals("array") || idf.equals("record")) {
-        //     errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        // errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
         // }
+
+        Type t = tipe.inferType(this.table.getSymbolLookup(region), a.type);
+
+        if (t.equals(new Primitive(Void.class))) {
+            errorHandler.error(type, "Type '" + type.getText() + "' is not defined");
+        }
 
         return a.ctx;
     }
@@ -608,14 +620,10 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
             return a.ctx;
         }
 
-        table = this.table.getSymbolLookup(region);
-
         // Check if identifier is a reserved word
         // if (idf.equals("array") || idf.equals("record")) {
-        //     errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        // errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
         // }
-        if (!(table.getSymbol(idf.nom) instanceof Function))
-            return a.ctx;
 
         for (Ast ast : a.args) {
             ast.accept(this);
@@ -624,7 +632,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         if (a.has_return)
             a.return_type.accept(this);
 
-        SymbolLookup table2 = this.table.getSymbolLookup(region+1);
+        SymbolLookup table2 = this.table.getSymbolLookup(region);
         if (table2 == null)
             return a.ctx;
 
@@ -632,7 +640,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         Type t = tipe.inferType(table2, a.expr);
         Type ft = table2.getSymbol(idf.nom).getType();
 
-        if (ft == null || t == null || (!idf.nom.equals("print") && !t.equals(ft) && !ft.equals(nilRecord))) {
+        if (ft == null || t == null || (!FuncCSem.isFuncFromLib(idf.nom) && !t.equals(ft) && !ft.equals(nilRecord))) {
             errorHandler.error(idfCtx, "Type mismatch in function declaration " + idf.nom + " : " + ft + " != " + t);
         }
 
@@ -647,15 +655,25 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         ParserRuleContext expr = a.expr.accept(this);
         Type t = null;
         SymbolLookup table = this.table.getSymbolLookup(region);
+        ID idf = (ID) a.id;
+
         if (a.getType() != null) {
             t = tipe.inferType(table, a.getType());
-        }
+        } else {
+            Type tExpr = tipe.inferType(table, a.expr);
+            if (tExpr instanceof Record && ((Record) tExpr).getIsNil())
+                errorHandler.error(a.ctx, "Cannot assigned nil value to " + idf.nom + " because it is of type "
+                        + new Primitive(Void.class));
 
-        ID idf = (ID) a.id;
+            if (tExpr.equals(new Primitive(Void.class)))
+                errorHandler.error(a.ctx, "Variable " + idf.nom + " cannot be of type "
+                        + tExpr);
+            return a.ctx;
+        }
 
         // Check if identifier is a reserved word
         // if (idf.equals("array") || idf.equals("record")) {
-        //     errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        // errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
         // }
 
         if (table == null)
@@ -665,7 +683,6 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         if (tExpr == null)
             return a.ctx;
 
-        
         if (t != null && (!t.equals(tExpr) && !tExpr.equals(nilRecord))) {
             errorHandler.error(idfCtx, "Type mismatch in variable declaration " + idf.nom + " : " + t + " != " + tExpr);
         }
@@ -674,7 +691,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
             errorHandler.error(a.ctx, "nil has no type in this context or expression has not returned a value");
         }
 
-        if (t!= null && !(t instanceof Record) && tExpr.equals(nilRecord)) {
+        if (t != null && !(t instanceof Record) && tExpr.equals(nilRecord)) {
             errorHandler.error(a.ctx, "Cannot assigned nil value to " + idf.nom + " because it is of type " + t);
         }
 
@@ -728,12 +745,13 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
                 errorHandler.error(fieldCtx, "Field '" + fieldname + "' not defined in type '" + idf.nom + "'");
                 continue;
             }
-            
+
             // Check for type of the field
             Type fieldtype = r.getField(fieldname).getType();
             Type expType = tipe.inferType(table, expr.get(i));
             if (expType == null || !fieldtype.equals(expType)) {
-                errorHandler.error(fieldCtx, "Type mismatch in field '" + fieldname + "' : " + fieldtype + " != " + expType);
+                errorHandler.error(fieldCtx,
+                        "Type mismatch in field '" + fieldname + "' : " + fieldtype + " != " + expType);
             }
 
             fields.add(fieldname);
@@ -773,7 +791,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         if (!(idType instanceof Array)) {
             errorHandler.error(a.ctx, "Type '" + idf.nom + "' is not an array type");
         }
-        
+
         Type sizeType = tipe.inferType(table, a.getSize());
         // Check if size is of type int
         if (!sizeType.equals(new Primitive(Integer.class))) {
@@ -785,12 +803,13 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
             Type exprType = tipe.inferType(table, a.getExpr());
             Type arrayType = ((Array) idType).getType();
             boolean state = true;
-            if (exprType == null || !exprType.equals(arrayType )) {
+            if (exprType == null || !exprType.equals(arrayType)) {
                 if (exprType instanceof Record && arrayType instanceof Record) {
-                    state = ! ((Record) exprType).getIsNil();
+                    state = !((Record) exprType).getIsNil();
                 }
                 if (state) {
-                    errorHandler.error(exprCtx, "Type mismatch in array declaration : " + arrayType + " != " + exprType);
+                    errorHandler.error(exprCtx,
+                            "Type mismatch in array declaration : " + arrayType + " != " + exprType);
                 }
             }
         }
@@ -817,11 +836,11 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
             for (Ast ast : a.getAccesChamps()) {
                 ParserRuleContext field = ast.accept(this);
                 AccesChamp ac = (AccesChamp) ast;
-                
+
                 if (t instanceof Record) {
                     String fieldname = ((ID) ac.getChild()).nom;
-                        
-                    if(((Record) t).getIsNil()) {
+
+                    if (((Record) t).getIsNil()) {
                         errorHandler.error(field, idf + out + "' is nil");
                         break;
                     } else {
@@ -838,6 +857,10 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
                     // Check if field is an integer, positive and less than size of array
                     if (!tipe.inferType(table, ast).equals(new Primitive(Integer.class))) {
                         errorHandler.error(field, "Index of array must be an integer");
+                        break;
+                    }
+                    if (TypeInferer.isNumeric(field.getText()) && Integer.parseInt(field.getText()) < 0) {
+                        errorHandler.error(field, "Index of array must be positive");
                         break;
                     }
                     t = a1.getType();

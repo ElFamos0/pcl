@@ -78,16 +78,40 @@ public class CSemType implements AstVisitor<Type> {
 
     @Override
     public Type visit(Ou a) {
+        Type t1 = a.left.accept(this);
+        Type t2 = a.right.accept(this);
+
+        if (t1 == null || t2 == null || !t1.equals(new Primitive(Integer.class))
+                || !t2.equals(new Primitive(Integer.class))) {
+            return new Primitive(Void.class);
+        }
+
         return new Primitive(Integer.class);
     }
 
     @Override
     public Type visit(Et a) {
+        Type t1 = a.left.accept(this);
+        Type t2 = a.right.accept(this);
+
+        if (t1 == null || t2 == null || !t1.equals(new Primitive(Integer.class))
+                || !t2.equals(new Primitive(Integer.class))) {
+            return new Primitive(Void.class);
+        }
+
         return new Primitive(Integer.class);
     }
 
     @Override
     public Type visit(Compar a) {
+        Type t1 = a.left.accept(this);
+        Type t2 = a.right.accept(this);
+
+        if (t1 == null || t2 == null || !t1.equals(new Primitive(Integer.class))
+                || !t2.equals(new Primitive(Integer.class))) {
+            return new Primitive(Void.class);
+        }
+
         return new Primitive(Integer.class);
     }
 
@@ -251,7 +275,7 @@ public class CSemType implements AstVisitor<Type> {
     @Override
     public Type visit(DeclarationChamp a) {
         // System.out.println("DeclarationChamp");
-        return new Primitive(Void.class);
+        return a.type.accept(this);
     }
 
     @Override
