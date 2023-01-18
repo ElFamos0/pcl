@@ -282,7 +282,7 @@ public class AstType extends exprBaseVisitor<Type> {
         Type t2 = ctx.getChild(5).accept(this);
 
         if (t1 == null || t2 == null || !t1.equals(t2)) {
-            return null;
+            return new Primitive(Void.class);
         }
 
         return t1;
@@ -312,6 +312,6 @@ public class AstType extends exprBaseVisitor<Type> {
             return ctx.getChild(i).accept(this);
         }
 
-        return null;
+        return new Primitive(Void.class);
     }
 }
