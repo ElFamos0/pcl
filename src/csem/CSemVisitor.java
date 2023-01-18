@@ -21,12 +21,14 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     private int biggestRegion = 0;
     private ErrorHandler errorHandler;
     private TypeInferer tipe = new TypeInferer();
+    private Record nilRecord = new Record();
 
     public CSemVisitor(SymbolLookup table, ErrorHandler errorHandler) {
         this.table = table;
         region = table.getLibFunc();
         biggestRegion = region;
         this.errorHandler = errorHandler;
+        this.nilRecord.setIsNil(true);
     }
 
     public void StepOneRegion() {
@@ -42,6 +44,14 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         return errorHandler;
     }
 
+    public Boolean isOp(Ast a) {
+        if (a instanceof Ou || a instanceof Et || a instanceof Compar || a instanceof Addition || a instanceof Soustraction
+                || a instanceof Multiplication || a instanceof Division) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public ParserRuleContext visit(Program a) {
         a.expression.accept(this);
@@ -50,49 +60,93 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Expression a) {
-        String left = a.left.accept(this);
-        String right = a.right.accept(this);
-        if (left == null || right == null) {
-            return null;
+        a.left.accept(this);
+        ParserRuleContext right = a.right.accept(this);
+
+        SymbolLookup table = this.table.getSymbolLookup(region);
+
+        Type leftType = tipe.inferType(table, a.left);
+        Type rightType = tipe.inferType(table, a.right);
+
+        if (!leftType.equals(rightType)) {
+            errorHandler.error(right, "Type mismatch between types " + leftType + " and " + rightType);
         }
 
-        // If expression is like `idf := expr` we need to check that expr is the same
-        // type as idf
-        if (right != null) {
-            SymbolLookup table = this.table.getSymbolLookup(region);
-            Type t = tipe.inferType(table, a.right);
-            if (table.getSymbol(left) != null) {
-                Type t2 = table.getSymbol(left).getType();
-                if (t2 == null || !t.equals(t2)) {
-                    errorHandler.error(a.ctx,
-                            "Type mismatch between '" + left + "' and '" + right + "' of type " + t2 + " and " + t);
-                }
-            }
-        }
-
-        return left + "=" + right;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Ou a) {
-        a.left.accept(this);
-        a.right.accept(this);
+        ParserRuleContext left = a.left.accept(this);
+        ParserRuleContext right = a.right.accept(this);
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        Type leftType = tipe.inferType(table, a.left);
+        Type rightType = tipe.inferType(table, a.right);
 
-        return null;
+        // Check if left and right are integers
+
+        Boolean rightIsOp = isOp(a.right);
+        Boolean leftIsOp = isOp(a.left);
+        
+        if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
+            if (a.left instanceof ID) {
+                ID id = (ID) a.left;
+                errorHandler.error(left, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(left, "this expression is not an integer");
+            }
+        }
+
+        if (rightType != null && !rightType.equals(new Primitive(Integer.class)) && !rightIsOp) {
+            if (a.right instanceof ID) {
+                ID id = (ID) a.right;
+                errorHandler.error(right, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(right, "this expression is not an integer");
+            }
+        }
+
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Et a) {
-        String left = a.left.accept(this);
-        String right = a.right.accept(this);
+        ParserRuleContext left = a.left.accept(this);
+        ParserRuleContext right = a.right.accept(this);
+        SymbolLookup table = this.table.getSymbolLookup(region);
+        Type leftType = tipe.inferType(table, a.left);
+        Type rightType = tipe.inferType(table, a.right);
 
-        return left + "0x87" + right;
+        // Check if left and right are integers
+
+        Boolean rightIsOp = isOp(a.right);
+        Boolean leftIsOp = isOp(a.left);
+        
+        if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
+            if (a.left instanceof ID) {
+                ID id = (ID) a.left;
+                errorHandler.error(left, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(left, "this expression is not an integer");
+            }
+        }
+
+        if (rightType != null && !rightType.equals(new Primitive(Integer.class)) && !rightIsOp) {
+            if (a.right instanceof ID) {
+                ID id = (ID) a.right;
+                errorHandler.error(right, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(right, "this expression is not an integer");
+            }
+        }
+
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Compar a) {
-        String left = a.left.accept(this);
-        String right = a.right.accept(this);
+        ParserRuleContext left = a.left.accept(this);
+        ParserRuleContext right = a.right.accept(this);
         String operator = a.operator;
 
         SymbolLookup table = this.table.getSymbolLookup(region);
@@ -102,124 +156,188 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         // Check if left and right are integers or string
 
         if (operator.equals("<") || operator.equals(">") || operator.equals(">=") || operator.equals("<=")) {
-            //System.out.println("Compar "+leftType+" "+rightType);
-            OpCSem.checkIntOrString(a.ctx, leftType, rightType, table, errorHandler);
+            OpCSem.checkIntOrString(left, right, leftType, rightType, table, errorHandler);
         } else if (operator.equals("=") || operator.equals("<>")) {
-            //System.out.println("Compar "+leftType+" "+rightType);
             if (leftType != null && rightType != null && !leftType.equals(rightType)) {
                 errorHandler.error(a.ctx, "Cannot compare different types");
             }
         }
 
-        return left + "&&" + right;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Addition a) {
-        String leftExpr = a.left.accept(this);
-        String rightExpr = a.right.accept(this);
+        ParserRuleContext left = a.left.accept(this);
+        ParserRuleContext right = a.right.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        Type left = tipe.inferType(table, a.left);
-        Type right = tipe.inferType(table, a.right);
+        Type leftType = tipe.inferType(table, a.left);
+        Type rightType = tipe.inferType(table, a.right);
 
         // Check if left and right are integers
 
-        OpCSem.checkint(a.ctx, left, right, table, errorHandler, leftExpr, rightExpr);
+        Boolean rightIsOp = isOp(a.right);
+        Boolean leftIsOp = isOp(a.left);
+        
+        if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
+            if (a.left instanceof ID) {
+                ID id = (ID) a.left;
+                errorHandler.error(left, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(left, "this expression is not an integer");
+            }
+        }
 
-        // OpCSem.checkint(a.ctx, left, right, table, errorHandler, leftExpr,
-        // rightExpr);
+        if (rightType != null && !rightType.equals(new Primitive(Integer.class)) && !rightIsOp) {
+            if (a.right instanceof ID) {
+                ID id = (ID) a.right;
+                errorHandler.error(right, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(right, "this expression is not an integer");
+            }
+        }
 
-        // System.out.println("Addition: " + left + " + " + right);
-
-        return leftExpr + "+" + rightExpr;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Soustraction a) {
-        String leftExpr = a.left.accept(this);
-        String rightExpr = a.right.accept(this);
-
+        ParserRuleContext left = a.left.accept(this);
+        ParserRuleContext right = a.right.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        Type left = tipe.inferType(table, a.left);
-        Type right = tipe.inferType(table, a.right);
+        Type leftType = tipe.inferType(table, a.left);
+        Type rightType = tipe.inferType(table, a.right);
 
         // Check if left and right are integers
+        
+        
+        Boolean rightIsOp = isOp(a.right);
+        Boolean leftIsOp = isOp(a.left);
+        
+        if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
+            if (a.left instanceof ID) {
+                ID id = (ID) a.left;
+                errorHandler.error(left, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(left, "this expression is not an integer");
+            }
+        }
 
-        OpCSem.checkint(a.ctx, left, right, table, errorHandler, leftExpr, rightExpr);
-
-        return leftExpr + "-" + rightExpr;
+        if (!rightType.equals(new Primitive(Integer.class)) && !rightIsOp) {
+            if (a.right instanceof ID) {
+                ID id = (ID) a.right;
+                errorHandler.error(right, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(right, "this expression is not an integer");
+            }
+        }
+        
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Multiplication a) {
-        String leftExpr = a.left.accept(this);
-        String rightExpr = a.right.accept(this);
-
+        ParserRuleContext left = a.left.accept(this);
+        ParserRuleContext right = a.right.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        Type left = tipe.inferType(table, a.left);
-        Type right = tipe.inferType(table, a.right);
+        Type leftType = tipe.inferType(table, a.left);
+        Type rightType = tipe.inferType(table, a.right);
 
         // Check if left and right are integers
-        OpCSem.checkint(a.ctx, left, right, table, errorHandler, leftExpr, rightExpr);
+        
+        Boolean rightIsOp = isOp(a.right);
+        Boolean leftIsOp = isOp(a.left);
+        
+        if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
+            if (a.left instanceof ID) {
+                ID id = (ID) a.left;
+                errorHandler.error(left, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(left, "this expression is not an integer");
+            }
+        }
 
-        return leftExpr + "*" + rightExpr;
+        if (rightType != null && !rightType.equals(new Primitive(Integer.class)) && !rightIsOp) {
+            if (a.right instanceof ID) {
+                ID id = (ID) a.right;
+                errorHandler.error(right, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(right, "this expression is not an integer");
+            }
+        }
+
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Division a) {
-        String leftExpr = a.left.accept(this);
-        String rightExpr = a.right.accept(this);
-
+        ParserRuleContext left = a.left.accept(this);
+        ParserRuleContext right = a.right.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        Type left = tipe.inferType(table, a.left);
-        Type right = tipe.inferType(table, a.right);
+        Type leftType = tipe.inferType(table, a.left);
+        Type rightType = tipe.inferType(table, a.right);
 
         // Check if left and right are integers
-        OpCSem.checkint(a.ctx, left, right, table, errorHandler, leftExpr, rightExpr);
-        // check division by zero
-        if (rightExpr.equals("0")) {
-            errorHandler.error(a.ctx, "Division by zero");
+        
+        Boolean rightIsOp = isOp(a.right);
+        Boolean leftIsOp = isOp(a.left);
+        
+        if (!leftType.equals(new Primitive(Integer.class)) && !leftIsOp) {
+            if (a.left instanceof ID) {
+                ID id = (ID) a.left;
+                errorHandler.error(left, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(left, "this expression is not an integer");
+            }
         }
 
-        return leftExpr + "/" + rightExpr;
+        if (rightType != null && !rightType.equals(new Primitive(Integer.class)) && !rightIsOp) {
+            if (a.right instanceof ID) {
+                ID id = (ID) a.right;
+                errorHandler.error(right, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(right, "this expression is not an integer");
+            }
+        }
+        
+        // check division by zero
+        if (a.right instanceof Int && ((Int) a.right).valeur.equals("0")) {
+            errorHandler.error(right, "Division by zero");
+        }
+
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Sequence a) {
-        String seq = "";
         for (Ast ast : a.seqs) {
-            seq += ast.accept(this) + ":";
+            ast.accept(this);
         }
-
-        // Return the last expression
-        // Because this is the only one to infer the type
-        return seq.substring(0, seq.length() - 1);
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Negation a) {
-        String leftExpr = a.expression.accept(this);
+        ParserRuleContext expr = a.expression.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        Type left = tipe.inferType(table, a.expression);
+        Type exprType = tipe.inferType(table, a.expression);
 
         // Check if left and right are integers
-        if (left == null || !left.equals(new Primitive(Integer.class))) {
-            errorHandler.error(a.ctx, leftExpr + " is not an integer");
+        if (!exprType.equals(new Primitive(Integer.class))) {
+            if (a.expression instanceof ID) {
+                ID id = (ID) a.expression;
+                errorHandler.error(expr, id.nom + " is not an integer");
+            } else {
+                errorHandler.error(expr, "this expression is not an integer");
+            }
         }
 
-        String data = a.expression.accept(this);
-        if (data.startsWith("-")) {
-            return data.substring(1);
-        } else {
-            return "-" + data;
-        }
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(ID a) {
-        String idf = a.nom;
-
-        return idf;
+        return a.ctx;
     }
 
     @Override
@@ -231,9 +349,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
             OpCSem.checkint(a, table, errorHandler);
         }
 
-        String val = String.valueOf(a.valeur);
-
-        return val;
+        return a.ctx;
     }
 
     @Override
@@ -249,145 +365,132 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(AppelFonction a) {
-        String idf = a.id.accept(this);
-        String args = a.args.accept(this);
-        String[] arg = args.split(":");
+        ParserRuleContext idCtx = a.id.accept(this);
+        ParserRuleContext argCtx = a.args.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         if (table == null)
-            return idf;
+            return a.ctx;
 
-        Function f = (Function) table.getSymbol(idf);
+        ID id = (ID) a.id;
+        ArgFonction argF = (ArgFonction) a.args;
+        ArrayList<Ast> args = argF.args;
 
-        if (table.getSymbol(idf) == null) {
-            errorHandler.error(a.ctx, "Function " + idf + " is not defined");
-            return idf;
+        Function f = (Function) table.getSymbol(id.nom);
+
+        if (table.getSymbol(id.nom) == null) {
+            errorHandler.error(idCtx, "Function is not defined");
+            return a.ctx;
         }
 
-        if (f != null && !args.equals("") && f.getParamsCount() != arg.length) {
-            errorHandler.error(a.ctx, "Function " + idf + " expects " + f.getParamsCount() + " arguments, but "
-                    + arg.length + " were given");
-            return idf;
-        }
-        
-        if (arg.length == 1 && arg[0].equals("")) {
-            if (f.getParamsCount() != 0) {
-                errorHandler.error(a.ctx, "Function " + idf + " expects " + f.getParamsCount() + " arguments, but none were given");
-            }
-            return idf;
+        // Verify that the function is not called with too many arguments
+        if (args.size() > f.getParamsCount()) {
+            errorHandler.error(argCtx, "Function " + id.nom + " expects " + f.getParamsCount() + " arguments, but " + args.size() + " were given");
+            return a.ctx;
         }
 
-        // Check params the other way around
-        for (int i = 0; i < arg.length; i++) {
-            Type t = TypeInferer.inferType(table, arg[i]);
-            Type ft = f.getParams().get(i).getType();
+        // Verify params in inverted order
+        for (int i = 0; i < args.size(); i++) {
+            Type t = tipe.inferType(table, args.get(i));
+            Type ft = f.getParams().get(args.size()-1-i).getType();
+            String param = f.getParams().get(args.size()-1-i).getName();
 
-            if (f != null && t != null && i < f.getParamsCount()&& !(ft.equals(t))) {
-                errorHandler.error(a.ctx, "Function " + idf + " expects " + ft + " as argument " + (i + 1) + ", but " + t + " was given");
+            if (i < f.getParamsCount() && !(ft.equals(t))) {
+                errorHandler.error(argCtx, "Function " + id.nom + " expects argument " + (i + 1) + " to be of type " + ft + ", but " + t + " was given");
             }
         }
 
-        return idf;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(ArgFonction a) {
-        String args = "";
         for (Ast ast : a.args) {
-            args += ast.accept(this) + ":";
+            ast.accept(this);
         }
 
-        return args.equals("") ? "" : args.substring(0, args.length() - 1);
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(IfThenElse a) {
         int temp = region;
-        String cond = a.condition.accept(this);
-        String[] split = null;
-        if (cond.contains(":")) {
-            split = cond.split(":");
-        }
+        SymbolLookup table = this.table.getSymbolLookup(temp);
+        ParserRuleContext cond = a.condition.accept(this);
+        Type condType = tipe.inferType(table.getSymbolLookup(region), a.condition);
 
         StepOneRegion();
-        String then = a.thenBlock.accept(this);
+        ParserRuleContext then = a.thenBlock.accept(this);
         Type thenType = tipe.inferType(table.getSymbolLookup(region), a.thenBlock);
 
         StepOneRegion();
-        String els = a.elseBlock.accept(this);
+        ParserRuleContext els = a.elseBlock.accept(this);
         Type elseType = tipe.inferType(table.getSymbolLookup(region), a.elseBlock);
 
-        SymbolLookup table = this.table.getSymbolLookup(temp);
-        Type condType = tipe.inferType(table, a.condition);
 
-        if ((split != null && (split[0].equals("for") || split[0].equals("while"))) || !condType.equals(TypeInferer.inferType(table, "int"))) {
-            errorHandler.error(a.ctx, "Condition is not an integer");
+        // Check if condition is an integer
+        if (!condType.equals(new Primitive(Integer.class))) {
+            errorHandler.error(cond, "Condition is not an integer");
         }
 
         // OpCSem.checksametype(a.ctx, then, els, table, errorHandler);
-        if (thenType == null || elseType == null || !thenType.equals(elseType)) {
-            errorHandler.error(a.ctx, "Then and else blocks must return the same type");
+        if (!thenType.equals(elseType)) {
+            errorHandler.error(els, "Then and else blocks must return the same type");
         }
 
         region = temp;
 
-        return "ifthen" + then + "else" + els;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(IfThen a) {
         int temp = region;
-        String cond = a.condition.accept(this);
-        StepOneRegion();
-        String then = a.thenBlock.accept(this);
-        String[] split = null;
-        if (cond.contains(":")) {
-            split = cond.split(":");
-        }
-
         SymbolLookup table = this.table.getSymbolLookup(temp);
+
+        ParserRuleContext cond = a.condition.accept(this);
+        StepOneRegion();
+        ParserRuleContext then = a.thenBlock.accept(this);
+
         Type condType = tipe.inferType(table, a.condition);
 
-        if ((split != null && (split[0].equals("for") || split[0].equals("while"))) || !condType.equals(TypeInferer.inferType(table, "int"))) {
-            errorHandler.error(a.ctx, "Condition is not an integer");
+        if (!condType.equals(new Primitive(Integer.class))) {
+            errorHandler.error(cond, "Condition is not an integer");
         }
 
 
         region = temp;
 
-        return "ifthen" + then;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(While a) {
         int temp = region;
-        String cond = a.condition.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(temp);
-        Type condType = tipe.inferType(table, a.condition);
-        String[] split = null;
-        if (cond.contains(":")) {
-            split = cond.split(":");
-        }
 
-        if ((split != null && (split[0].equals("for") || split[0].equals("while"))) || !condType.equals(TypeInferer.inferType(table, "int"))) {
-            errorHandler.error(a.ctx, "Condition is not an integer");
+        ParserRuleContext cond = a.condition.accept(this);
+        Type condType = tipe.inferType(table, a.condition);
+
+        if (!condType.equals(new Primitive(Integer.class))) {
+            errorHandler.error(cond, "Condition is not an integer");
         }
 
         StepOneRegion();
 
         a.condition.accept(this);
-        String b = a.block.accept(this);
+        ParserRuleContext b = a.block.accept(this);
 
         region = temp;
 
-        return "while:" + b;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(For a) {
         int temp = region;
-        String id = a.start.accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
+        ParserRuleContext id = a.start.accept(this);
         Type start = tipe.inferType(table, a.startValue);
         Type end = tipe.inferType(table, a.endValue);
 
@@ -400,11 +503,11 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         a.start.accept(this);
         a.startValue.accept(this);
         a.endValue.accept(this);
-        String s = a.block.accept(this);
+        ParserRuleContext s = a.block.accept(this);
 
         region = temp;
 
-        return "for:" + s;
+        return a.ctx;
     }
 
     @Override
@@ -420,73 +523,73 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
         region = temp;
 
-        return "while";
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(DeclarationType a) {
-        String idf = a.id.accept(this);
+        a.id.accept(this);
         a.type.accept(this);
 
         // Check if identifier is a reserved word
-        if (idf.equals("array") || idf.equals("record")) {
-            errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
-        }
+        // if (idf.equals("array") || idf.equals("record")) {
+        //     errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        // }
 
-        return null;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(DeclarationTypeClassique a) {
-        String type = a.id.accept(this);
+        ParserRuleContext type = a.id.accept(this);
+        ID idf = (ID) a.id;
 
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         // Check that type exists
-        if (table.getType(type) == null) {
-            errorHandler.error(a.ctx, "Type '" + type + "' is not defined");
+        if (table.getType(idf.nom) == null) {
+            errorHandler.error(type, "Type '" + idf.nom + "' is not defined");
         }
-        return type;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(DeclarationArrayType a) {
-        String idk = a.id.accept(this);
-
-        return idk;
+        ParserRuleContext idk = a.id.accept(this);
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(DeclarationRecordType a) {
         List<String> fields = new ArrayList<>();
         for (Ast ast : a.champs) {
-            String expr = ast.accept(this);
-
-            String[] split = expr.split(":");
-            String idf = split[0];
+            ParserRuleContext expr = ast.accept(this);
+            DeclarationChamp champ = (DeclarationChamp) ast;
+            ID idf = (ID) champ.id;
+            // ID type = (ID) champ.type;
 
             // Check for existence of the field
-            if (fields.contains(idf)) {
-                errorHandler.error(a.ctx, "Field '" + split[0] + "' is redefined in record");
+            if (fields.contains(idf.nom)) {
+                errorHandler.error(idf.ctx, "Field '" + idf.nom + "' is redefined in record");
             }
 
-            fields.add(idf);
+            fields.add(idf.nom);
         }
 
-        return null;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(DeclarationChamp a) {
-        String idf = a.id.accept(this);
-        String type = a.type.accept(this);
+        ParserRuleContext idf = a.id.accept(this);
+        ParserRuleContext type = a.type.accept(this);
 
         // Check if identifier is a reserved word
-        if (idf.equals("array") || idf.equals("record")) {
-            errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
-        }
+        // if (idf.equals("array") || idf.equals("record")) {
+        //     errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        // }
 
-        return idf + ":" + type;
+        return a.ctx;
     }
 
     @Override
@@ -494,19 +597,21 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         int temp = region;
         SymbolLookup table = this.table.getNearSymbolLookup(temp);
         StepOneRegion();
-        String idf = a.id.accept(this);
+        ParserRuleContext idfCtx = a.id.accept(this);
 
-        if (!(table.getSymbol(idf) instanceof Function)) {
+        ID idf = (ID) a.id;
+
+        if (!(table.getSymbol(idf.nom) instanceof Function)) {
             return null;
         }
 
         table = this.table.getSymbolLookup(region);
 
         // Check if identifier is a reserved word
-        if (idf.equals("array") || idf.equals("record")) {
-            errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
-        }
-        if (!(table.getSymbol(idf) instanceof Function))
+        // if (idf.equals("array") || idf.equals("record")) {
+        //     errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
+        // }
+        if (!(table.getSymbol(idf.nom) instanceof Function))
             return null;
 
         for (Ast ast : a.args) {
@@ -516,106 +621,85 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         if (a.has_return)
             a.return_type.accept(this);
 
-        String expr = a.expr.accept(this);
-        String[] split = null;
+        SymbolLookup table2 = this.table.getSymbolLookup(region+1);
+        if (table2 == null)
+            return a.ctx;
 
-        if (expr != null && expr.contains(":"))
-            split = expr.split(":");
+        ParserRuleContext expr = a.expr.accept(this);
+        Type t = tipe.inferType(table2, a.expr);
+        Type ft = table2.getSymbol(idf.nom).getType();
 
-        Type t = null;
-        if (split != null && table.getSymbol(split[split.length - 1]) != null) {
-            t = table.getSymbol(split[split.length - 1]).getType();
-        } else {
-            t = tipe.inferType(table, a.expr);
+        if (ft == null || t == null || (!idf.nom.equals("print") && !t.equals(ft) && !ft.equals(nilRecord))) {
+            errorHandler.error(idfCtx, "Type mismatch in function declaration " + idf.nom + " : " + ft + " != " + t);
         }
-        Type ft = table.getSymbol(idf).getType();
-
-        if (ft == null || t == null
-                || (!idf.equals("print") && !t.equals(ft) && !ft.equals(TypeInferer.inferType(table, "nil"))))
-            errorHandler.error(a.ctx, "Type mismatch in function declaration " + idf + " : " + ft + " != " + t);
 
         region = temp;
 
-        return null;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(DeclarationValeur a) {
-        String idf = a.id.accept(this);
+        ParserRuleContext idfCtx = a.id.accept(this);
+        ParserRuleContext expr = a.expr.accept(this);
         Type t = null;
+        SymbolLookup table = this.table.getSymbolLookup(region);
         if (a.getType() != null) {
             t = tipe.inferType(table, a.getType());
         }
-        String expr = a.expr.accept(this);
+
+        ID idf = (ID) a.id;
 
         // Check if identifier is a reserved word
-        if (idf.equals("array") || idf.equals("record")) {
-            errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
-        }
-
-        SymbolLookup table = this.table.getSymbolLookup(region);
-
-        // if (type == null) {
-        // errorHandler.error(a.ctx, "Expression '"+type+"' does not evaluate to any
-        // type");
-        // return null;
+        // if (idf.equals("array") || idf.equals("record")) {
+        //     errorHandler.error(a.ctx, "Identifier '" + idf + "' is a reserved word");
         // }
 
-        // if (t == null) {
-        // return null;
-        // }
+        if (table == null)
+            return a.ctx;
+
         Type tExpr = tipe.inferType(table, a.expr);
+        if (tExpr == null)
+            return a.ctx;
 
-        if (t != null && !t.equals(tExpr) && !tExpr.equals  (TypeInferer.inferType(table, "nil"))) {
-            errorHandler.error(a.ctx, "Type mismatch in variable declaration " + idf + " : " + t + " != " + tExpr);
+        
+        if (t != null && (!t.equals(tExpr) && !tExpr.equals(nilRecord))) {
+            errorHandler.error(idfCtx, "Type mismatch in variable declaration " + idf.nom + " : " + t + " != " + tExpr);
         }
 
-        if (t == null && tExpr == null) {
-            errorHandler.error(a.ctx, "Nil has no type in this context");
+        if (t == null && tExpr.equals(new Primitive(Void.class))) {
+            errorHandler.error(a.ctx, "nil has no type in this context or expression has not returned a value");
         }
 
-        return null;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(ChaineChr a) {
-        String val = a.valeur;
-
-        return val;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Nil a) {
-        String val = "nil";
-
-        return val;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Break a) {
-        // check if in a loop
-        // ParserRuleContext parent = a.ctx.getParent();
-        // while (parent != null) {
-        // if (parent.getParent() instanceof OperationBoucleContext) {
-        // return null;
-        // }
-        // parent = parent.getParent();
-        // }
-        // errorHandler.error(a.ctx, "Break outside of loop");
         BouclesCSem.checkInBoucle(a.ctx, table, errorHandler);
-        return null;
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(InstanciationType a) {
-
-        String fidf = a.getId().accept(this);
+        ParserRuleContext idfCtx = a.getId().accept(this);
+        ID idf = (ID) a.getId();
 
         SymbolLookup table = this.table.getSymbolLookup(region);
-        Type t = table.getType(fidf);
+        Type t = table.getType(idf.nom);
         if (t == null) {
-            errorHandler.error(a.ctx, "Type '" + fidf + "' not defined");
-            return fidf;
+            errorHandler.error(idfCtx, "Type '" + idf.nom + "' not defined");
+            return a.ctx;
         }
 
         Record r = new Record();
@@ -624,23 +708,25 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         }
         List<String> fields = new ArrayList<String>();
 
-        ArrayList<Ast> idf = a.getIdentifiants();
+        ArrayList<Ast> identifiants = a.getIdentifiants();
         ArrayList<Ast> expr = a.getExpressions();
-        for (int i = 0; i < idf.size(); i++) {
-            String fieldname = idf.get(i).accept(this);
+        for (int i = 0; i < identifiants.size(); i++) {
+            ParserRuleContext fieldCtx = identifiants.get(i).accept(this);
+            String fieldname = ((ID) identifiants.get(i)).nom;
+
             expr.get(i).accept(this);
 
             // Check for existence of the field
             if (r.getField(fieldname) == null) {
-                errorHandler.error(a.ctx, "Field '" + fieldname + "' not defined in type '" + fidf + "'");
+                errorHandler.error(fieldCtx, "Field '" + fieldname + "' not defined in type '" + idf.nom + "'");
                 continue;
             }
+            
             // Check for type of the field
             Type fieldtype = r.getField(fieldname).getType();
             Type expType = tipe.inferType(table, expr.get(i));
             if (expType == null || !fieldtype.equals(expType)) {
-                errorHandler.error(a.ctx,
-                        "Type mismatch in field '" + fieldname + "' : " + fieldtype + " != " + expType);
+                errorHandler.error(fieldCtx, "Type mismatch in field '" + fieldname + "' : " + fieldtype + " != " + expType);
             }
 
             fields.add(fieldname);
@@ -650,15 +736,15 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         for (Symbol field : r.getFields()) {
             if (!fields.contains(field.getName())) {
                 errorHandler.error(a.ctx,
-                        "Field '" + field.getName() + "' not defined on instanciation of type '" + fidf + "'");
+                        "Field '" + field.getName() + "' not defined on instanciation of type '" + idf.nom + "'");
             }
         }
 
         if (t instanceof Record) {
-            return r.toString();
+            return a.ctx;
         }
 
-        return fidf;
+        return a.ctx;
     }
 
     @Override
@@ -668,47 +754,36 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(ExpressionArray a) {
-        String idf = a.getId().accept(this);
-        String size = a.getSize().accept(this);
-        String expr = a.getExpr().accept(this);
-        String[] split = null;
-
+        ParserRuleContext idfCtx = a.getId().accept(this);
+        ParserRuleContext sizeCtx = a.getSize().accept(this);
+        ParserRuleContext exprCtx = a.getExpr().accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        Type t = table.getType(idf);
-        if (!(t instanceof Array)) {
-            errorHandler.error(a.ctx, "Type '" + idf + "' is not an array type");
+
+        ID idf = (ID) a.getId();
+        Type idType = table.getType(idf.nom);
+
+        // Check if of type array
+        if (!(idType instanceof Array)) {
+            errorHandler.error(a.ctx, "Type '" + idf.nom + "' is not an array type");
+        }
+        
+        Type sizeType = tipe.inferType(table, a.getSize());
+        // Check if size is of type int
+        if (!sizeType.equals(new Primitive(Integer.class))) {
+            errorHandler.error(sizeCtx, "Size of array must be of type int");
         }
 
-        if (size.contains(":")) {
-            split = size.split(":");
-        }
-
-        // Check if size is an integer
-        if ((split != null && (split[0].equals("for") || split[0].equals("while")))
-                || !tipe.inferType(table, a.getSize()).equals(TypeInferer.inferType(table, "int"))) {
-            errorHandler.error(a.ctx, "Size of array must be an integer");
-        } else {
-            // Check that size is positive
-            if (!tipe.inferType(table, a.getSize()).equals(TypeInferer.inferType(table, "int"))
-                    && Integer.parseInt(size) <= 0) {
-                errorHandler.error(a.ctx, "Size of array must be positive");
-            }
-        }
-
-        if (expr.contains(":"))
-            split = expr.split(":");
-
-        if (t instanceof Array) {
+        if (idType instanceof Array) {
             // Check that expression is of the right type
             Type exprType = tipe.inferType(table, a.getExpr());
-            Type arrayType = ((Array) t).getType();
+            Type arrayType = ((Array) idType).getType();
             boolean state = true;
             if (exprType == null || !exprType.equals(arrayType )) {
                 if (exprType instanceof Record && arrayType instanceof Record) {
                     state = ! ((Record) exprType).getIsNil();
                 }
                 if (state) {
-                    errorHandler.error(a.ctx, "Type mismatch in array declaration : " + arrayType + " != " + exprType);
+                    errorHandler.error(exprCtx, "Type mismatch in array declaration : " + arrayType + " != " + exprType);
                 }
             }
         }
@@ -718,51 +793,45 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(ListeAcces a) {
-        String idf = a.getId().accept(this);
+        ParserRuleContext idfCtx = a.getId().accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);
-        Symbol s = table.getSymbol(idf);
+        ID idf = (ID) a.getId();
+        Symbol s = table.getSymbol(idf.nom);
         if (s == null) {
-            errorHandler.error(a.ctx, "Variable '" + idf + "' not defined");
+            errorHandler.error(idfCtx, "Variable '" + idf + "' not defined");
             return null;
         }
         Type t = s.getType();
         if (a.getisExpressionArray()) {
-            String idk = a.getExpressionArray().accept(this);
+            ParserRuleContext idk = a.getExpressionArray().accept(this);
             return idk;
         } else {
             String out = "";
             for (Ast ast : a.getAccesChamps()) {
-                String field = ast.accept(this);
+                ParserRuleContext field = ast.accept(this);
+                AccesChamp ac = (AccesChamp) ast;
                 
                 if (t instanceof Record) {
+                    String fieldname = ((ID) ac.getChild()).nom;
+                        
                     if(((Record) t).getIsNil()) {
-                        errorHandler.error(a.ctx, idf + out + "' is nil");
+                        errorHandler.error(field, idf + out + "' is nil");
                         break;
                     } else {
                         Record r = (Record) t;
-                        if (r.getField(field) == null) {
-                            errorHandler.error(a.ctx, "Field '" + field + "' not defined in type '" + t + "'");
+                        if (r.getField(fieldname) == null) {
+                            errorHandler.error(field, "Field '" + fieldname + "' not defined in type '" + t + "'");
                             break;
                         }
-                        t = r.getField(field).getType();
+                        t = r.getField(fieldname).getType();
                         out += "." + field;
                     }
                 } else if (t instanceof Array) {
                     Array a1 = (Array) t;
                     // Check if field is an integer, positive and less than size of array
                     if (!tipe.inferType(table, ast).equals(new Primitive(Integer.class))) {
-                        errorHandler.error(a.ctx, "Index of array must be an integer");
+                        errorHandler.error(field, "Index of array must be an integer");
                         break;
-                    } else {
-                        if (TypeInferer.isNumeric(field) && Integer.parseInt(field) < 0) {
-                            errorHandler.error(a.ctx, "Index of array must be positive");
-                            break;
-                        } else {
-                            if (TypeInferer.isNumeric(field) && Integer.parseInt(field) >= ((Array) t).getSize()) {
-                                errorHandler.error(a.ctx, "Index of array must be less than size of array");
-                                break;
-                            }
-                        }
                     }
                     t = a1.getType();
                     out += "[" + field + "]";
@@ -772,7 +841,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
                 }
             }
             // return idf.field1.field2...
-            return idf + out;
+            return a.ctx;
         }
     }
 

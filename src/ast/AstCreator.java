@@ -122,7 +122,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
-            noeudTemporaire = new Ou(noeudTemporaire, ctx.getChild(2 * i + 2).accept(this));
+            noeudTemporaire = new Ou(ctx, noeudTemporaire, ctx.getChild(2 * i + 2).accept(this));
         }
 
         return noeudTemporaire;
@@ -133,7 +133,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         Ast noeudTemporaire = ctx.getChild(0).accept(this);
 
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
-            noeudTemporaire = new Et(noeudTemporaire, ctx.getChild(2 * i + 2).accept(this));
+            noeudTemporaire = new Et(ctx, noeudTemporaire, ctx.getChild(2 * i + 2).accept(this));
         }
 
         return noeudTemporaire;
@@ -204,7 +204,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitSequence(SequenceContext ctx) {
-        Sequence sequence = new Sequence();
+        Sequence sequence = new Sequence(ctx);
 
         for (int i = 0; 2 * i < ctx.getChildCount() - 1; i++) {
             sequence.addSeq(ctx.getChild(2 * i + 1).accept(this));
@@ -230,12 +230,12 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitChaineChr(ChaineChrContext ctx) {
-        return new ChaineChr(ctx.getChild(0).getText());
+        return new ChaineChr(ctx, ctx.getChild(0).getText());
     }
 
     @Override
     public Ast visitNil(NilContext ctx) {
-        return new Nil();
+        return new Nil(ctx);
     }
 
     @Override
@@ -245,7 +245,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
     @Override
     public Ast visitAppelFonction(AppelFonctionContext ctx) {
-        ArgFonction argFonction = new ArgFonction();
+        ArgFonction argFonction = new ArgFonction(ctx);
         // args are located at even indexes
         for (int i = 0; 2 * i + 1 < ctx.getChildCount() - 1; i++) {
             argFonction.addArg(ctx.getChild(2 * i + 1).accept(this));
@@ -590,7 +590,6 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                         errorHandler.error(ctx, "Type '" + split[1] + "' not defined");
                     }
                 }
-
                 drf.addArg(((DeclarationChamp) branch));
                 count++;
             }
@@ -651,7 +650,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         if (condition instanceof Sequence) {
             ((Sequence) condition).setNom("Condition");
         } else {
-            Sequence seq = new Sequence();
+            Sequence seq = new Sequence(ctx);
             seq.addSeq(condition);
             condition = seq;
         }
@@ -659,7 +658,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         if (thenBlock instanceof Sequence) {
             ((Sequence) thenBlock).setNom("Then");
         } else {
-            Sequence seq = new Sequence();
+            Sequence seq = new Sequence(ctx);
             seq.addSeq(thenBlock);
             thenBlock = seq;
         }
@@ -686,7 +685,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         if (condition instanceof Sequence) {
             ((Sequence) condition).setNom("Condition");
         } else {
-            Sequence seq = new Sequence();
+            Sequence seq = new Sequence(ctx);
             seq.addSeq(condition);
             condition = seq;
         }
@@ -694,7 +693,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         if (thenBlock instanceof Sequence) {
             ((Sequence) thenBlock).setNom("Then");
         } else {
-            Sequence seq = new Sequence();
+            Sequence seq = new Sequence(ctx);
             seq.addSeq(thenBlock);
             thenBlock = seq;
         }
@@ -702,7 +701,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         if (elseBlock instanceof Sequence) {
             ((Sequence) elseBlock).setNom("Else");
         } else {
-            Sequence seq = new Sequence();
+            Sequence seq = new Sequence(ctx);
             seq.addSeq(elseBlock);
             elseBlock = seq;
         }
@@ -754,7 +753,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
     public Ast visitDefinition(DefinitionContext ctx) {
         boolean sawIn = false;
 
-        Definition def = new Definition();
+        Definition def = new Definition(ctx);
 
         int temp = region;
         region = table.getSymbolLookup(region).addChildren();

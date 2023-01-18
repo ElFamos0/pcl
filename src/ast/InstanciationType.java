@@ -8,9 +8,9 @@ public class InstanciationType implements Ast {
     public <T> T accept(AstVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
-    ArrayList<Ast> identifiants;
-    ArrayList<Ast> expressions;
-    Ast id;
+    public ArrayList<Ast> identifiants;
+    public ArrayList<Ast> expressions;
+    public Ast id;
     public InstanciationTypeContext ctx;
 
     public InstanciationType(InstanciationTypeContext ctx){

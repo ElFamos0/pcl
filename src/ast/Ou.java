@@ -1,5 +1,7 @@
 package ast;
 
+import parser.exprParser.OperationOuContext;
+
 public class Ou implements Ast {
 	public <T> T accept(AstVisitor<T> visitor) {
 		return visitor.visit(this);
@@ -7,8 +9,10 @@ public class Ou implements Ast {
 
     public Ast left;
     public Ast right;
+    public OperationOuContext ctx;
 
-    public Ou(Ast left, Ast right) {
+    public Ou(OperationOuContext ctx, Ast left, Ast right) {
+        this.ctx = ctx;
         this.left = left;
         this.right = right;
     }

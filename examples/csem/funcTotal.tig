@@ -20,9 +20,10 @@ let
     function a(x:int, y:string) :string = b()
     function b() : string = a(0,"")
 in  
-
     notAFunction();
     e(3,"Test",3);
     e(3,3);
     e(3)
 end
+
+/* 12 errors */

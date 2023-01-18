@@ -2,6 +2,10 @@ package ast;
 
 import java.util.ArrayList;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+
+import parser.exprParser.SequenceContext;
+
 public class Sequence implements Ast {
     public <T> T accept(AstVisitor<T> visitor){
         return visitor.visit(this);
@@ -9,8 +13,10 @@ public class Sequence implements Ast {
     
     public String nom = "Sequence";
     public ArrayList<Ast> seqs;
+    public ParserRuleContext ctx;
 
-    public Sequence() {
+    public Sequence(ParserRuleContext ctx) {
+        this.ctx = ctx;
         this.seqs = new ArrayList<>();
     }
 

@@ -7,3 +7,5 @@ in
   for i:= 0 to "test" do (3);
   for i:= "test" to 10 do (3)
 end
+
+/* 4 errors */

@@ -7,3 +7,5 @@ in
   for i:= 3 to 9 do break;
   break
 end
+
+/* 3 errors */

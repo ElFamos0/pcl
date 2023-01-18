@@ -47,15 +47,6 @@ public class OpCSem {
                 }
             }
         }
-        if (table.getSymbol(s) != null) {
-            if (!(table.getSymbol(s).getType().equals(new Primitive(Integer.class)))) {
-                errorHandler.error(a.ctx, "Not an integer");
-            }
-        } else {
-            if (!(TypeInferer.inferType(table, s).equals(new Primitive(Integer.class)))) {
-                errorHandler.error(a.ctx, "Not an integer");
-            }
-        }
     }
 
     public static void checkint(ParserRuleContext ctx, Type left, Type right, SymbolLookup table,
@@ -83,44 +74,27 @@ public class OpCSem {
         
     }
 
-    public static void checkIntOrString(ParserRuleContext ctx, Type left, Type right, SymbolLookup table,
+    public static void checkIntOrString(ParserRuleContext leftCtx, ParserRuleContext rightCtx, Type left, Type right, SymbolLookup table,
             ErrorHandler errorHandler) {
         boolean isInt = false;
         if (left.equals(new Primitive(Integer.class))) {
             isInt = true;
             //System.out.println("left is int");
         } else if (!left.equals(new Array(new Primitive(Character.class)))) {
-            errorHandler.error(ctx, "Invalid type for comparaison");
+            errorHandler.error(leftCtx, "Invalid type for comparaison");
         }
+
         if (right.equals(new Primitive(Integer.class))) {
             if (!isInt) {
-                errorHandler.error(ctx, "Cannot compare an integer and a string");
+                errorHandler.error(rightCtx, "Cannot compare an integer and a string");
             }
         } else if (right.equals(new Array(new Primitive(Character.class)))) {
             if (isInt) {
-                errorHandler.error(ctx, "Cannot compare an integer and a string");
+                errorHandler.error(rightCtx, "Cannot compare an integer and a string");
             }} 
         else {
-                errorHandler.error(ctx, "Invalid type for comparaison");
+                errorHandler.error(rightCtx, "Invalid type for comparaison");
         }
         
-    }
-
-    public static void checksametype(ParserRuleContext ctx, String left, String right, SymbolLookup table,
-            ErrorHandler errorHandler) {
-        String split[] = left.split("0x");
-        String split2[] = right.split("0x");
-        if (split.length == 1 && split2.length == 1) {
-            String s = split[0];
-            String s2 = split2[0];
-            if (!(TypeInferer.inferType(table, s).equals(TypeInferer.inferType(table, s2)))) {
-                if (ctx instanceof SiAlorsSinonContext) {
-                    errorHandler.error(ctx, "Not the same value in then and else block");
-                } else {
-                    errorHandler.error(ctx, "Cannot compare different types");
-                }
-
-            }
-        }
     }
 }

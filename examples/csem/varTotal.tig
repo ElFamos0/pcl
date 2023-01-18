@@ -11,3 +11,5 @@ in
     a + b;
     b:= 5
 end
+
+/* 8 errors */

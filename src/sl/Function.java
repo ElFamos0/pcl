@@ -29,12 +29,12 @@ public class Function extends FuncOrVariable {
     }
 
     public void addParams(ArrayList<Variable> params) {
-        int offset = -8;
+        int offset = 0;
 
-        for (int i = params.size() - 1; i >= 0; i--) {
-            params.get(i).setOffset(offset);
-            table.addSymbolParam(params.get(i));
-            offset -= params.get(i).getType().getOffset();
+        for (Variable p : params) {
+            offset -= 8;
+            p.setOffset(offset);
+            table.addSymbolParam(p);
         }
     }
 

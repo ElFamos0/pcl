@@ -15,4 +15,4 @@ in
     a[-5]
 end
 
-/* 9 errors */
+/* 8 errors */

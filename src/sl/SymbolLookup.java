@@ -1,6 +1,8 @@
 package sl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class SymbolLookup {
@@ -204,6 +206,15 @@ public class SymbolLookup {
             }
         }
 
+        // Sort result by offset
+        Collections.sort(result, new Comparator<Variable>() {
+            public int compare(Variable v1, Variable v2) {
+                return v1.getOffset() - v2.getOffset();
+                // To flip it
+                // return v2.getOffset() - v1.getOffset();
+            }
+        });
+
         return result;
     }
 
@@ -212,7 +223,7 @@ public class SymbolLookup {
         if (s instanceof Variable) {
             ((Variable) s).setOffset(varOffset);
 
-            varOffset += s.getType().getOffset();
+            varOffset += 8;
         }
         if (s instanceof Function) {
             // Get the last children

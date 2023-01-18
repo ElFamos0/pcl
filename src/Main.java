@@ -49,12 +49,12 @@ public class Main {
             GraphVizVisitor graphViz = new GraphVizVisitor();
             ast.accept(graphViz);
 
-            // Display TDS
-            System.out.println(table);
-
             // Controle semantique
             CSemVisitor csem = new CSemVisitor(table, errorHandler);
             ast.accept(csem);
+
+            // Display TDS
+            System.out.println(table);
 
             if (errorHandler.getErrorCount() > 0) {
                 System.out.println("Compilation failed with " + errorHandler.getErrorCount() + " errors");

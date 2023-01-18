@@ -49,7 +49,11 @@ public class CSemType implements AstVisitor<Type> {
 
     public CSemType(SymbolLookup table) {
         this.table = table;
-        this.region = 0;
+        if (table != null) {
+            region = table.getRegion();
+        } else {
+            region = 0;
+        }
     }
 
     public void setTable(SymbolLookup table) {
@@ -93,7 +97,7 @@ public class CSemType implements AstVisitor<Type> {
         Type t2 = a.right.accept(this);
 
         if (t1 == null || t2 == null || !t1.equals(t2)) {
-            return null;
+            return new Primitive(Void.class);
         }
 
         return t1;
@@ -105,7 +109,7 @@ public class CSemType implements AstVisitor<Type> {
         Type t2 = a.right.accept(this);
 
         if (t1 == null || t2 == null || !t1.equals(t2)) {
-            return null;
+            return new Primitive(Void.class);
         }
 
         return t1;
@@ -117,7 +121,7 @@ public class CSemType implements AstVisitor<Type> {
         Type t2 = a.right.accept(this);
 
         if (t1 == null || t2 == null || !t1.equals(t2)) {
-            return null;
+            return new Primitive(Void.class);
         }
 
         return t1;
@@ -129,7 +133,7 @@ public class CSemType implements AstVisitor<Type> {
         Type t2 = a.right.accept(this);
 
         if (t1 == null || t2 == null || !t1.equals(t2)) {
-            return null;
+            return new Primitive(Void.class);
         }
 
         return t1;
@@ -149,8 +153,15 @@ public class CSemType implements AstVisitor<Type> {
 
     @Override
     public Type visit(ID a) {
-        SymbolLookup table = this.table.getSymbolLookup(region);
-        return table.getSymbol(a.nom) == null ? table.getType(a.nom) : table.getSymbol(a.nom).getType();
+        SymbolLookup table = this.table;
+        region = table.getRegion();
+        if (table.getSymbol(a.nom) == null) {
+            if (table.getType(a.nom) == null) {
+                return new Primitive(Void.class);
+            }
+            return table.getType(a.nom);
+        }
+        return table.getSymbol(a.nom).getType();
     }
 
     @Override
@@ -161,7 +172,10 @@ public class CSemType implements AstVisitor<Type> {
     @Override
     public Type visit(ExpressionIdentifiant a) {
         // System.out.println("ExpressionIdentifiant");
-        return null;
+        if (a.right == null) {
+            return a.left.accept(this);
+        }
+        return a.right.accept(this);
     }
 
     @Override
@@ -171,7 +185,7 @@ public class CSemType implements AstVisitor<Type> {
 
     @Override
     public Type visit(ArgFonction a) {
-        return null;
+        return new Primitive(Void.class);
     }
 
     @Override
@@ -182,7 +196,7 @@ public class CSemType implements AstVisitor<Type> {
         Type t2 = a.elseBlock.accept(this);
 
         if (t1 == null || t2 == null || !t1.equals(t2)) {
-            return null;
+            return new Primitive(Void.class);
         }
 
         return t1;
@@ -272,7 +286,7 @@ public class CSemType implements AstVisitor<Type> {
     @Override
     public Type visit(InstanciationType a) {
         // System.out.println("InstanciationType");
-        return new Primitive(Void.class);
+        return a.id.accept(this);
     }
 
     @Override

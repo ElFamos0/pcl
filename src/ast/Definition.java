@@ -5,6 +5,8 @@ package ast;
 
 import java.util.ArrayList;
 
+import parser.exprParser.DefinitionContext;
+
 public class Definition implements Ast {
 	public <T> T accept(AstVisitor<T> visitor) {
 		return visitor.visit(this);
@@ -12,8 +14,10 @@ public class Definition implements Ast {
     
     public ArrayList<Ast> declarations;
     public ArrayList<Ast> exprs;
+    public DefinitionContext ctx;
 
-    public Definition() {
+    public Definition(DefinitionContext ctx) {
+        this.ctx = ctx;
         this.declarations = new ArrayList<Ast>();
         this.exprs = new ArrayList<Ast>();
     }
