@@ -330,12 +330,13 @@ public class CSemType implements AstVisitor<Type> {
         }
 
         if (t instanceof Record) {
+            AccesChamp ac = (AccesChamp) a.accesChamps.get(i);
             Record r = (Record) t;
 
-            if (!(a.accesChamps.get(i) instanceof ID)) {
+            if (!(ac.getChild() instanceof ID)) {
                 return new Primitive(Void.class);
             }
-            ID id = (ID) a.accesChamps.get(i);
+            ID id = (ID) ac.getChild();
             return r.getField(id.nom).getType();
         } else if (t instanceof Array) {
             Array arr = (Array) t;
