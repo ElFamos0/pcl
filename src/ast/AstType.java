@@ -226,6 +226,7 @@ public class AstType extends exprBaseVisitor<Type> {
     @Override
     public Type visitListeAcces(ListeAccesContext ctx) {
         // System.out.println("Liste acces");
+        
         return null;
     }
 
