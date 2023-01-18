@@ -8,13 +8,15 @@ let
 
     var c:= 5
     var d:= nil
+    var x :int := nil
 in  
     a[0].val;
     b.val;
     c + nil;
     if nil = nil then (3);
     if b = nil then (3);
+    c := nil;
     nil
 end
 
-/* 1 errors */
+/* 3 errors */

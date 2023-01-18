@@ -420,10 +420,12 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         Type condType = tipe.inferType(table.getSymbolLookup(region), a.condition);
 
         StepOneRegion();
+        table = this.table.getSymbolLookup(biggestRegion);
         ParserRuleContext then = a.thenBlock.accept(this);
         Type thenType = tipe.inferType(table.getSymbolLookup(region), a.thenBlock);
 
         StepOneRegion();
+        table = this.table.getSymbolLookup(biggestRegion);
         ParserRuleContext els = a.elseBlock.accept(this);
         Type elseType = tipe.inferType(table.getSymbolLookup(region), a.elseBlock);
 
@@ -450,6 +452,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
         ParserRuleContext cond = a.condition.accept(this);
         StepOneRegion();
+        table = this.table.getSymbolLookup(biggestRegion);
         ParserRuleContext then = a.thenBlock.accept(this);
 
         Type condType = tipe.inferType(table, a.condition);
@@ -671,6 +674,10 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
             errorHandler.error(a.ctx, "nil has no type in this context or expression has not returned a value");
         }
 
+        if (t!= null && !(t instanceof Record) && tExpr.equals(nilRecord)) {
+            errorHandler.error(a.ctx, "Cannot assigned nil value to " + idf.nom + " because it is of type " + t);
+        }
+
         return a.ctx;
     }
 
@@ -798,7 +805,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         ID idf = (ID) a.getId();
         Symbol s = table.getSymbol(idf.nom);
         if (s == null) {
-            errorHandler.error(idfCtx, "Variable '" + idf + "' not defined");
+            errorHandler.error(idfCtx, "Variable '" + idf.nom + "' not defined");
             return a.ctx;
         }
         Type t = s.getType();

@@ -1,0 +1,120 @@
+let
+    type newArrayType = array of int
+    var array1:= newArrayType [10] of 0
+    var int1 := 5
+    var array2 := newArrayType [10] of for i:=0 to 10 do (3)
+    var array3:= newArrayType [10] of "test"
+    var array4:= newArrayType [for i:= 0 to 10 do (3)] of 0
+    var array5:= newArrayType ["test"] of 0
+    var array6:= int [10] of 0
+
+    var breakVar := break
+
+    var int2 := 5
+    function func1() : int = 3
+    function func1() : int = 3
+    function print() : int = 3
+    function int2() = 3
+    type type1 = int
+    function func2(x : type1, y : type2 ) : int = 3
+    function func3(x : int, x :string ) : int = 3
+    function func4() : int = for i:= 0 to 10 do (3)
+    function func5() : int = ("Ceci est un string")
+    function func6(x:int, y:string) :int = 3
+    var b1 :string := func6(3,"test")
+    function func7(x:int, y:string) = 3
+    var b2 :string := func7(3,"test")
+    function func8(x:int, y:string) :string = func9()
+    function func9() : string = func8(0,"")
+
+    var overflow:int := 2147483648
+    var undeflow:int := -2147483649
+
+    var int3:int := nil
+
+    type record1 = {test :int}
+    var x1 :int := 5
+    var x2 :string := "Test"
+    var x3 :int := 5
+    var x4 := record1{test = 0}
+    var x5 := 0
+
+    type newType = {val : int, name : string}
+    var nt1 :newType := newType {val = 5, name = "test"}
+    var nt2 :newType := nil
+    var nt3 :newType := newType{val = 5, name = for i:= 0 to 10 do (3) }
+    var nt4 := newType{val = 5, name = 5}
+    var nt5 := newType{val = 5, val2 = 10, name = "test"}
+    var nt6 := newType{val = 5}
+    type newTypeAllias = int
+    var nta :newTypeAllias := "test"
+    var ntf := newTypeThatDontExist{}
+    type newArrayType2 = array of float
+    type newFalseType = {champ1 : int, champ1 : string}
+    type newFalseType2 = {champ1 : float, champ2 : int}
+    type newTypeAllias2 = float
+    type t1 = int
+    type t1 = int
+    type int = int
+
+    var va1 :int := 3
+    var va2 := "test"
+    var va3:string := 3
+    var va4 := for i:= 0 to 10 do (3)
+    var va1 := 5
+    var va5 := break
+    
+in  
+    array1[for i:= 0 to 10 do (3)];
+    int1[2];
+    array1["test"];
+    array1[-5];
+
+    while 3 do break;
+    for i:= 3 to 9 do break;
+    break;
+
+    for i:= 0 to for j:= 0 to 10 do (3) do (3);
+    for i:= for j:= 0 to 10 do (3) to 10 do (3);
+    for i:= 0 to "test" do (3);
+    for i:= "test" to 10 do (3);
+
+    notAFunction();
+    func6(3,"Test",3);
+    func6(3,3);
+    func6(3);
+
+    if 1 then 5 else for i:= 0 to 10 do (3);
+    if 1 then 5 else "test";
+    if for i:= 0 to 10 do (3) then 3 else 3;
+    if int1 then 3 else 3;
+    if for i:= 0 to 10 do (3) then 3;
+    if "test" then 3;
+
+    int1 + nil;
+    int1 := nil;
+
+    x1 + x2 / x3 + x4 + x5;
+    x1 + for i:= 0 to 10 do (nil);
+    -x2;
+    x1 >= x2;
+    x1 = x3;
+    x1 > x4;
+    x1/0;
+    3 & 1 | x2 & "testString";
+
+    5 + nt1.name;
+    nt2.name;
+    nt3.notAField;
+    int1.name;
+
+    va1 + vaUndefined;
+    va1 + va2;
+    va2:= 5;
+
+    while for i:= 0 to 10 do (3) do (3);
+    while "test" do (3)
+end
+
+/* 8 errors Array + 3 erros Break + 4 errors For + 14? (13 pour le moment) errors Func + 5 errors If */
+/* + 2 errors Integer + 3 errors Nil + 9 errors Operators + 16 errors Type + 8 errors Var + 2 errors While */
