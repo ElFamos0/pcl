@@ -69,8 +69,11 @@ public class SymbolLookup {
         String result = indent + "Scope " + scope + " (region " + region + ")\n";
 
         for (String name : funcAndVar.keySet()) {
-            if (funcAndVar.get(name) instanceof Variable)
-                result += indent + "  " + "variable " + name + " : " + funcAndVar.get(name).getType() + "\n";
+            if (funcAndVar.get(name) instanceof Variable) {
+                Variable v = (Variable) funcAndVar.get(name);
+                result += indent + "  " + "variable " + name + " : " + funcAndVar.get(name).getType() + " offset "
+                        + v.getOffset() + "\n";
+            }
         }
 
         result += "\n";
