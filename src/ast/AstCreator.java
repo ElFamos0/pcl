@@ -584,10 +584,11 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 else {
                     Type t = typeInferer.inferType(table, ctx.getChild(count));
 
-                    if (t != null) {
-                        params.add(new Variable(split[0], t));
-                    } else {
+                    if (t == null || t.equals(new Primitive(Void.class))) {
                         errorHandler.error(ctx, "Type '" + split[1] + "' not defined");
+                    } else {
+                        params.add(new Variable(split[0], t));
+                        
                     }
                 }
                 drf.addArg(((DeclarationChamp) branch));
@@ -598,7 +599,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         Ast branch = ctx.getChild(count).accept(this);
         // System.out.println("branch = " + ctx.getChild(count + 3).accept(type));
         String txt = ctx.getChild(count).getText();
-        Type type = null;
+        Type type = new Primitive(Void.class);
         if (txt.equals(":")) {
             count++;
             type = typeInferer.inferType(table, ctx.getChild(count));
@@ -608,7 +609,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         }
         count++;
         branch = ctx.getChild(count).accept(this);
-        if (type == null)
+        if (type == null || type.equals(new Primitive(Void.class)))
             type = typeInferer.inferType(table, ctx.getChild(count));
 
         Symbol s = table.getSymbolInScope(idf);
