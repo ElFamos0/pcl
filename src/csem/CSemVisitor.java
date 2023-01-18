@@ -421,12 +421,12 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         Type condType = tipe.inferType(table.getSymbolLookup(region), a.condition);
 
         StepOneRegion();
-        table = this.table.getSymbolLookup(biggestRegion);
+        table = this.table.getSymbolLookup(region);
         a.thenBlock.accept(this);
         Type thenType = tipe.inferType(table.getSymbolLookup(region), a.thenBlock);
 
         StepOneRegion();
-        table = this.table.getSymbolLookup(biggestRegion);
+        table = this.table.getSymbolLookup(region);
         ParserRuleContext els = a.elseBlock.accept(this);
         Type elseType = tipe.inferType(table.getSymbolLookup(region), a.elseBlock);
 
@@ -452,7 +452,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
         ParserRuleContext cond = a.condition.accept(this);
         StepOneRegion();
-        table = this.table.getSymbolLookup(biggestRegion);
+        table = this.table.getSymbolLookup(region);
         a.thenBlock.accept(this);
 
         Type condType = tipe.inferType(table, a.condition);
@@ -632,7 +632,8 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         if (a.has_return)
             a.return_type.accept(this);
 
-        SymbolLookup table2 = this.table.getSymbolLookup(region + 1);
+        Function f = (Function) table.getSymbol(idf.nom);
+        SymbolLookup table2 = f.getTable();
         if (table2 == null)
             return a.ctx;
 

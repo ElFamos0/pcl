@@ -45,6 +45,8 @@ import sl.Record;
 
 public class CSemType implements AstVisitor<Type> {
     private SymbolLookup table;
+    private int region;
+    private int biggestRegion;
 
     public CSemType(SymbolLookup table) {
         this.table = table;
@@ -52,6 +54,17 @@ public class CSemType implements AstVisitor<Type> {
 
     public void setTable(SymbolLookup table) {
         this.table = table;
+        region = table.getRegion();
+        biggestRegion = region;
+    }
+
+    public void StepOneRegion() {
+        biggestRegion++;
+        region = biggestRegion;
+    }
+
+    public void StepDownRegion() {
+        region--;
     }
 
     @Override
@@ -170,7 +183,7 @@ public class CSemType implements AstVisitor<Type> {
 
     @Override
     public Type visit(ID a) {
-        SymbolLookup table = this.table;
+        SymbolLookup table = this.table.getSymbolLookup(region);
         if (table.getSymbol(a.nom) == null) {
             if (table.getType(a.nom) == null) {
                 return new Primitive(Void.class);
@@ -206,19 +219,33 @@ public class CSemType implements AstVisitor<Type> {
 
     @Override
     public Type visit(IfThenElse a) {
+        int temp = region;
+
+        StepOneRegion();
         Type t1 = a.thenBlock.accept(this);
+
+        StepOneRegion();
         Type t2 = a.elseBlock.accept(this);
 
         if (t1 == null || t2 == null || !t1.equals(t2)) {
             return new Primitive(Void.class);
         }
 
+        region = temp;
+
         return t1;
     }
 
     @Override
     public Type visit(IfThen a) {
-        return a.thenBlock.accept(this);
+        int temp = region;
+
+        StepOneRegion();
+        Type t = a.thenBlock.accept(this);
+
+        region = temp;
+
+        return t;
     }
 
     @Override
@@ -234,7 +261,12 @@ public class CSemType implements AstVisitor<Type> {
     @Override
     public Type visit(Definition a) {
         // System.out.println("Definition");
-        return a.exprs.get(a.exprs.size() - 1).accept(this);
+        int temp = region;
+        StepOneRegion();
+        Type t = a.exprs.get(a.exprs.size() - 1).accept(this);
+
+        region = temp;
+        return t;
     }
 
     @Override
