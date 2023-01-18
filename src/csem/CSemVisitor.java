@@ -632,7 +632,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         if (a.has_return)
             a.return_type.accept(this);
 
-        SymbolLookup table2 = this.table.getSymbolLookup(region);
+        SymbolLookup table2 = this.table.getSymbolLookup(region + 1);
         if (table2 == null)
             return a.ctx;
 
