@@ -45,20 +45,13 @@ import sl.Record;
 
 public class CSemType implements AstVisitor<Type> {
     private SymbolLookup table;
-    private int region;
 
     public CSemType(SymbolLookup table) {
         this.table = table;
-        if (table != null) {
-            region = table.getRegion();
-        } else {
-            region = 0;
-        }
     }
 
     public void setTable(SymbolLookup table) {
         this.table = table;
-        region = table.getRegion();
     }
 
     @Override
@@ -178,7 +171,6 @@ public class CSemType implements AstVisitor<Type> {
     @Override
     public Type visit(ID a) {
         SymbolLookup table = this.table;
-        region = table.getRegion();
         if (table.getSymbol(a.nom) == null) {
             if (table.getType(a.nom) == null) {
                 return new Primitive(Void.class);
@@ -214,9 +206,7 @@ public class CSemType implements AstVisitor<Type> {
 
     @Override
     public Type visit(IfThenElse a) {
-        region++;
         Type t1 = a.thenBlock.accept(this);
-        region++;
         Type t2 = a.elseBlock.accept(this);
 
         if (t1 == null || t2 == null || !t1.equals(t2)) {
@@ -244,7 +234,6 @@ public class CSemType implements AstVisitor<Type> {
     @Override
     public Type visit(Definition a) {
         // System.out.println("Definition");
-        region++;
         return a.exprs.get(a.exprs.size() - 1).accept(this);
     }
 
@@ -303,7 +292,7 @@ public class CSemType implements AstVisitor<Type> {
 
     @Override
     public Type visit(Break a) {
-        // TODO Auto-generated method stub
+        // System.out.println("Break");
         return new Primitive(Void.class);
     }
 

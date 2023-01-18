@@ -422,7 +422,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
         StepOneRegion();
         table = this.table.getSymbolLookup(biggestRegion);
-        ParserRuleContext then = a.thenBlock.accept(this);
+        a.thenBlock.accept(this);
         Type thenType = tipe.inferType(table.getSymbolLookup(region), a.thenBlock);
 
         StepOneRegion();
@@ -453,7 +453,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         ParserRuleContext cond = a.condition.accept(this);
         StepOneRegion();
         table = this.table.getSymbolLookup(biggestRegion);
-        ParserRuleContext then = a.thenBlock.accept(this);
+        a.thenBlock.accept(this);
 
         Type condType = tipe.inferType(table, a.condition);
 
@@ -481,7 +481,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         StepOneRegion();
 
         a.condition.accept(this);
-        ParserRuleContext b = a.block.accept(this);
+        a.block.accept(this);
 
         region = temp;
 
@@ -492,7 +492,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(For a) {
         int temp = region;
         SymbolLookup table = this.table.getSymbolLookup(region);
-        ParserRuleContext id = a.start.accept(this);
+        a.start.accept(this);
         Type start = tipe.inferType(table, a.startValue);
         Type end = tipe.inferType(table, a.endValue);
 
@@ -505,7 +505,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         a.start.accept(this);
         a.startValue.accept(this);
         a.endValue.accept(this);
-        ParserRuleContext s = a.block.accept(this);
+        a.block.accept(this);
 
         region = temp;
 
@@ -572,7 +572,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(DeclarationRecordType a) {
         List<String> fields = new ArrayList<>();
         for (Ast ast : a.champs) {
-            ParserRuleContext expr = ast.accept(this);
+            ast.accept(this);
             DeclarationChamp champ = (DeclarationChamp) ast;
             ID idf = (ID) champ.id;
             // ID type = (ID) champ.type;
@@ -590,7 +590,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(DeclarationChamp a) {
-        ParserRuleContext idf = a.id.accept(this);
+        a.id.accept(this);
         ParserRuleContext type = a.type.accept(this);
 
         // Check if identifier is a reserved word
@@ -636,7 +636,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         if (table2 == null)
             return a.ctx;
 
-        ParserRuleContext expr = a.expr.accept(this);
+        a.expr.accept(this);
         Type t = tipe.inferType(table2, a.expr);
         Type ft = table2.getSymbol(idf.nom).getType();
 
@@ -652,7 +652,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(DeclarationValeur a) {
         ParserRuleContext idfCtx = a.id.accept(this);
-        ParserRuleContext expr = a.expr.accept(this);
+        a.expr.accept(this);
         Type t = null;
         SymbolLookup table = this.table.getSymbolLookup(region);
         ID idf = (ID) a.id;
@@ -779,7 +779,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(ExpressionArray a) {
-        ParserRuleContext idfCtx = a.getId().accept(this);
+        a.getId().accept(this);
         ParserRuleContext sizeCtx = a.getSize().accept(this);
         ParserRuleContext exprCtx = a.getExpr().accept(this);
         SymbolLookup table = this.table.getSymbolLookup(region);

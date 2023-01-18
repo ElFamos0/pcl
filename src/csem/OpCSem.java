@@ -1,16 +1,12 @@
 package csem;
 
 import sl.SymbolLookup;
-import sl.TypeInferer;
 import sl.Type;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import ast.Int;
 import parser.exprParser.NegationContext;
-import parser.exprParser.PourContext;
-import parser.exprParser.SiAlorsContext;
-import parser.exprParser.SiAlorsSinonContext;
 import sl.Primitive;
 import sl.Array;
 
@@ -52,34 +48,37 @@ public class OpCSem {
     public static void checkint(ParserRuleContext ctx, Type left, Type right, SymbolLookup table,
             ErrorHandler errorHandler, String leftExpr, String rightExpr) {
 
-                if (left == null || !left.equals(new Primitive(Integer.class))) {
-                    if (!(leftExpr.contains("+") || leftExpr.contains("-") || leftExpr.contains("*") || leftExpr.contains("/"))) {
-                        if (leftExpr.contains("for:") || left==null) {
-                            errorHandler.error(ctx, "Cannot add null to an integer");
-                        } else {
-                            errorHandler.error(ctx, leftExpr + " is not an integer");
-                        }
-                    }
+        if (left == null || !left.equals(new Primitive(Integer.class))) {
+            if (!(leftExpr.contains("+") || leftExpr.contains("-") || leftExpr.contains("*")
+                    || leftExpr.contains("/"))) {
+                if (leftExpr.contains("for:") || left == null) {
+                    errorHandler.error(ctx, "Cannot add null to an integer");
+                } else {
+                    errorHandler.error(ctx, leftExpr + " is not an integer");
                 }
-        
-                if (right == null || !right.equals(new Primitive(Integer.class))) {
-                    if (!(rightExpr.contains("+") || rightExpr.contains("-") || rightExpr.contains("*") || rightExpr.contains("/"))) {
-                        if(rightExpr.contains("for:") || right==null) {
-                            errorHandler.error(ctx, "Cannot add null to an integer");
-                        } else {
-                            errorHandler.error(ctx, rightExpr + " is not an integer");
-                        }
-                    }
+            }
+        }
+
+        if (right == null || !right.equals(new Primitive(Integer.class))) {
+            if (!(rightExpr.contains("+") || rightExpr.contains("-") || rightExpr.contains("*")
+                    || rightExpr.contains("/"))) {
+                if (rightExpr.contains("for:") || right == null) {
+                    errorHandler.error(ctx, "Cannot add null to an integer");
+                } else {
+                    errorHandler.error(ctx, rightExpr + " is not an integer");
                 }
-        
+            }
+        }
+
     }
 
-    public static void checkIntOrString(ParserRuleContext leftCtx, ParserRuleContext rightCtx, Type left, Type right, SymbolLookup table,
+    public static void checkIntOrString(ParserRuleContext leftCtx, ParserRuleContext rightCtx, Type left, Type right,
+            SymbolLookup table,
             ErrorHandler errorHandler) {
         boolean isInt = false;
         if (left.equals(new Primitive(Integer.class))) {
             isInt = true;
-            //System.out.println("left is int");
+            // System.out.println("left is int");
         } else if (!left.equals(new Array(new Primitive(Character.class)))) {
             errorHandler.error(leftCtx, "Invalid type for comparaison");
         }
@@ -91,10 +90,10 @@ public class OpCSem {
         } else if (right.equals(new Array(new Primitive(Character.class)))) {
             if (isInt) {
                 errorHandler.error(rightCtx, "Cannot compare an integer and a string");
-            }} 
-        else {
-                errorHandler.error(rightCtx, "Invalid type for comparaison");
+            }
+        } else {
+            errorHandler.error(rightCtx, "Invalid type for comparaison");
         }
-        
+
     }
 }

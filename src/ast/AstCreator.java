@@ -14,10 +14,6 @@ package ast;
 
 import java.util.ArrayList;
 
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-
-import csem.CSemType;
 import csem.ErrorHandler;
 import csem.FuncCSem;
 import parser.exprBaseVisitor;
@@ -31,7 +27,6 @@ import parser.exprParser.DeclarationTypeContext;
 import parser.exprParser.DeclarationValeurContext;
 import parser.exprParser.DefinitionContext;
 import parser.exprParser.EntierContext;
-import parser.exprParser.ExpressionContext;
 import parser.exprParser.ExpressionIdentifiantContext;
 import parser.exprParser.ExpressionUnaireContext;
 import parser.exprParser.IdentifiantContext;

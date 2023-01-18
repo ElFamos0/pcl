@@ -31,26 +31,16 @@ import parser.exprParser.SiAlorsContext;
 import parser.exprParser.SiAlorsSinonContext;
 import parser.exprParser.TantQueContext;
 import sl.Array;
-import sl.Function;
 import sl.Primitive;
-import sl.Symbol;
 import sl.SymbolLookup;
 import sl.Type;
-import sl.TypeInferer;
-import sl.Variable;
 import sl.Record;
 
 public class AstType extends exprBaseVisitor<Type> {
     private SymbolLookup table;
-    private int region;
 
     public AstType(SymbolLookup table) {
         this.table = table;
-        if (table != null) {
-            region = table.getRegion();
-        } else {
-            region = 0;
-        }
     }
 
     public void setTable(SymbolLookup table) {
@@ -176,7 +166,6 @@ public class AstType extends exprBaseVisitor<Type> {
     public Type visitIdentifiant(IdentifiantContext ctx) {
         // System.out.println("Identifiant");
         SymbolLookup table = this.table;
-        region = table.getRegion();
         if (table.getSymbol(ctx.getText()) == null) {
             if (table.getType(ctx.getText()) == null) {
                 return new Primitive(Void.class);
@@ -226,7 +215,7 @@ public class AstType extends exprBaseVisitor<Type> {
     @Override
     public Type visitListeAcces(ListeAccesContext ctx) {
         // System.out.println("Liste acces");
-        
+
         return null;
     }
 

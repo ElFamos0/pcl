@@ -2,7 +2,6 @@ package csem;
 
 import sl.SymbolLookup;
 import sl.Type;
-import sl.TypeInferer;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
