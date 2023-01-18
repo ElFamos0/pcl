@@ -1,7 +1,14 @@
 let 
-    var x:= 3
-    function f(x:int) = nil
-    var y:= x:=f("yo)
+    type intArray = array of int
+    type recordType = {x:int,y : intArray}
+    type recordArray = array of recordType
+    function f(x:int) : string = 
+        let 
+            var x:= recordArray [10] of nil
+        in
+            x[5].y[2]
+        end
+    var y:= x:=f("yo")
 in
 
 end
