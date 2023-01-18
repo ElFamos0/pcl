@@ -428,12 +428,9 @@ public class AstCreator extends exprBaseVisitor<Ast> {
         SymbolLookup table = this.table.getSymbolLookup(region);
 
         Type t = typeInferer.inferType(table, ctx.getChild(2));
-        if (t == null || t.equals(new Primitive(Void.class))) {
-            errorHandler.error(ctx, "Type '" + ctx.getChild(2).getText() + "' not defined");
-        } else {
-            Type at = new Array(t);
-            table.addType(idf, at);
-        }
+
+        Type at = new Array(t);
+        table.addType(idf, at);
 
         dat.setId(ctx.getChild(2).accept(this));
         return dat;
@@ -490,7 +487,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                         int size;
                         if (expr.contains("[")) {
                             String temp = expr.substring(expr.indexOf("[") + 1, expr.indexOf("]"));
-                            
+
                             try {
                                 size = Integer.parseInt(temp);
                             } catch (NumberFormatException e) {
@@ -499,7 +496,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                         } else {
                             size = expr.length();
                         }
-    
+
                         ((Array) t).setSize(size);
                     }
                 }
@@ -520,7 +517,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                     int size;
                     if (expr.contains("[")) {
                         String temp = expr.substring(expr.indexOf("[") + 1, expr.indexOf("]"));
-                        
+
                         try {
                             size = Integer.parseInt(temp);
                         } catch (NumberFormatException e) {
@@ -588,7 +585,7 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                         errorHandler.error(ctx, "Type '" + split[1] + "' not defined");
                     } else {
                         params.add(new Variable(split[0], t));
-                        
+
                     }
                 }
                 drf.addArg(((DeclarationChamp) branch));
@@ -617,7 +614,9 @@ public class AstCreator extends exprBaseVisitor<Ast> {
 
         if (s != null) {
             errorHandler.error(ctx, "Symbol '" + idf + "' already defined as a " + s.toString() + " in this scope");
-            // Je sais pas pourquoi tu remove le symbol, mais j'ai enlever le remove du symbole pour éiter les erreurs pendant le parcourt de l'arbre ensuite blblblbl
+            // Je sais pas pourquoi tu remove le symbol, mais j'ai enlever le remove du
+            // symbole pour éiter les erreurs pendant le parcourt de l'arbre ensuite
+            // blblblbl
             // table.removeChildren(id);
         } else if (err != null) {
             errorHandler.error(ctx, err);
