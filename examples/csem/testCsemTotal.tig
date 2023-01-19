@@ -113,7 +113,9 @@ in
     va2:= 5;
 
     while for i:= 0 to 10 do (3) do (3);
-    while "test" do (3)
+    while "test" do (3);
+
+    a := c
 end
 
 /* 8 errors Array + 3 erros Break + 4 errors For + 14? (13 pour le moment) errors Func + 5 errors If */
