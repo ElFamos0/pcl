@@ -170,5 +170,14 @@ public class ASMWriter {
         String instr = "orr" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
     }
 
+    public void Bic(Register dst, Register val1, Register val2) {
+        String instr = "bic" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+    }
+
+    public void Bic(Register dst, Register val1, int val2) {
+        String instr = "bic" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
+    }
+
+    
 
 }
