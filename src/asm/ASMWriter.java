@@ -27,14 +27,14 @@ public class ASMWriter {
 
     // Add functions
     public void Add(Register dst, Register val1, Register val2) {
-        String instr = "ADD" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
+        String instr = "add" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
         // Write instruction to file
         write(instr);
     }
 
     public void Add(Register dst, Register val1, int val2) {
-        String instr = "ADD" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
+        String instr = "add" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
 
         // Write instruction to file
         write(instr);
@@ -42,14 +42,14 @@ public class ASMWriter {
 
     // Adc functions
     public void Adc(Register dst, Register val1, Register val2) {
-        String instr = "ADC" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
+        String instr = "adc" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
         // Write instruction to file
         write(instr);
     }
 
     public void Adc(Register dst, Register val1, int val2) {
-        String instr = "ADC" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
+        String instr = "adc" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
 
         // Write instruction to file
         write(instr);
@@ -57,14 +57,14 @@ public class ASMWriter {
 
     // Sub functions
     public void Sub(Register dst, Register val1, Register val2) {
-        String instr = "SUB" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
+        String instr = "sub" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
         // Write instruction to file
         write(instr);
     }
 
     public void Sub(Register dst, Register val1, int val2) {
-        String instr = "SUB" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
+        String instr = "sub" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
 
         // Write instruction to file
         write(instr);
@@ -72,14 +72,14 @@ public class ASMWriter {
 
     // Sbc functions
     public void Sbc(Register dst, Register val1, Register val2) {
-        String instr = "SBC" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
+        String instr = "sbc" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
         // Write instruction to file
         write(instr);
     }
 
     public void Sbc(Register dst, Register val1, int val2) {
-        String instr = "SBC" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
+        String instr = "sbc" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
 
         // Write instruction to file
         write(instr);
@@ -87,14 +87,14 @@ public class ASMWriter {
 
     // Rsb functions
     public void Rsb(Register dst, Register val1, Register val2) {
-        String instr = "RSB" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
+        String instr = "rsb" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
         // Write instruction to file
         write(instr);
     }
 
     public void Rsb(Register dst, Register val1, int val2) {
-        String instr = "RSB" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
+        String instr = "rsb" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
 
         // Write instruction to file
         write(instr);
@@ -102,14 +102,14 @@ public class ASMWriter {
 
     // Rsc functions
     public void Rsc(Register dst, Register val1, Register val2) {
-        String instr = "RSC" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
+        String instr = "rsc" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
         // Write instruction to file
         write(instr);
     }
 
     public void Rsc(Register dst, Register val1, int val2) {
-        String instr = "RSC" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
+        String instr = "rsc" + ", " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
 
         // Write instruction to file
         write(instr);
@@ -117,28 +117,28 @@ public class ASMWriter {
 
     // Move functions
     public void Mov(Register dst, Register val) {
-        String instr = "MOV" + ", " + dst.getName() + ", " + val.getName();
+        String instr = "mov" + ", " + dst.getName() + ", " + val.getName();
 
         // Write instruction to file
         write(instr);
     }
 
     public void Mov(Register dst, int val) {
-        String instr = "MOV" + ", " + dst.getName() + ", #" + val;
+        String instr = "mov" + ", " + dst.getName() + ", #" + val;
 
         // Write instruction to file
         write(instr);
     }
 
     public void Mvn(Register dst, int val) {
-        String instr = "MVN" + ", " + dst.getName() + ", #" + val;
+        String instr = "mvn" + ", " + dst.getName() + ", #" + val;
 
         // Write instruction to file
         write(instr);
     }
 
     public void Mvn(Register dst, Register val) {
-        String instr = "MVN" + ", " + dst.getName() + ", " + val.getName();
+        String instr = "mvn" + ", " + dst.getName() + ", " + val.getName();
 
         // Write instruction to file
         write(instr);
@@ -146,35 +146,35 @@ public class ASMWriter {
 
 
     public void And(Register dst, Register val1, Register val2) {
-        String instr = "AND" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+        String instr = "and" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
         // TODO: write instruction to file
     }
 
     public void And(Register dst, Register val1, int val2) {
-        String instr = "AND" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
+        String instr = "and" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
         // TODO: write instruction to file
     }
 
     public void Eor(Register dst, Register val1, Register val2) {
-        String instr = "ORR" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+        String instr = "orr" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
         // TODO: write instruction to file
     }
 
     public void Eor(Register dst, Register val1, int val2) {
-        String instr = "ORR" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
+        String instr = "orr" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
         // TODO: write instruction to file
     }
 
     // Lsl functions
     public void Lsl(Register dst, Register val1, Register val2) {
-        String instr = "LSL" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+        String instr = "lsl" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
 
         // Write instruction to file
         write(instr);
     }
 
     public void Lsl(Register dst, Register val1, int val2) {
-        String instr = "LSL" + ", " + dst.getName() + ", " + val1.getName() + ", #" + val2;
+        String instr = "lsl" + ", " + dst.getName() + ", " + val1.getName() + ", #" + val2;
 
         // Write instruction to file
         write(instr);
@@ -182,14 +182,14 @@ public class ASMWriter {
 
     // Lsr functions
     public void Lsr(Register dst, Register val1, Register val2) {
-        String instr = "LSR" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+        String instr = "lsr" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
 
         // Write instruction to file
         write(instr);
     }
 
     public void Lsr(Register dst, Register val1, int val2) {
-        String instr = "LSR" + ", " + dst.getName() + ", " + val1.getName() + ", #" + val2;
+        String instr = "lsr" + ", " + dst.getName() + ", " + val1.getName() + ", #" + val2;
 
         // Write instruction to file
         write(instr);
@@ -197,14 +197,14 @@ public class ASMWriter {
 
     // Asr functions
     public void Asr(Register dst, Register val1, Register val2) {
-        String instr = "ASR" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+        String instr = "asr" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
 
         // Write instruction to file
         write(instr);
     }
 
     public void Asr(Register dst, Register val1, int val2) {
-        String instr = "ASR" + ", " + dst.getName() + ", " + val1.getName() + ", #" + val2;
+        String instr = "asr" + ", " + dst.getName() + ", " + val1.getName() + ", #" + val2;
 
         // Write instruction to file
         write(instr);
@@ -212,32 +212,32 @@ public class ASMWriter {
 
     // Ror functions
     public void Ror(Register dst, Register val1, Register val2) {
-        String instr = "ROR" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+        String instr = "ror" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
 
         // Write instruction to file
         write(instr);
     }
 
     public void Ror(Register dst, Register val1, int val2) {
-        String instr = "ROR" + ", " + dst.getName() + ", " + val1.getName() + ", #" + val2;
+        String instr = "ror" + ", " + dst.getName() + ", " + val1.getName() + ", #" + val2;
 
         // Write instruction to file
         write(instr);
     }
     public void Orr(Register dst, Register val1, Register val2) {
-        String instr = "ORR" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+        String instr = "orr" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
     }
 
     public void Orr(Register dst, Register val1, int val2) {
-        String instr = "ORR" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
+        String instr = "orr" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
     }
 
     public void Bic(Register dst, Register val1, Register val2) {
-        String instr = "BIC" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+        String instr = "bic" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
     }
 
     public void Bic(Register dst, Register val1, int val2) {
-        String instr = "BIC" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
+        String instr = "bic" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
     }
 
     
