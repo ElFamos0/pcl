@@ -1,5 +1,8 @@
 package asm;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import ast.*;
 import sl.SymbolLookup;
@@ -10,11 +13,34 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     private int region;
     private int biggestRegion = 0;
 
+    private List<Register> registers = new ArrayList<Register>();
+    private Register BasePointer = new Register("r11", 0);
+    private Register StackPointer = new Register("r13", 0);
+    private Register LinkRegister = new Register("r14", 0);
+    private Register ProgramCounter = new Register("r15", 0);
+
     public ASMVisitor(SymbolLookup table) {
         this.table = table;
         // permet de récuperer le premier offset (on l'a déjà oublié donc on le note)
         region = table.getLibFunc();
         biggestRegion = region;
+    }
+
+    public void initRegisters() {
+        // Init ARMv7 registers
+        registers.add(new Register("r0", 0));
+        registers.add(new Register("r1", 0));
+        registers.add(new Register("r2", 0));
+        registers.add(new Register("r3", 0));
+        registers.add(new Register("r4", 0));
+        registers.add(new Register("r5", 0));
+        registers.add(new Register("r6", 0));
+        registers.add(new Register("r7", 0));
+        registers.add(new Register("r8", 0));
+        registers.add(new Register("r9", 0));
+        registers.add(new Register("r10", 0));
+        // registers.add(new Register("r11", 0)); BP
+        // registers.add(new Register("r12", 0)); UNUSED
     }
 
     public void StepOneRegion() {
