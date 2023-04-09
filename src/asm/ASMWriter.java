@@ -22,7 +22,7 @@ public class ASMWriter {
         }
     }
 
-    /// We can implement the {, SHIFT_op #expression} 
+    /// We can implement the {, SHIFT_op #expression}
     /// but it's not necessary for the moment.
 
     /// Add functions
