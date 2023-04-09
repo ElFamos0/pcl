@@ -152,13 +152,23 @@ public class ASMWriter {
         // TODO: write instruction to file
     }
 
-    public void And(Register dst, int val1, Register val2) {
-        String instr = "and" + " " + dst.getName() + ", #" + val1 + ", " + val2.getName();
+    public void Eor(Register dst, Register val1, Register val2) {
+        String instr = "orr" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
         // TODO: write instruction to file
     }
 
-    public void And(Register dst, int val1, int val2) {
-        String instr = "and" + " " + dst.getName() + ", #" + val1 + ", #" + val2;
+    public void Eor(Register dst, Register val1, int val2) {
+        String instr = "orr" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
         // TODO: write instruction to file
     }
+
+    public void Orr(Register dst, Register val1, Register val2) {
+        String instr = "orr" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+    }
+
+    public void Orr(Register dst, Register val1, int val2) {
+        String instr = "orr" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
+    }
+
+
 }
