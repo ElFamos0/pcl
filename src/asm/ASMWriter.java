@@ -22,10 +22,10 @@ public class ASMWriter {
         }
     }
 
-    /// We can implement the {, SHIFT_op #expression}
-    /// but it's not necessary for the moment.
+    // We can implement the {, SHIFT_op #expression}
+    // but it's not necessary for the moment.
 
-    /// Add functions
+    // Add functions
     public void Add(Register dst, Register val1, Register val2) {
         String instr = "add" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
@@ -40,7 +40,7 @@ public class ASMWriter {
         write(instr);
     }
 
-    /// Adc functions
+    // Adc functions
     public void Adc(Register dst, Register val1, Register val2) {
         String instr = "adc" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
@@ -55,7 +55,7 @@ public class ASMWriter {
         write(instr);
     }
 
-    /// Sub functions
+    // Sub functions
     public void Sub(Register dst, Register val1, Register val2) {
         String instr = "sub" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
@@ -85,7 +85,7 @@ public class ASMWriter {
         write(instr);
     }
 
-    /// Rsb functions
+    // Rsb functions
     public void Rsb(Register dst, Register val1, Register val2) {
         String instr = "rsb" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
@@ -100,7 +100,7 @@ public class ASMWriter {
         write(instr);
     }
 
-    /// Rsc functions
+    // Rsc functions
     public void Rsc(Register dst, Register val1, Register val2) {
         String instr = "rsc" + ", " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
@@ -115,7 +115,7 @@ public class ASMWriter {
         write(instr);
     }
 
-    /// Move functions
+    // Move functions
     public void Mov(Register dst, Register val) {
         String instr = "mov" + ", " + dst.getName() + ", " + val.getName();
 
@@ -165,7 +165,7 @@ public class ASMWriter {
         // TODO: write instruction to file
     }
 
-    /// Lsl functions
+    // Lsl functions
     public void Lsl(Register dst, Register val1, Register val2) {
         String instr = "lsl" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
 
@@ -180,7 +180,7 @@ public class ASMWriter {
         write(instr);
     }
 
-    /// Lsr functions
+    // Lsr functions
     public void Lsr(Register dst, Register val1, Register val2) {
         String instr = "lsr" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
 
@@ -195,7 +195,7 @@ public class ASMWriter {
         write(instr);
     }
 
-    /// Asr functions
+    // Asr functions
     public void Asr(Register dst, Register val1, Register val2) {
         String instr = "asr" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
 
@@ -210,7 +210,7 @@ public class ASMWriter {
         write(instr);
     }
 
-    /// Ror functions
+    // Ror functions
     public void Ror(Register dst, Register val1, Register val2) {
         String instr = "ror" + ", " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
 
