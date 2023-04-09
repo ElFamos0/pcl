@@ -68,14 +68,14 @@ public class ASMWriter {
         write(instr);
     }
 
-    public void Movn(Register dst, int val) {
+    public void Mvn(Register dst, int val) {
         String instr = "mvn" + " " + dst.getName() + ", #" + val;
 
         // Write instruction to file
         write(instr);
     }
 
-    public void Movn(Register dst, Register val) {
+    public void Mvn(Register dst, Register val) {
         String instr = "mvn" + " " + dst.getName() + ", " + val.getName();
 
         // Write instruction to file
