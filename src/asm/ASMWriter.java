@@ -259,4 +259,74 @@ public class ASMWriter {
         // Write instruction to file
         write(instr);
     }
+
+    // CMP functions
+    public void Cmp(Register val1, Register val2) {
+        String instr = "CMP" + " " + val1.getName() + ", " + val2.getName();
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    public void Cmp(Register val1, int val2) {
+        String instr = "CMP" + " " + val1.getName() + ", #" + val2;
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // CMN functions
+    public void Cmn(Register val1, Register val2) {
+        String instr = "CMN" + " " + val1.getName() + ", " + val2.getName();
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    public void Cmn(Register val1, int val2) {
+        String instr = "CMN" + " " + val1.getName() + ", #" + val2;
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // TST functions
+    public void Tst(Register val1, Register val2) {
+        String instr = "TST" + " " + val1.getName() + ", " + val2.getName();
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    public void Tst(Register val1, int val2) {
+        String instr = "TST" + " " + val1.getName() + ", #" + val2;
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // TEQ functions
+    public void Teq(Register val1, Register val2) {
+        String instr = "TEQ" + " " + val1.getName() + ", " + val2.getName();
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    public void Teq(Register val1, int val2) {
+        String instr = "TEQ" + " " + val1.getName() + ", #" + val2;
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // ADR functions
+    // ADR generates an address by adding an immediate value to the PC,
+    // and writes the result to the destination register.
+    public void Adr(Register dst, String label, Flags flag) {
+        String instr = "ADR" + flag.toString() + " " + dst.getName() + ", " + label;
+
+        // Write instruction to file
+        write(instr);
+    }
 }
