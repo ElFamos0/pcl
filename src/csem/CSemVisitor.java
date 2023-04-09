@@ -25,6 +25,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
 
     public CSemVisitor(SymbolLookup table, ErrorHandler errorHandler) {
         this.table = table;
+        // permet de récuperer le premier offset (on l'a déjà oublié donc on le note)
         region = table.getLibFunc();
         biggestRegion = region;
         this.errorHandler = errorHandler;
