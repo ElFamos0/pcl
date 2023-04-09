@@ -52,6 +52,70 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         region--;
     }
 
+    /// Add functions
+    private void Add(Register dst, Register val1, Register val2) {
+        String instr = "add" + " " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
+
+        // TODO: write instruction to file
+    }
+
+    private void Add(Register dst, Register val1, int val2) {
+        String instr = "add" + " " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
+
+        // TODO: write instruction to file
+    }
+
+    private void Add(Register dst, int val1, Register val2) {
+        String instr = "add" + " " + dst.getName() + ", #" + val1 + ", " + val2.getValue();
+
+        // TODO: write instruction to file
+    }
+
+    // Sub functions
+    private void Sub(Register dst, Register val1, Register val2) {
+        String instr = "sub" + " " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
+
+        // TODO: write instruction to file
+    }
+
+    private void Sub(Register dst, Register val1, int val2) {
+        String instr = "sub" + " " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
+
+        // TODO: write instruction to file
+    }
+
+    private void Sub(Register dst, int val1, Register val2) {
+        String instr = "sub" + " " + dst.getName() + ", #" + val1 + ", " + val2.getValue();
+
+        // TODO: write instruction to file
+    }
+
+
+    /// Move functions
+    private void Mov(Register dst, Register val) {
+        String instr = "mov" + " " + dst.getName() + ", " + val.getName();
+
+        // TODO: write instruction to file
+    }
+
+    private void Mov(Register dst, int val) {
+        String instr = "mov" + " " + dst.getName() + ", #" + val;
+
+        // TODO: write instruction to file
+    }
+
+    private void Movn(Register dst, int val) {
+        String instr = "movn" + " " + dst.getName() + ", #" + val;
+
+        // TODO: write instruction to file
+    }
+
+    private void Movn(Register dst, Register val) {
+        String instr = "movn" + " " + dst.getName() + ", " + val.getName();
+
+        // TODO: write instruction to file
+    }
+
     @Override
     public ParserRuleContext visit(Program a) {
         // TODO Auto-generated method stub
