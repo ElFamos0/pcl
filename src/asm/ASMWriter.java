@@ -37,21 +37,7 @@ public class ASMWriter {
         write(instr);
     }
 
-    public void Add(Register dst, int val1, Register val2) {
-        String instr = "add" + " " + dst.getName() + ", #" + val1 + ", " + val2.getValue();
-
-        // Write instruction to file
-        write(instr);
-    }
-
-    public void Add(Register dst, int val1, int val2) {
-        String instr = "add" + " " + dst.getName() + ", #" + val1 + ", #" + val2;
-
-        // Write instruction to file
-        write(instr);
-    }
-
-    // Sub functions
+    /// Sub functions
     public void Sub(Register dst, Register val1, Register val2) {
         String instr = "sub" + " " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
 
@@ -61,20 +47,6 @@ public class ASMWriter {
 
     public void Sub(Register dst, Register val1, int val2) {
         String instr = "sub" + " " + dst.getName() + ", " + val1.getValue() + ", #" + val2;
-
-        // Write instruction to file
-        write(instr);
-    }
-
-    public void Sub(Register dst, int val1, Register val2) {
-        String instr = "sub" + " " + dst.getName() + ", #" + val1 + ", " + val2.getValue();
-
-        // Write instruction to file
-        write(instr);
-    }
-
-    public void Sub(Register dst, int val1, int val2) {
-        String instr = "sub" + " " + dst.getName() + ", #" + val1 + ", #" + val2;
 
         // Write instruction to file
         write(instr);
