@@ -320,11 +320,36 @@ public class ASMWriter {
         write(instr);
     }
 
-    // ADR functions
+    // ADR function
     // ADR generates an address by adding an immediate value to the PC,
     // and writes the result to the destination register.
-    public void Adr(Register dst, String label, Flags flag) {
-        String instr = "ADR" + flag.toString() + " " + dst.getName() + ", " + label;
+    public void Adr(Register dst, String label) {
+        String instr = "ADR" + " " + dst.getName() + ", " + label;
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // LDR function
+    // LDR loads a word from memory into a register.
+    public void Ldr(Register dst, Register addr) {
+        String instr = "LDR" + " " + dst.getName() + ", [" + addr.getName() + "]";
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    public void Ldr(Register dst, String offset) {
+        String instr = "LDR" + " " + dst.getName() + ", =" + offset;
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // STR function
+    // STR stores a word from a register into memory.
+    public void Str(Register dst, Register addr) {
+        String instr = "STR" + " " + dst.getName() + ", [" + addr.getName() + "]";
 
         // Write instruction to file
         write(instr);
