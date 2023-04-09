@@ -81,4 +81,25 @@ public class ASMWriter {
         // Write instruction to file
         write(instr);
     }
+
+
+    public void And(Register dst, Register val1, Register val2) {
+        String instr = "and" + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+        // TODO: write instruction to file
+    }
+
+    public void And(Register dst, Register val1, int val2) {
+        String instr = "and" + " " + dst.getName() + ", " + val1.getName() + ", #" + val2;
+        // TODO: write instruction to file
+    }
+
+    public void And(Register dst, int val1, Register val2) {
+        String instr = "and" + " " + dst.getName() + ", #" + val1 + ", " + val2.getName();
+        // TODO: write instruction to file
+    }
+
+    public void And(Register dst, int val1, int val2) {
+        String instr = "and" + " " + dst.getName() + ", #" + val1 + ", #" + val2;
+        // TODO: write instruction to file
+    }
 }
