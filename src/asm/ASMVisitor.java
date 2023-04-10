@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import ast.*;
+import parser.exprParser.*;
+import sl.Array;
 import sl.Primitive;
 import sl.SymbolLookup;
 import sl.Type;
@@ -24,6 +26,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     private Register StackPointer = new Register("r13", 0);
     private Register LinkRegister = new Register("r14", 0);
     private Register ProgramCounter = new Register("r15", 0);
+
+    private List<Constant> constants = new ArrayList<Constant>();
 
     public ASMVisitor(SymbolLookup table, ASMWriter writer) {
         this.table = table;
@@ -70,6 +74,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.write(".data\n");
         writer.write("format_str: .ascii      \"%s\\n\\0\"\n");
         writer.write("format_int: .ascii      \"%d\\n\\0\"\n");
+
+        for (Constant c : constants) {
+            writer.write(c.toASM()+"\n");
+        }
 
         return null;
     }
@@ -347,8 +355,20 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             // Get the argument
             a.args.accept(this);
 
+            SymbolLookup table = this.table.getSymbolLookup(this.region);
+
+            ArgFonction argF = (ArgFonction) a.args;
+            ArrayList<Ast> args = argF.args;
+
+            Type t = type.inferType(table, args.get(0));
+
+            String def = "format_int";
+            if (t.equals(new Array(new Primitive(Character.class)))) {
+                def = "format_str";
+            }
+
             Register r0 = new Register("r0", 0);
-            writer.Ldr(r0, "format_int");
+            writer.Ldr(r0, def);
 
             Register r1 = new Register("r1", 0);
             Register[] load_registers = { r1 };
@@ -482,8 +502,15 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(ChaineChr a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        Constant c = new Constant(a.getValeur());
+        constants.add(c);
+
+        Register r0 = new Register("r0", 0);
+        Register[] store_registers = { r0 };
+        writer.Ldr(r0, c.getId());
+        writer.Stmfd(StackPointer, store_registers);
+        
+        return a.ctx;
     }
 
     @Override

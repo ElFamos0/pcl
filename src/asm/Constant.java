@@ -1,43 +1,44 @@
 package asm;
 
 public class Constant {
+    private static Integer sid = 0;
     private String id;
     private Object value;
     private int type;
 
-    public Constant(Integer value, String id) {
+    public Constant(Integer value) {
         this.value = value;
         this.type = 0;
-        this.id = id;
+
+        this.sid += 1;
+        this.id = sid.toString();
     }
 
-    public Constant(String value, String id) {
+    public Constant(String value) {
         this.value = value;
         this.type = 1;
-        this.id = id;
+        
+        this.sid += 1;
+        this.id = sid.toString();
     }
 
     public String toString() {
-        if (type == 0) {
-            return value.toString();
-        } else {
-            return "\"" + value.toString() + "\"";
-        }
+        return value.toString();
     }
 
     public String toASM() {
         switch (type) {
             case 0:
-                return id+":\t.word " + value.toString();
+                return "string_"+id+":\t.word " + value.toString();
             case 1:
-                return id+":\t.ascii \"" + value.toString() + "\\0\"";
+                return "string_"+id+":\t.ascii \"" + value.toString() + "\\0\"";
             default:
                 return "";
         }
     }
 
     public String getId() {
-        return id;
+        return "string_"+id;
     }
 
     public void setId(String id) {

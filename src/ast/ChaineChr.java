@@ -18,4 +18,9 @@ public class ChaineChr implements Ast {
         // add ` to the string 
         this.valeur = "`" + this.valeur + "`";
 	}
+
+	public String getValeur() {
+		// Remove first & last char
+		return valeur.substring(1, valeur.length() - 1);
+	}
 }
