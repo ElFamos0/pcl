@@ -61,9 +61,15 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Program a) {
+        writer.write(".text\n");
+        writer.write(".globl main\n");
         writer.Label("main");
 
         a.expression.accept(this);
+
+        writer.write(".data\n");
+        writer.write("format_str: .ascii      \"%s\\n\\0\"\n");
+        writer.write("format_int: .ascii      \"%d\\n\\0\"\n");
 
         return null;
     }
@@ -334,14 +340,33 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(AppelFonction a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        ID id = (ID) a.id;
+
+        // Only implement "print" for integers
+        if (id.nom.equals("print")) {
+            // Get the argument
+            a.args.accept(this);
+
+            Register r0 = new Register("r0", 0);
+            writer.Ldr(r0, "format_int");
+
+            Register r1 = new Register("r1", 0);
+            Register[] load_registers = { r1 };
+            writer.Ldmfd(StackPointer, load_registers);
+
+            writer.Bl("printf");
+        } else {
+            throw new UnsupportedOperationException("Unimplemented function '" + a.id + "'");
+        }
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(ArgFonction a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        for (Ast e : a.args) {
+            e.accept(this);
+        }
+        return a.ctx;
     }
 
     @Override

@@ -395,7 +395,7 @@ public class ASMWriter {
     // LDMFD function
     // LDMFD loads multiple registers from memory.
     public void Ldmfd(Register src, Register[] regs) {
-        String instr = "LDMFD" + " " + src.getName() + ", {";
+        String instr = "LDMFD" + " " + src.getName() + "!, {";
 
         for (int i = 0; i < regs.length; i++) {
             instr += regs[i].getName();
@@ -415,7 +415,7 @@ public class ASMWriter {
     // STMFD function
     // STMFD stores multiple registers into memory.
     public void Stmfd(Register dst, Register[] regs) {
-        String instr = "STMFD" + " " + dst.getName() + ", {";
+        String instr = "STMFD" + " " + dst.getName() + "!, {";
 
         for (int i = 0; i < regs.length; i++) {
             instr += regs[i].getName();
@@ -478,9 +478,11 @@ public class ASMWriter {
     }
 
     public void Printf(String formatAddr, String ValueAddr) {
-        String instr = """ldr r0, =format;
+        String instr = """
+                ldr r0, =format;
                 ldr r1, =value
-                bl printf\n""";
+                bl printf
+                """;
 
         instr = instr.replace("format", formatAddr);
         instr = instr.replace("value", ValueAddr);
