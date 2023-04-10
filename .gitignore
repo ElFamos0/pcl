@@ -4,6 +4,7 @@ bin
 images
 out
 src/parser
+test.asm
 
 .DS_Store
 .vscode/*
