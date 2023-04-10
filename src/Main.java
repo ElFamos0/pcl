@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 
+import asm.ASMWriter;
 import parser.*;
 import parser.exprParser.ProgramContext;
 import sl.*;
@@ -64,6 +65,9 @@ public class Main {
             System.out.println("Compilation successful");
 
             graphViz.dumpGraph("./out/tree.dot");
+
+            ASMWriter writer = new ASMWriter("test.asm");
+            writer.Itoa();
 
         } catch (IOException e) {
             e.printStackTrace();

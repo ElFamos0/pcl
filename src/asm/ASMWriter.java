@@ -354,4 +354,109 @@ public class ASMWriter {
         // Write instruction to file
         write(instr);
     }
+
+    // Don't know the use of LDM and STM
+    // so I didn't implement them.
+
+    // B function
+    // B branches to a label.
+    public void B(String label) {
+        String instr = "B" + " " + label;
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // BL function
+    // BL branches to a label and stores the return address in LR.
+    public void Bl(String label) {
+        String instr = "BL" + " " + label;
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // EQU function
+    // EQU defines a label.
+    public void Equ(String label, String value) {
+        String instr = label + " " + "EQU" + " " + value;
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // FILL function
+    // FILL fills a memory location with a value.
+    public void Fill(String addr, String value) {
+        String instr = addr + " " + "FILL" + " " + value;
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // End function
+    // End writes the end of the program.
+    public void End() {
+        String instr = "END";
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // Itoa function
+    // Itoa converts an integer to a string.
+    public void Itoa() {
+        String fn = """
+            its         STMFA SP!, {R0-R10}
+                        MOV R9, R2
+                        MOV R3, R1
+                        MOV R4, #10
+                        MOV R8, #0
+                        MOV R5, #0
+                        MOV R6, #0
+                        MOV R7, #0
+                        CMP R3, #0
+                        MOV R10, #0
+                        RSBLT R3, R3, #0
+                        MOVLT R5, #0x2D
+                        ADDLT R8, R8, #8
+                        ADDLT R10, R10, #1
+                """;
+
+        String fn_init = """
+            _its_init   CMP R3, R4
+                        BLT _its_loop
+                        MOV R1, R4
+                        MOV R2, #10
+                        STR PC, [SP], #4
+                        B mul
+                        MOV R4, R0
+                        B _its_init
+                """;
+
+        String fn_loop = """
+            _its_loop   MOV R1, R4
+                        MOV R2, #10
+                        STR PC, [SP], #4
+                        B div
+                        MOV R4, R0
+                        CMP R4, #0
+                        BEQ _its_exit
+                        MOV R2, R0
+                        MOV R1, R3
+                        STR PC, [SP], #4
+                        B div
+                        MOV R1, R0
+                        ADD R0, R0, #0x30
+                        LSL R0, R0, R8
+                        ADD R5, R5, R0
+                        MOV R2, R4
+                        STR PC, [SP], #4
+                        B mul
+                        SUB R3, R3, R0
+                        ADD R8, R8, #8
+                """;
+
+        write(fn + "\n" + fn_init + "\n" + fn_loop + "\n");
+    }
 }
