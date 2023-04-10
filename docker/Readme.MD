@@ -5,4 +5,7 @@ Il faut : `docker`, `docker-buildx`, `qemu-user-static`, `qemu-user-binfmt`
 `sudo docker buildx inspect --bootstrap`
 Pour check : `docker buildx ls`
 `sudo docker buildx build -t arm --output type=docker --platform linux/arm/v7 .`
+
 `sudo docker run --platform linux/arm/v7 --rm -it arm /bin/sh`
+OU 
+`sudo docker run --platform linux/arm/v7 --rm -it arm /prgm`
