@@ -16,16 +16,23 @@ public class ASMWriter {
     public void write(String s) {
         // Writes a string to the file
         try {
-            writer.write(s + "\n");
+            writer.write(s);
             writer.flush();
         } catch (IOException e) {
-            System.out.println("Error while writing to file");
             e.printStackTrace();
         }
     }
 
     // We can implement the {, SHIFT_op #expression}
     // but it's not necessary for the moment.
+
+    // Label functions
+    public void Label(String label) {
+        String instr = label + ":\n";
+
+        // Write instruction to file
+        write(instr);
+    }
 
     // Add functions
     public void Add(Register dst, Register val1, Register val2, Flags flag) {
