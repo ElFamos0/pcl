@@ -309,7 +309,17 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         Register r0 = new Register("r0", 0);
         Register r1 = new Register("r1", 0);
 
-        writer.Sub(r0, r0, r1,null);
+        Register[] load_register = { r0, r1 };
+        Register[] store_registers = { r0 };
+
+
+        writer.Ldmfd(StackPointer, load_register);
+
+        // ADD R0 and R1
+        writer.Sub(r0, r0, r1, Flags.NI);
+
+        // Store R0 in the stack
+        writer.Stmfd(StackPointer, store_registers);
 
         return a.ctx;
     }
