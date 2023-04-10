@@ -79,8 +79,12 @@ public class Main {
             timerThread.interrupt();
             System.out.println("\r\033[0;32m COMPILATION SUCCESSFUL \033[0m");
         } catch (IOException e) {
+            timerThread.interrupt();
+            System.out.println("\r\033[0;31m COMPILATION FAILED \033[0m");
             e.printStackTrace();
         } catch (RecognitionException e) {
+            timerThread.interrupt();
+            System.out.println("\r\033[0;31m COMPILATION FAILED \033[0m");
             e.printStackTrace();
         }
     }
