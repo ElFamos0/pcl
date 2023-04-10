@@ -71,12 +71,17 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         a.expression.accept(this);
 
+        writer.SkipLine();
+        writer.Comment("syscall exit(int status = 0)", 1);
+        writer.Exit(0);
+        writer.SkipLine();
+
         writer.write(".data\n");
-        writer.write("format_str: .ascii      \"%s\\n\\0\"\n");
-        writer.write("format_int: .ascii      \"%d\\n\\0\"\n");
+        writer.write("\tformat_str: .ascii      \"%s\\n\\0\"\n");
+        writer.write("\tformat_int: .ascii      \"%d\\n\\0\"\n");
 
         for (Constant c : constants) {
-            writer.write(c.toASM()+"\n");
+            writer.write("\t" + c.toASM() + "\n");
         }
 
         return null;
