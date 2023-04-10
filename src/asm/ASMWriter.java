@@ -479,7 +479,7 @@ public class ASMWriter {
 
     public void Exit(Integer status) {
         String instr = "mov %r0, $" + status.toString() + "\n";
-        instr = "mov %r7, $1\n"
+        instr = "mov %r7, $1\n";
         instr = "swi $0\n";
 
         // Write instruction to file
