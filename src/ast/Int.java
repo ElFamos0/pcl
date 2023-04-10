@@ -14,4 +14,12 @@ public class Int implements Ast {
 		this.ctx = ctx;
 		this.valeur = valeur;
 	}
+
+	public String toString() {
+		return "Int [valeur=" + valeur + ", ctx=" + ctx + ", alreadySeen=" + alreadySeen + "]";
+	}
+
+	public int toInt() {
+		return Integer.parseInt(valeur);
+	}
 }

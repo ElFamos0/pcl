@@ -25,11 +25,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     private Register LinkRegister = new Register("r14", 0);
     private Register ProgramCounter = new Register("r15", 0);
 
-    public ASMVisitor(SymbolLookup table) {
+    public ASMVisitor(SymbolLookup table, ASMWriter writer) {
         this.table = table;
         // permet de récuperer le premier offset (on l'a déjà oublié donc on le note)
         region = table.getLibFunc();
         biggestRegion = region;
+        this.writer = writer;
     }
 
     public void initRegisters() {
@@ -92,7 +93,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Ldmfd(StackPointer, load_register);
 
         // ORR R0 and R1
-        writer.Orr(r0, r0, r1, null);
+        writer.Orr(r0, r0, r1, Flags.NI);
 
         // Store R0 in the stack
         Register[] store_registers = { r0 };
@@ -118,7 +119,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Ldmfd(StackPointer, load_register);
 
         // AND R0 and R1
-        writer.And(r0, r0, r1, null);
+        writer.And(r0, r0, r1, Flags.NI);
 
         // Store R0 in the stack
         Register[] store_registers = { r0 };
@@ -317,8 +318,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Int a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        Register r0 = new Register("r0", 0);
+        Register[] store_registers = { r0 };
+        writer.Mov(r0, a.toInt(), Flags.NI);
+        writer.Stmfd(StackPointer, store_registers);
+
+        return a.ctx;
     }
 
     @Override

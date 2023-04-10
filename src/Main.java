@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 
+import asm.ASMVisitor;
 import asm.ASMWriter;
 import parser.*;
 import parser.exprParser.ProgramContext;
@@ -68,8 +69,11 @@ public class Main {
 
             System.out.println("ASM");
             ASMWriter writer = new ASMWriter("test.asm");
-            writer.Itoa();
-            writer.End();
+
+            ASMVisitor asmv = new ASMVisitor(table, writer);
+            ast.accept(asmv);
+            // writer.Itoa();
+            // writer.End();
 
         } catch (IOException e) {
             e.printStackTrace();
