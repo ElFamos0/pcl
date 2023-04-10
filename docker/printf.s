@@ -4,7 +4,6 @@
 msg:    .ascii          "Hello World!\0"
 format_str: .ascii      "Je print un string : %s\n\0"
 format_int: .ascii      "Je print un int : %d\n\0"
-len = . - msg
 
 .text
 

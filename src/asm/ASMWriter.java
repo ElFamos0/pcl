@@ -447,6 +447,34 @@ public class ASMWriter {
         write(instr);
     }
 
+    public void Printf(String formatAddr, String ValueAddr) {
+        String instr = """
+                ldr r0, =format;
+                ldr r1, =value
+                bl printf
+                """;
+
+        instr = instr.replace("format", formatAddr);
+        instr = instr.replace("value", ValueAddr);
+        
+        // Write instruction to file
+        write(instr);
+    }
+
+    public void Printf(String formatAddr, int Value) {
+        String instr = """
+                ldr r0, =format
+                mov r1, #value
+                bl printf
+                """;
+
+        instr = instr.replace("format", formatAddr);
+        instr = instr.replace("value", Integer.toString(Value));
+        
+        // Write instruction to file
+        write(instr);
+    }
+
     // Mul function
     // Mul multiplies two numbers inside R1 and R2 register.
     // The result is stored in R0 register.
