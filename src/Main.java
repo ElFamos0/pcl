@@ -66,9 +66,6 @@ public class Main {
 
             graphViz.dumpGraph("./out/tree.dot");
 
-            ASMWriter writer = new ASMWriter("test.asm");
-            writer.Itoa();
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (RecognitionException e) {
