@@ -73,7 +73,7 @@ public class ASMWriter {
 
     // Sub functions
     public void Sub(Register dst, Register val1, Register val2, Flags flag) {
-        String instr = "SUB"+flag.toString() + " " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue() + "\n";
+        String instr = "SUB"+flag.toString() + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName() + "\n";
 
         // Write instruction to file
         write(instr);

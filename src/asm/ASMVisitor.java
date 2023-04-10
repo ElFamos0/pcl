@@ -375,13 +375,16 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(Negation a) {
         a.expression.accept(this);
         Register r0 = new Register("r0", 0);
+        Register r1 = new Register("r1", 0);
         Register[] load_register = { r0 };
         Register[] store_registers = { r0 };
 
         // Load the last value in the stack in R0.
         writer.Ldmfd(StackPointer, load_register);
+        // Mov 0 in R1
+        writer.Mov(r1, 0, Flags.NI);
         // Negate R0 using the MVN instruction
-        writer.Mvn(r0, r0, Flags.NI);
+        writer.Sub(r0, r1, r0, Flags.NI);
         // Store R0 in the stack
         writer.Stmfd(StackPointer, store_registers);
 
