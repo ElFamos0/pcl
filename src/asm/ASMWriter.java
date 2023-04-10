@@ -188,17 +188,7 @@ public class ASMWriter {
     }
 
     public void Eor(Register dst, Register val1, Register val2, Flags flag) {
-        String instr = "ORR"
-            + flag.toString()
-            + " "
-            +
-            dst.getName()
-            + ", "
-            + val1.getName()
-            + ", "
-            + val2.getName()
-            + "\n";
-
+        String instr = "ORR"+ flag.toString()+ " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName() + "\n";
         // Write instruction to file
         write(instr);
     }
