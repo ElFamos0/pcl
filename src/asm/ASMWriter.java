@@ -16,7 +16,7 @@ public class ASMWriter {
     public void write(String s) {
         // Writes a string to the file
         try {
-            writer.write(s);
+            writer.write(s + "\n");
             writer.flush();
         } catch (IOException e) {
             System.out.println("Error while writing to file");
@@ -357,8 +357,43 @@ public class ASMWriter {
         write(instr);
     }
 
-    // Don't know the use of LDM and STM
-    // so I didn't implement them.
+    // LDMFD function
+    // LDMFD loads multiple registers from memory.
+    public void Ldmfd(Register src, Register[] regs) {
+        String instr = "LDMFD" + " " + src.getName() + ", {";
+
+        for (int i = 0; i < regs.length; i++) {
+            instr += regs[i].getName();
+
+            if (i != regs.length - 1) {
+                instr += ", ";
+            }
+        }
+
+        instr += "}";
+
+        // Write instruction to file
+        write(instr);
+    }
+
+    // STMFD function
+    // STMFD stores multiple registers into memory.
+    public void Stmfd(Register dst, Register[] regs) {
+        String instr = "STMFD" + " " + dst.getName() + ", {";
+
+        for (int i = 0; i < regs.length; i++) {
+            instr += regs[i].getName();
+
+            if (i != regs.length - 1) {
+                instr += ", ";
+            }
+        }
+
+        instr += "}";
+
+        // Write instruction to file
+        write(instr);
+    }
 
     // B function
     // B branches to a label.
@@ -405,11 +440,86 @@ public class ASMWriter {
         write(instr);
     }
 
+    // Mul function
+    // Mul multiplies two numbers inside R1 and R2 register.
+    // The result is stored in R0 register.
+    public void Mul() {
+        String fn = """
+            mul         STMFD SP!, {R1,R2}
+                        MOV R0, #0
+                """;
+
+        String fn_loop = """
+            _mul_loop   LSRS R2, R2, #1
+                        ADDCS R0, R0, R1
+                        LSL R1, R1, #1
+                        TST R2, R2
+                        BNE _mul_loop
+                        LDMFD SP!, {R1,R2}
+                        LDR PC, [R13, #-4]!
+                """;
+        
+        // Write function to file
+        write(fn + "\n" + fn_loop + "\n");
+    }
+
+    // Div function
+    // Div divides two numbers inside R1 and R2 register.
+    // The result is stored in R0 register.
+    public void Div() {
+        String fn = """
+            div         STMFD SP!, {R2-R5}
+                        MOV R0, #0
+                        MOV R3, #0
+                        CMP R1, #0
+                        RSBLT R1, R1, #0
+                        EORLT R3, R3, #1
+                        CMP R2, #0
+                        RSBLT R2, R2, #0
+                        EORLT R3, R3, #1
+                        MOV R4, R2
+                        MOV R5, #1
+                """;
+        
+        String fn_max = """
+            _div_max    LSL R4, R4, #1
+                        LSL R5, R5, #1
+                        CMP R4, R1
+                        BLE _div_max
+                """;
+        
+        String fn_loop = """
+            _div_loop   LSR R4, R4, #1
+                        LSR R5, R5, #1
+                        CMP R4,R1
+                        BGT _div_loop
+                        ADD R0, R0, R5
+                        SUB R1, R1, R4
+                        CMP R1, R2
+                        BGE _div_loop
+                        CMP R3, #1
+                        BNE _div_exit
+                        CMP R1, #0
+                        ADDNE R0, R0, #1
+                        RSB R0, R0, #0
+                        RSB R1, R1, #0
+                        ADDNE R1, R1, R2
+                """;
+        
+        String fn_exit = """
+            _div_exit   LDMFD SP!, {R2-R5}
+                        LDR PC, [R13, #-4]!
+                """;
+
+        write(fn + "\n" + fn_max + "\n" + fn_loop + "\n" + fn_exit + "\n");
+    }
+
     // Itoa function
-    // Itoa converts an integer to a string.
+    // Itoa converts an integer to a string inside R1 register.
+    // The result is stored in the address pointed by the R2 register.
     public void Itoa() {
         String fn = """
-            its         STMFA SP!, {R0-R10}
+            its         STMFD SP!, {R0-R10}
                         MOV R9, R2
                         MOV R3, R1
                         MOV R4, #10
@@ -458,7 +568,78 @@ public class ASMWriter {
                         SUB R3, R3, R0
                         ADD R8, R8, #8
                 """;
+        
+        String fn_2 = """
+            _its2       MOV R1, R4
+                        MOV R2, #10
+                        STR PC, [SP], #4
+                        B div
+                        MOV R4, R0
+                        CMP R4, #0
+                        BEQ _its_exit
+                        MOV R2, R0
+                        MOV R1, R3
+                        STR PC, [SP], #4
+                        B div
+                        MOV R1, R0
+                        ADD R0, R0, #0x30
+                        LSL R0, R0, R8
+                        ADD R6, R6, R0
+                        MOV R2, R4
+                        STR PC, [SP], #4
+                        B mul
+                        SUB R3, R3, R0
+                        ADD R8, R8, #8
+                        ADD R10, R10, #1
+                        CMP R8, #32
+                        MOVEQ R8, #0
+                        BEQ _its3
+                        B _its2
+                """;
+        
+        String fn_3 = """
+            _its3       MOV R1, R4
+                        MOV R2, #10
+                        STR PC, [SP], #4
+                        B div
+                        MOV R4, R0
+                        CMP R4, #0
+                        BEQ _its_exit
+                        MOV R2, R0
+                        MOV R1, R3
+                        STR PC, [SP], #4
+                        B div
+                        MOV R1, R0
+                        ADD R0, R0, #0x30
+                        LSL R0, R0, R8
+                        ADD R7, R7, R0
+                        ADD R10, R10, #1
+                        MOV R2, R4
+                        STR PC, [SP], #4
+                        B mul
+                        SUB R3, R3, R0
+                        ADD R8, R8,
+                """;
+        
+        String fn_exit = """
+            _its_exit   STMIA R9, {R5-R7}
+                        LDMFD SP!, {R0-R10}
+                        LDR PC, [SP, #-4]!
+                """;
+        
+        String instr = fn
+            .concat("\n")
+            .concat(fn_init)
+            .concat("\n")
+            .concat(fn_loop)
+            .concat("\n")
+            .concat(fn_2)
+            .concat("\n")
+            .concat(fn_3)
+            .concat("\n")
+            .concat(fn_exit)
+            .concat("\n");
 
-        write(fn + "\n" + fn_init + "\n" + fn_loop + "\n");
+        write(instr);
     }
 }
