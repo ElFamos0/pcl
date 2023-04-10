@@ -152,31 +152,64 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(IfThenElse a) {
-        // TODO Auto-generated method stub
+        int temp = region;
+
+        StepOneRegion();
+        // Do the then block
+
+        StepOneRegion();
+        // Do the else block
+
+        // Get back to the original region
+        this.region = temp;
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(IfThen a) {
-        // TODO Auto-generated method stub
+        int temp = region;
+
+        StepOneRegion();
+        // Do the then block
+
+        // Get back to the original region
+        this.region = temp;
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(While a) {
-        // TODO Auto-generated method stub
+        int temp = region;
+
+        StepOneRegion();
+        // Do the while block
+
+        // Get back to the original region
+        this.region = temp;
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(For a) {
-        // TODO Auto-generated method stub
+        int temp = region;
+
+        StepOneRegion();
+        // Do the for block
+
+        // Get back to the original region
+        this.region = temp;
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(Definition a) {
-        // TODO Auto-generated method stub
+        int temp = region;
+
+        StepOneRegion();
+        // Do the definition block
+
+        // Get back to the original region
+        this.region = temp;
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
@@ -212,7 +245,13 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(DeclarationFonction a) {
-        // TODO Auto-generated method stub
+        int temp = region;
+
+        StepOneRegion();
+        // Do the function block
+
+        // Get back to the original region
+        this.region = temp;
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
