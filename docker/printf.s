@@ -12,26 +12,19 @@ len = . - msg
 .globl main
 main:
     /* libc call printf(format, 42) */
-    stmfd   sp!, {r11, lr}
     ldr     %r0, =format_int
     mov     %r1, #42
     BL      printf
-    ldmfd   sp!, {r11, lr}
 
     /* libc call printf(format, 48) */
-    stmfd   sp!, {r11, lr}
     ldr     %r0, =format_int
     mov     %r1, #48
     BL      printf
-    ldmfd   sp!, {r11, lr}
 
     /* libc call printf(format, &hello) */
-    stmfd   sp!, {r11, lr}
     ldr     %r0, =format_str
     ldr     %r1, =msg
     BL      printf
-    ldmfd   sp!, {r11, lr}
-
 
     /* syscall exit(int status) */
     mov     %r0, $0     /* status := 0 */
