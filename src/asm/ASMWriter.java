@@ -477,30 +477,11 @@ public class ASMWriter {
         write(instr);
     }
 
-    public void Printf(String formatAddr, String ValueAddr) {
-        String instr = """
-                ldr r0, =format;
-                ldr r1, =value
-                bl printf
-                """;
+    public void Exit(Integer status) {
+        String instr = "mov %r0, $" + status.toString() + "\n";
+        instr = "mov %r7, $1\n"
+        instr = "swi $0\n";
 
-        instr = instr.replace("format", formatAddr);
-        instr = instr.replace("value", ValueAddr);
-        
-        // Write instruction to file
-        write(instr);
-    }
-
-    public void Printf(String formatAddr, int Value) {
-        String instr = """
-                ldr r0, =format
-                mov r1, #value
-                bl printf
-                """;
-
-        instr = instr.replace("format", formatAddr);
-        instr = instr.replace("value", Integer.toString(Value));
-        
         // Write instruction to file
         write(instr);
     }
