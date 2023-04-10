@@ -113,8 +113,7 @@ public class CSemType implements AstVisitor<Type> {
         Type t1 = a.left.accept(this);
         Type t2 = a.right.accept(this);
 
-        if (t1 == null || t2 == null || !t1.equals(new Primitive(Integer.class))
-                || !t2.equals(new Primitive(Integer.class))) {
+        if (t1 == null || t2 == null || !t1.equals(t2)) {
             return new Primitive(Void.class);
         }
 

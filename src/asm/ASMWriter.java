@@ -424,6 +424,7 @@ public class ASMWriter {
                 instr += ", ";
             }
         }
+        
 
         instr += "}"
             + "\n";

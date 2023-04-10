@@ -6,9 +6,10 @@ let
         let 
             var x:= recordArray [10] of nil
         in
-            x[5].y[2]
+            x[5].y
         end
-    var y:= x:=f("yo")
+    function k() :string = 3
+    var y:= x:=f(5)
 in
 
 end

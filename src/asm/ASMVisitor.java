@@ -316,14 +316,53 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Multiplication a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        a.left.accept(this);
+        a.right.accept(this);
+        Register r2 = new Register("r2", 0);
+        Register r1 = new Register("r1", 0);
+        Register r0 = new Register("r0",0);
+        // Generate arm code
+        // Load two last values in the stack in R0 and R1.
+        // We have :
+        //      R2 = a.right
+        //      R1 = a.left
+        Register[] load_register = { r2, r1 };
+        writer.Ldmfd(StackPointer, load_register);
+
+        // Mult R2 and R1
+        writer.Bl("mul");
+
+        // Store R0 in the stack
+        Register[] store_registers = { r0 };
+        writer.Stmfd(StackPointer, store_registers);
+
+        return a.ctx;
     }
+
 
     @Override
     public ParserRuleContext visit(Division a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        a.left.accept(this);
+        a.right.accept(this);
+        Register r2 = new Register("r2", 0);
+        Register r1 = new Register("r1", 0);
+        Register r0 = new Register("r0",0);
+        // Generate arm code
+        // Load two last values in the stack in R0 and R1.
+        // We have :
+        //      R2 = a.right
+        //      R1 = a.left
+        Register[] load_register = { r2, r1 };
+        writer.Ldmfd(StackPointer, load_register);
+
+        // Div R2 and R1
+        writer.Bl("div");
+
+        // Store R0 in the stack
+        Register[] store_registers = { r0 };
+        writer.Stmfd(StackPointer, store_registers);
+
+        return a.ctx;
     }
 
     @Override

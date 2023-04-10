@@ -1,12 +1,17 @@
 let 
     type intArray = array of int
     type intTab = array of intArray
-    type r = {val : int, name: string}
-    type newInt = int
+    type stringArray = array of string
 
-    var a:= intArray [8] of 0
-    var board := intTab [8] of a
-    var b:newInt := 5 + 10 *13 -6
+    type position = {board : intTab, stringArray : moveList, moveCount : int, turn : string}
+
+    var emptyLine:= intArray [8] of 0
+    var board := intTab [8] of emptyLine
+    var turn := "white"
+    var moveCount := 0
+    var moveList := stringArray [moveCount*2 +2] of "none"
+
+    /* Move format : 'bxc3', 'Nbd5', 'O-O-O', ...*/
 
     function init(board:intTab) =
         for i := 0 to 7 do
@@ -32,6 +37,39 @@ let
             colonne := case - ligne*8;
             board[ligne][colonne]
         end
+
+
+
+    function getLastMove(moveList : stringArray, moveCount:int, turn:string) : string = 
+        let
+            var n := moveCount*2
+        in
+            if (turn = "white") then
+                (n := n)
+            else 
+                (n := n +1)
+            ;
+            moveList[n]
+        end
+
+    function isTileInCheck(board: intTab, case:int, color : int) :int = 
+        /* Color : 1 for white, -1 for black */
+        let
+            var retour:= -1
+        in
+            0
+        end
+
+    function isCastleAllowed(board: intTab, moveList : stringArray, moveCount : int, turn : string, side : int, color : int) :int = 
+        /* Side : 0 for king size castling, 1 for queen side castling ; Color : 1 for white, -1 for black */
+        let
+            var retour := -1
+            var bannedMoves := stringArray [100] of "none"
+        in
+            0
+        end
+
+
 
     function findFirstNonZero(board:intTab) :int = 
         let 
@@ -70,9 +108,5 @@ let
             end
         end
 in
-    init(board);
-    setTileValue(board,8,1);
-    b+3;
-    print(getTileValue(board,8));
-    findFirstNonZero(board)
+    init(board)
 end

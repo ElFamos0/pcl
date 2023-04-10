@@ -4,6 +4,8 @@ let
     function a(x:int, y:string) :string = b()
         
     function b(i:int) : string = a(0,"")
+
+    function c(i:int) : int = c(i-1)
 in  
 
 end
