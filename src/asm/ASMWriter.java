@@ -40,9 +40,9 @@ public class ASMWriter {
             + flag.toString()
             + " " + dst.getName()
             + ", "
-            + val1.getValue()
+            + val1.getName()
             + ", "
-            + val2.getValue()
+            + val2.getName()
             + "\n";
 
         // Write instruction to file
