@@ -315,7 +315,11 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         writer.Ldmfd(StackPointer, load_register);
 
-        // ADD R0 and R1
+        // SUB R1 and R0
+        // We have :
+        //      R0 = a.right
+        //      R1 = a.left
+        
         writer.Sub(r0, r1, r0, Flags.NI);
 
         // Store R0 in the stack
