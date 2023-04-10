@@ -5,13 +5,17 @@ import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import ast.*;
+import sl.Primitive;
 import sl.SymbolLookup;
+import sl.Type;
+import sl.TypeInferer;
 
 public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     
     private SymbolLookup table;
     private int region;
     private int biggestRegion = 0;
+    private TypeInferer type = new TypeInferer();
 
     private ASMWriter writer;
 
@@ -56,32 +60,202 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Program a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        writer.Label("main");
+
+        a.expression.accept(this);
+
+        return null;
     }
 
     @Override
     public ParserRuleContext visit(Expression a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        a.left.accept(this);
+        a.right.accept(this);
+
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Ou a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        a.left.accept(this);
+        a.right.accept(this);
+
+        Register r0 = new Register("r0", 0);
+        Register r1 = new Register("r1", 0);
+
+        // Generate arm code
+        // Load two last values in the stack in R0 and R1.
+        // We have :
+        //      R0 = a.right
+        //      R1 = a.left
+        Register[] load_register = { r0, r1 };
+        writer.Ldmfd(StackPointer, load_register);
+
+        // ORR R0 and R1
+        writer.Orr(r0, r0, r1, null);
+
+        // Store R0 in the stack
+        Register[] store_registers = { r0 };
+        writer.Stmfd(StackPointer, store_registers);
+
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Et a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        a.left.accept(this);
+        a.right.accept(this);
+
+        Register r0 = new Register("r0", 0);
+        Register r1 = new Register("r1", 0);
+
+        // Generate arm code
+        // Load two last values in the stack in R0 and R1.
+        // We have :
+        //      R0 = a.right
+        //      R1 = a.left
+        Register[] load_register = { r0, r1 };
+        writer.Ldmfd(StackPointer, load_register);
+
+        // AND R0 and R1
+        writer.And(r0, r0, r1, null);
+
+        // Store R0 in the stack
+        Register[] store_registers = { r0 };
+        writer.Stmfd(StackPointer, store_registers);
+
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Compar a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        ParserRuleContext left = a.left.accept(this);
+        a.right.accept(this);
+
+        SymbolLookup table = this.table.getSymbolLookup(this.region);
+
+        Type leftType = this.type.inferType(table, left);
+
+        if (leftType.equals(new Primitive(Integer.class))) {
+            // We have to compare two integers
+
+            Register r0 = new Register("r0", 0);
+            Register r1 = new Register("r1", 0);
+
+            Register[] load_register = { r0, r1 };
+            Register[] store_registers = { r0 };
+
+            // Load two last values in the stack in R0 and R1.
+            // We have :
+            //      R0 = a.right
+            //      R1 = a.left
+            writer.Ldmfd(StackPointer, load_register);
+
+            // CMP R0 and R1 following the operator.
+            switch (a.operator) {
+            case "<":
+                // CMP R0 and R1
+                // CMP does R0 - R1
+                // We need here R0 > R1
+                writer.Cmp(r1, r0);
+
+                // Store the N flag in R0
+                // N flag is set if R0 > R1
+
+                // Set R0 to 1 if N flag is not set.
+                writer.Mov(r0, 1, Flags.PL);
+
+                // Set R0 to 0 if N flag is set.
+                writer.Mov(r0, 0, Flags.MI);
+
+                // Set R0 to 0 if Z flag is set because we want R0 != R1.
+                writer.Mov(r0, 0, Flags.EQ);
+
+                // Store R0 in the stack
+                writer.Stmfd(StackPointer, store_registers);
+                break;
+            case ">":
+                // CMP R0 and R1
+                // CMP does R0 - R1
+                // We need here R0 < R1
+                writer.Cmp(r1, r0);
+
+                // Set R0 to 1 if N flag is set.
+                writer.Mov(r0, 1, Flags.MI);
+
+                // Set R0 to 0 otherwise.
+                writer.Mov(r0, 0, Flags.PL);
+
+                // Store R0 in the stack
+                writer.Stmfd(StackPointer, store_registers);
+                break;
+            case "=":
+                // CMP R0 and R1
+                // CMP does R0 - R1
+                // We need here R0 = R1
+                writer.Cmp(r1, r0);
+
+                // Set R0 to 1 if Z flag is set.
+                writer.Mov(r0, 1, Flags.EQ);
+
+                // Set R0 to 0 otherwise.
+                writer.Mov(r0, 0, Flags.NE);
+
+                // Store R0 in the stack
+                writer.Stmfd(StackPointer, store_registers);
+                break;
+            case "<=":
+                // CMP R0 and R1
+                // CMP does R0 - R1
+                // We need here R0 >= R1
+                writer.Cmp(r1, r0);
+
+                // Set R0 to 1 if N flag is not set.
+                writer.Mov(r0, 1, Flags.PL);
+
+                // Set R0 to 0 if N flag is set.
+                writer.Mov(r0, 0, Flags.MI);
+
+                // Store R0 in the stack
+                writer.Stmfd(StackPointer, store_registers);
+                break;
+            case ">=":
+                // CMP R0 and R1
+                // CMP does R1 - R0
+                // We need here R1 >= R0
+                writer.Cmp(r0, r1);
+
+                // Set R0 to 1 if N flag is not set.
+                writer.Mov(r0, 1, Flags.PL);
+
+                // Set R0 to 0 if N flag is set.
+                writer.Mov(r0, 0, Flags.MI);
+
+                // Store R0 in the stack
+                writer.Stmfd(StackPointer, store_registers);
+                break;
+            case "<>":
+                // CMP R0 and R1
+                // CMP does R0 - R1
+                // We need here R0 != R1
+                writer.Cmp(r1, r0);
+
+                // Set R0 to 1 if Z flag is not set.
+                writer.Mov(r0, 1, Flags.NE);
+
+                // Set R0 to 0 if Z flag is set.
+                writer.Mov(r0, 0, Flags.EQ);
+
+                // Store R0 in the stack
+                writer.Stmfd(StackPointer, store_registers);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unimplemented operator '" + a.operator + "'");
+            }
+        }
+
+
+        return a.ctx;
     }
 
     @Override

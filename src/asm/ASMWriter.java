@@ -36,7 +36,14 @@ public class ASMWriter {
 
     // Add functions
     public void Add(Register dst, Register val1, Register val2, Flags flag) {
-        String instr = "ADD"+flag.toString() + " " + dst.getName() + ", " + val1.getValue() + ", " + val2.getValue();
+        String instr = "ADD"
+            + flag.toString()
+            + " " + dst.getName()
+            + ", "
+            + val1.getValue()
+            + ", "
+            + val2.getValue()
+            + "\n";
 
         // Write instruction to file
         write(instr);
@@ -126,14 +133,26 @@ public class ASMWriter {
 
     // Move functions
     public void Mov(Register dst, Register val, Flags flag) {
-        String instr = "MOV"+flag.toString() + " " + dst.getName() + ", " + val.getName();
+        String instr = "MOV"
+            + flag.toString()
+            + " "
+            + dst.getName()
+            + ", " 
+            + val.getName()
+            + "\n";
 
         // Write instruction to file
         write(instr);
     }
 
     public void Mov(Register dst, int val, Flags flag) {
-        String instr = "MOV"+flag.toString() + " " + dst.getName() + ", #" + val;
+        String instr = "MOV"
+            + flag.toString()
+            + " "
+            + dst.getName()
+            + ", #"
+            + val
+            + "\n";
 
         // Write instruction to file
         write(instr);
@@ -169,7 +188,16 @@ public class ASMWriter {
     }
 
     public void Eor(Register dst, Register val1, Register val2, Flags flag) {
-        String instr = "ORR"+flag.toString() + " " + dst.getName() + ", " + val1.getName() + ", " + val2.getName();
+        String instr = "ORR"
+            + flag.toString()
+            + " "
+            +
+            dst.getName()
+            + ", "
+            + val1.getName()
+            + ", "
+            + val2.getName()
+            + "\n";
 
         // Write instruction to file
         write(instr);
@@ -271,14 +299,24 @@ public class ASMWriter {
 
     // CMP functions
     public void Cmp(Register val1, Register val2) {
-        String instr = "CMP" + " " + val1.getName() + ", " + val2.getName();
+        String instr = "CMP"
+            + " "
+            + val1.getName()
+            + ", "
+            + val2.getName()
+            + "\n";
 
         // Write instruction to file
         write(instr);
     }
 
     public void Cmp(Register val1, int val2) {
-        String instr = "CMP" + " " + val1.getName() + ", #" + val2;
+        String instr = "CMP"
+            + " "
+            + val1.getName()
+            + ", #"
+            + val2
+            + "\n";
 
         // Write instruction to file
         write(instr);
@@ -377,7 +415,8 @@ public class ASMWriter {
             }
         }
 
-        instr += "}";
+        instr += "}"
+            + "\n";
 
         // Write instruction to file
         write(instr);
@@ -396,7 +435,8 @@ public class ASMWriter {
             }
         }
 
-        instr += "}";
+        instr += "}"
+            + "\n";
 
         // Write instruction to file
         write(instr);
