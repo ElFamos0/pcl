@@ -19,3 +19,4 @@ test.asm
 
 # Built Visual Studio Code Extensions
 *.vsix
+docker/test.s

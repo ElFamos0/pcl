@@ -25,10 +25,24 @@ public class Main {
 
         String testFile = args[0];
 
+        // Create a new thread to update and print elapsed time
+        Thread timerThread = new Thread(() -> {
+            int elapsedTime = 0;
+            while (true) {
+                System.out.print("\r\033[0;34m COMPILING... (" + elapsedTime + "s) \033[0m");
+                elapsedTime++;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    // Thread was interrupted, exit the loop
+                    break;
+                }
+            }
+        });
+        timerThread.start();
+
         try {
-
             // chargement du fichier et construction du parser
-
             CharStream input = CharStreams.fromFileName(testFile);
             exprLexer lexer = new exprLexer(input);
             CommonTokenStream stream = new CommonTokenStream(lexer);
@@ -55,26 +69,15 @@ public class Main {
             CSemVisitor csem = new CSemVisitor(table, errorHandler);
             ast.accept(csem);
 
-            // Display TDS
-            System.out.println(table);
-
-            if (errorHandler.getErrorCount() > 0) {
-                System.out.println("Compilation failed with " + errorHandler.getErrorCount() + " errors");
-                System.exit(1);
-            }
-
-            System.out.println("Compilation successful");
-
             graphViz.dumpGraph("./out/tree.dot");
 
-            System.out.println("ASM");
             ASMWriter writer = new ASMWriter("test.asm");
 
             ASMVisitor asmv = new ASMVisitor(table, writer);
             ast.accept(asmv);
-            // writer.Itoa();
-            // writer.End();
 
+            timerThread.interrupt();
+            System.out.println("\r\033[0;32m COMPILATION SUCCESSFUL \033[0m");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (RecognitionException e) {
