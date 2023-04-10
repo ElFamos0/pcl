@@ -260,14 +260,29 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Addition a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        a.left.accept(this);
+        a.right.accept(this);
+
+        Register r0 = new Register("r0", 0);
+        Register r1 = new Register("r1", 0);
+
+        writer.Add(r0, r0, r1,null);
+
+
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Soustraction a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        a.left.accept(this);
+        a.right.accept(this);
+
+        Register r0 = new Register("r0", 0);
+        Register r1 = new Register("r1", 0);
+
+        writer.Sub(r0, r0, r1,null);
+
+        return a.ctx;
     }
 
     @Override
