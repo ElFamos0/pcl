@@ -17,7 +17,9 @@ public class ASMWriter {
         // Writes a string to the file
         try {
             writer.write(s);
+            writer.flush();
         } catch (IOException e) {
+            System.out.println("Error while writing to file");
             e.printStackTrace();
         }
     }
