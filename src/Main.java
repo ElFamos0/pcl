@@ -64,7 +64,7 @@ public class Main {
             AstCreator creator = new AstCreator(table, errorHandler);
             Ast ast = program.accept(creator);
 
-            // System.out.println(table.toString());
+            System.out.println(table.toString());
 
             // Visiteur de représentation graphique + appel
             GraphVizVisitor graphViz = new GraphVizVisitor();
@@ -89,14 +89,13 @@ public class Main {
 
             timerThread.interrupt();
             System.out.println("\r\033[0;32m COMPILATION SUCCESSFUL \033[0m");
+            System.exit(0);
         } catch (IOException e) {
-            timerThread.interrupt();
-            System.out.println("\r\033[0;31m COMPILATION FAILED \033[0m");
             e.printStackTrace();
         } catch (RecognitionException e) {
-            timerThread.interrupt();
-            System.out.println("\r\033[0;31m COMPILATION FAILED \033[0m");
             e.printStackTrace();
         }
+        timerThread.interrupt();
+        System.out.println("\r\033[0;31m COMPILATION FAILED \033[0m");
     }
 }

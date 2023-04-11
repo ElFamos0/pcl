@@ -709,11 +709,11 @@ public class ASMWriter {
 
     public void Exit(Integer status) {
         String instr = "\t"
-            + "MOV %r0, $" + status.toString() + "\n"
+            + "MOV r0, #" + status.toString() + "\n"
             + "\t"
-            + "MOV %r7, $1\n"
+            + "MOV r7, #1\n"
             + "\t"
-            + "SWI $0\n";
+            + "SWI 0\n";
 
         // Write instruction to file
         write(instr);

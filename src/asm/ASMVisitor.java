@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import ast.*;
 import parser.exprParser.*;
 import sl.Array;
+import sl.Function;
 import sl.Primitive;
 import sl.Symbol;
 import sl.SymbolLookup;
@@ -54,6 +55,14 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         String label = "_blk_";
 
         SymbolLookup sl = this.table.getSymbolLookup(this.region);
+
+        label += sl.getScope() + "_" + sl.getRegion();
+
+        return label;
+    }
+
+    public String getLabel(SymbolLookup sl) {
+        String label = "_blk_";
 
         label += sl.getScope() + "_" + sl.getRegion();
 
@@ -516,27 +525,40 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         if (id.nom.equals("print")) {
             // Get the argument
             a.args.accept(this);
-
             SymbolLookup table = this.table.getSymbolLookup(this.region);
-
             ArgFonction argF = (ArgFonction) a.args;
             ArrayList<Ast> args = argF.args;
-
             Type t = type.inferType(table, args.get(0));
-
             String def = "format_int";
             if (t.equals(new Array(new Primitive(Character.class)))) {
                 def = "format_str";
             }
 
-            writer.Comment("Load param values inside r0 and r1", 1);
+            String profile = "printf(" + t + ")";
+
+            writer.SkipLine();
+            writer.Comment("call: "+profile, 1);
             writer.Ldr(r0, def);
             writer.Ldmfd(StackPointer, new Register[] { r1 });
-            writer.SkipLine();
-
             writer.Bl("printf", Flags.NI);
         } else {
-            throw new UnsupportedOperationException("Unimplemented function '" + a.id + "'");
+            // Get the sl 
+            SymbolLookup sl = this.table.getSymbolLookup(this.region);
+            // Get the function
+            Function f = (Function) sl.getSymbol(id.nom);
+            SymbolLookup fsl = f.getTable();
+            String funclabel = getLabel(fsl);
+            writer.SkipLine();
+            writer.Comment("call: " + f.getProfile(), 1);
+
+            // Push args
+            a.args.accept(this);
+
+            // Add #4 to the stack pointer to leave a place for the return value
+            writer.Add(StackPointer, StackPointer, 4, Flags.NI);
+
+            // Branch to the function
+            writer.Bl(funclabel, Flags.NI);
         }
         return a.ctx;
     }
@@ -553,8 +575,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
                 Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
                 
-                writer.SkipLine();
-                writer.Comment("Use the static chain to get back " + id.nom, 1);
+                // writer.SkipLine();
+                // writer.Comment("Use the static chain to get back " + id.nom, 1);
                 writer.Mov(r0, BasePointer, Flags.NI);
 
                 if (offset > 0) {
@@ -564,9 +586,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
                 writer.Ldr(r0, r0, Flags.NI, v.getOffset() - 4);
 
-                writer.Comment("Add " + id.nom + " to the stack", 1);
+                // writer.Comment("Add " + id.nom + " to the stack", 1);
                 writer.Stmfd(StackPointer, new Register[] { r0 });
-                writer.SkipLine();
             }
         }
         return a.ctx;
@@ -682,17 +703,22 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Mov(BasePointer, StackPointer, Flags.NI);
 
         for (Ast ast : a.declarations) {
-            ast.accept(this);
-        }
-
-        for (Ast ast : a.exprs) {
-            if (!(ast instanceof Definition)) {
+            if (!(ast instanceof Definition) && !(ast instanceof DeclarationFonction)) {
                 ast.accept(this);
             }
         }
 
-        for (String label : this.getSonsLabels()) {
-            writer.Bl(label, Flags.NI);
+        for (Ast ast : a.exprs) {
+            if (!(ast instanceof Definition) && !(ast instanceof DeclarationFonction)) {
+                ast.accept(this);
+            }
+        }
+
+        String[] labels = getSonsLabels();
+        for (int i = 0; i < a.exprs.size(); i++) {
+            if (!(a.exprs.get(i) instanceof AppelFonction)) {
+                writer.Bl(labels[i], Flags.NI);
+            }
         }
 
         registers = new Register[] { r0 };
@@ -705,7 +731,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.SkipLine();
 
         for (Ast ast : a.exprs) {
-            if (ast instanceof Definition) {
+            if (ast instanceof Definition || ast instanceof DeclarationFonction) {
+                ast.accept(this);
+            }
+        }
+        for (Ast ast : a.declarations) {
+            if ((ast instanceof Definition) || (ast instanceof DeclarationFonction)) {
                 ast.accept(this);
             }
         }
@@ -742,20 +773,44 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(DeclarationChamp a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        return a.ctx; 
     }
 
     @Override
     public ParserRuleContext visit(DeclarationFonction a) {
         int temp = region;
+        SymbolLookup sl = this.table.getSymbolLookup(this.region);
 
         StepOneRegion();
-        // Do the function block
+        writer.SkipLine();
+
+        for (Ast ast : a.args) {
+            ast.accept(this);
+        }
+
+        ID id = (ID) a.id;
+        Symbol s = sl.getSymbol(id.nom);
+        Function f = (Function) s;
+        writer.Comment("func: " + f.getProfile(), 0);
+        String l = getLabel();
+        writer.Label(l);
+        
+        Register[] registers = { BasePointer, LinkRegister };
+        // Begin
+        writer.Stmfd(StackPointer, registers);
+        writer.Mov(BasePointer, StackPointer, Flags.NI);
+
+        // Block
+        a.expr.accept(this);
+
+        // End
+        registers = new Register[] { ProgramCounter, BasePointer };
+        writer.Ldmfd(StackPointer, registers);
+        writer.SkipLine();
 
         // Get back to the original region
         this.region = temp;
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        return a.ctx;
     }
 
     @Override

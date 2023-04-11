@@ -45,4 +45,16 @@ public class Function extends FuncOrVariable {
     public String toString() {
         return "function";
     }
+
+    public String getProfile() {
+        String profile = this.getName()+"(";
+        ArrayList<Variable> var = this.getParams();
+        for (int i = 0 ; i < var.size() ; i++) {
+            profile += var.get(i).getType().toString();
+            profile += ": ";
+            profile += var.get(i).getName();
+        }
+        profile += ")";
+        return profile;
+    }
 }
