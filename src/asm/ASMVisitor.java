@@ -65,6 +65,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Program a) {
+        // System.out.println("Program");
         writer.write(".text\n");
         writer.write(".globl main\n");
         writer.Label("main");
@@ -89,6 +90,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Expression a) {
+        // System.out.println("Expression");
         a.left.accept(this);
         a.right.accept(this);
 
@@ -97,6 +99,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Ou a) {
+        // System.out.println("Ou");
         a.left.accept(this);
         a.right.accept(this);
 
@@ -123,6 +126,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Et a) {
+        // System.out.println("Et");
         a.left.accept(this);
         a.right.accept(this);
 
@@ -149,6 +153,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Compar a) {
+        // System.out.println("Compar");
         ParserRuleContext left = a.left.accept(this);
         a.right.accept(this);
 
@@ -280,6 +285,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Addition a) {
+        // System.out.println("Addition");
         a.left.accept(this);
         a.right.accept(this);
 
@@ -308,6 +314,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Soustraction a) {
+        // System.out.println("Soustraction");
         a.left.accept(this);
         a.right.accept(this);
 
@@ -335,6 +342,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Multiplication a) {
+        // System.out.println("Multiplication");
         a.left.accept(this);
         a.right.accept(this);
         Register r2 = new Register("r2", 0);
@@ -361,6 +369,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Division a) {
+        // System.out.println("Division");
         a.left.accept(this);
         a.right.accept(this);
         Register r2 = new Register("r2", 0);
@@ -386,12 +395,14 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Sequence a) {
+        // System.out.println("Sequence");
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(Negation a) {
+        // System.out.println("Negation");
         a.expression.accept(this);
         Register r0 = new Register("r0", 0);
         Register r1 = new Register("r1", 0);
@@ -412,12 +423,14 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(ID a) {
+        // System.out.println("ID");
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(Int a) {
+        // System.out.println("Int");
         Register r0 = new Register("r0", 0);
         Register[] store_registers = { r0 };
         writer.Mov(r0, a.toInt(), Flags.NI);
@@ -428,12 +441,14 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(ExpressionIdentifiant a) {
+        // System.out.println("ExpressionIdentifiant");
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(AppelFonction a) {
+        // System.out.println("AppelFonction");
         ID id = (ID) a.id;
 
         // Only implement "print" for integers
@@ -469,6 +484,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(ArgFonction a) {
+        // System.out.println("ArgFonction");
         for (Ast e : a.args) {
             e.accept(this);
         }
@@ -477,6 +493,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(IfThenElse a) {
+        // System.out.println("IfThenElse");
         int temp = region;
 
         StepOneRegion();
@@ -504,14 +521,37 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(While a) {
+        // System.out.println("While");
         int temp = region;
+
+        Register r0 = new Register("r0", 0);
+        Register r1 = new Register("r1", 0);
+        Register r3 = new Register("r3", 0);
+
+        Register[] store = {r0};
+
+        // TODO: Remove this code
+        writer.Add(r0, r0, 10, Flags.NI);
+        writer.Stmfd(StackPointer, store);
 
         StepOneRegion();
         // Do the while block
+        writer.SkipLine();
+        writer.Label("while_" + this.region);
+
+        
+
+
+        // End of the while
+        writer.SkipLine();
+        writer.Label("while_exit_" + this.region);
+        writer.B("_exit", Flags.NI);
+        writer.SkipLine();
 
         // Get back to the original region
         this.region = temp;
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        
+        return a.ctx;
     }
 
     @Override
@@ -528,14 +568,22 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Definition a) {
+        // System.out.println("Definition");
         int temp = region;
 
         StepOneRegion();
         // Do the definition block
+        for (Ast ast : a.declarations) {
+            ast.accept(this);
+        }
+        for (Ast ast : a.exprs) {
+            ast.accept(this);
+        }
 
         // Get back to the original region
         this.region = temp;
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        
+        return a.ctx;
     }
 
     @Override
@@ -583,7 +631,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(DeclarationValeur a) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        
+        return a.ctx;
     }
 
     @Override

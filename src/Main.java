@@ -61,6 +61,8 @@ public class Main {
             AstCreator creator = new AstCreator(table, errorHandler);
             Ast ast = program.accept(creator);
 
+            System.out.println(table.toString());
+
             // Visiteur de représentation graphique + appel
             GraphVizVisitor graphViz = new GraphVizVisitor();
             ast.accept(graphViz);

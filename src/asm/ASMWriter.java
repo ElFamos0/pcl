@@ -654,8 +654,11 @@ public class ASMWriter {
 
     // B function
     // B branches to a label.
-    public void B(String label) {
-        String instr = "\t" + "B" + " " + label + "\n";
+    public void B(String label, Flags flag) {
+        String instr = "\t" + "B"
+            + flag.toString()
+            + " "
+            + label + "\n";
 
         // Write instruction to file
         write(instr);

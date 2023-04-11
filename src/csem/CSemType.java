@@ -183,6 +183,7 @@ public class CSemType implements AstVisitor<Type> {
     @Override
     public Type visit(ID a) {
         SymbolLookup table = this.table.getSymbolLookup(region);
+
         if (table.getSymbol(a.nom) == null) {
             if (table.getType(a.nom) == null) {
                 return new Primitive(Void.class);
