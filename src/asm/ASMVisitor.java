@@ -577,6 +577,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         StepOneRegion();
         // Do the definition block
 
+        for (Ast ast : a.exprs) {
+            ast.accept(this);
+        }
+
         // Add StackPointer + Return address and create label
         writer.SkipLine();
         writer.Label("def_" + this.getLabel("def"));
@@ -585,9 +589,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Stmfd(StackPointer, registers);
 
         for (Ast ast : a.declarations) {
-            ast.accept(this);
-        }
-        for (Ast ast : a.exprs) {
             ast.accept(this);
         }
 

@@ -1,5 +1,10 @@
 let
     var x := "caca"
 in
-    print(x)
+    let
+        var y := 5
+    in
+        print(x);
+        print(y)
+    end
 end
