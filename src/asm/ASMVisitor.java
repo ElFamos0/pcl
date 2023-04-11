@@ -341,7 +341,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 writer.Bl("_stack_var", Flags.NI);
             }
 
-            writer.Ldr(r0, r0, Flags.NI, v.getOffset() - 4);
+            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
 
             writer.Comment("Add " + id.nom + " to the stack", 1);
             writer.Stmfd(StackPointer, new Register[] { r0 });
@@ -363,7 +363,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 writer.Bl("_stack_var", Flags.NI);
             }
 
-            writer.Ldr(r0, r0, Flags.NI, v.getOffset() - 4);
+            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
 
             writer.Comment("Add " + id.nom + " to the stack", 1);
             writer.Stmfd(StackPointer, new Register[] { r0 });
@@ -584,7 +584,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                     writer.Bl("_stack_var", Flags.NI);
                 }
 
-                writer.Ldr(r0, r0, Flags.NI, v.getOffset() - 4);
+                writer.Ldr(r0, r0, Flags.NI, v.getOffset());
 
                 // writer.Comment("Add " + id.nom + " to the stack", 1);
                 writer.Stmfd(StackPointer, new Register[] { r0 });

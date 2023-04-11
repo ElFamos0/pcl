@@ -45,7 +45,7 @@ public class Primitive extends Type {
                 return 4;
             case BOOL:
                 // Bool size
-                return 1;
+                return 4;
             case ANY:
                 // Any size
                 return 4;
