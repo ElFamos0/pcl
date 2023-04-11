@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import sl.SymbolLookup;
+import sl.Variable;
+
 public class ASMWriter {
     private FileWriter writer;
 
@@ -714,6 +717,33 @@ public class ASMWriter {
 
         // Write instruction to file
         write(instr);
+    }
+
+    // StackVar
+    // StackVar is used to stack a variable value into the stack.
+    // You need to pop the value from the stack after using it.
+    // The value is stored in r0 register.
+    // The number of times to stack the value is stored in r1 register.
+    public void StackVar() {
+        String fn = """
+            _stack_var:
+                STMFD r13!, {r14}
+                BL _stack_var_loop
+                LDMFD SP!, {r15}
+                """;
+        
+        String fn_loop = """
+            _stack_var_loop:
+                STMFD r13!, {r14}
+                LDR r0, [r0, #0]
+                SUB r1, r1, #1
+                CMP r1, #0
+                BNE _stack_var_loop
+                LDMFD r13!, {r15}
+                """;
+
+        // Write function to file
+        write(fn + "\n" + fn_loop);
     }
 
     // Mul function
