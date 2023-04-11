@@ -1,6 +1,5 @@
 let
-    var x := 10
+    var x := "caca"
 in
-    while x > 0
-        do (x := x - 1)
+    print(x)
 end

@@ -83,7 +83,7 @@ public class ASMWriter {
             + " "
             + dst.getName()
             + ", "
-            + val1.getValue()
+            + val1.getName()
             + ", #"
             + val2
             + "\n";
@@ -578,12 +578,13 @@ public class ASMWriter {
 
     // LDR function
     // LDR loads a word from memory into a register.
-    public void Ldr(Register dst, Register addr) {
+    public void Ldr(Register dst, Register addr, Flags flag, int offset) {
         String instr = "\t"
             + "LDR"
+            + flag.toString()
             + " "
             + dst.getName() 
-            + ", [" + addr.getName() + "]"
+            + ", [" + addr.getName() + ", #" + offset + "]"
             + "\n";
 
         // Write instruction to file
@@ -666,8 +667,11 @@ public class ASMWriter {
 
     // BL function
     // BL branches to a label and stores the return address in LR.
-    public void Bl(String label) {
-        String instr = "\t" + "BL" + " " + label + "\n";
+    public void Bl(String label, Flags flag) {
+        String instr = "\t" + "BL"
+            + flag.toString()
+            + " "
+            + label + "\n";
 
         // Write instruction to file
         write(instr);
