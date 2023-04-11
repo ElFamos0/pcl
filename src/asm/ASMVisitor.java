@@ -715,28 +715,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(IfThenElse a) {
-        // System.out.println("IfThenElse");
-        int temp = region;
-
-
-        
-        StepOneRegion();
-        // Do the then block
-
-        StepOneRegion();
-        // Do the else block
-
-        // Get back to the original region
-        this.region = temp;
-
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
-
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
-    }
-
-    @Override
     public ParserRuleContext visit(IfThen a) {
         int temp = region;
 
@@ -771,6 +749,32 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         this.region = temp;
         return a.ctx;
     }
+
+
+
+
+    @Override
+    public ParserRuleContext visit(IfThenElse a) {
+        // System.out.println("IfThenElse");
+        int temp = region;
+
+
+        
+        StepOneRegion();
+        // Do the then block
+
+        StepOneRegion();
+        // Do the else block
+
+        // Get back to the original region
+        this.region = temp;
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
+        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+    }
+
 
     @Override
     public ParserRuleContext visit(While a) {
