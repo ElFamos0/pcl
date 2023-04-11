@@ -1,13 +1,7 @@
 let
-    var x := 4
-
-    function f(x: int): int =
-        x + 4 
+    var x := 8
 in
-    let
-        var y := 8
-    in
-        print(f(y));
-        print(f(x))
-    end
+    x := x + 4;
+    print(x);
+    print("caca")
 end
