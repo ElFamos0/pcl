@@ -723,7 +723,7 @@ public class ASMWriter {
     // StackVar is used to stack a variable value into the stack.
     // You need to pop the value from the stack after using it.
     // The value is stored in r0 register.
-    // The number of times to stack the value is stored in r1 register.
+    // The number of times to follow the static link is stored in r1 register.
     public void StackVar() {
         String fn = """
             _stack_var:

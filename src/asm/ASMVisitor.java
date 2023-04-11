@@ -327,9 +327,33 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             writer.Comment("Use the static chain to get back " + id.nom, 1);
             writer.Mov(r0, BasePointer, Flags.NI);
 
-            for (int i = 0; i < offset; i++) {
-                writer.Ldr(r0, r0, Flags.NI, 0);
+            if (offset > 0) {
+                writer.Mov(r1, offset, Flags.NI);
+                writer.Bl("_stack_var", Flags.NI);
             }
+
+            writer.Ldr(r0, r0, Flags.NI, v.getOffset() - 4);
+
+            writer.Comment("Add " + id.nom + " to the stack", 1);
+            writer.Stmfd(StackPointer, new Register[] { r0 });
+            writer.SkipLine();
+        }
+
+        if (a.right instanceof ID) {
+            ID id = (ID) a.left;
+
+            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
+            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
+                
+            writer.SkipLine();
+            writer.Comment("Use the static chain to get back " + id.nom, 1);
+            writer.Mov(r0, BasePointer, Flags.NI);
+
+            if (offset > 0) {
+                writer.Mov(r1, offset, Flags.NI);
+                writer.Bl("_stack_var", Flags.NI);
+            }
+
             writer.Ldr(r0, r0, Flags.NI, v.getOffset() - 4);
 
             writer.Comment("Add " + id.nom + " to the stack", 1);
@@ -537,7 +561,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                     writer.Mov(r1, offset, Flags.NI);
                     writer.Bl("_stack_var", Flags.NI);
                 }
-                
+
                 writer.Ldr(r0, r0, Flags.NI, v.getOffset() - 4);
 
                 writer.Comment("Add " + id.nom + " to the stack", 1);
