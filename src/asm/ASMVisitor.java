@@ -22,11 +22,21 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     private ASMWriter writer;
 
-    private List<Register> registers = new ArrayList<Register>();
     private Register BasePointer = new Register("r11", 0);
     private Register StackPointer = new Register("r13", 0);
     private Register LinkRegister = new Register("r14", 0);
     private Register ProgramCounter = new Register("r15", 0);
+
+    private Register r0 = new Register("r1", 0);
+    private Register r1 = new Register("r2", 0);
+    private Register r2 = new Register("r3", 0);
+    private Register r4 = new Register("r4", 0);
+    private Register r5 = new Register("r5", 0);
+    private Register r6 = new Register("r6", 0);
+    private Register r7 = new Register("r7", 0);
+    private Register r8 = new Register("r8", 0);
+    private Register r9 = new Register("r9", 0);
+    private Register r10 = new Register("r10", 0);
 
     private List<Constant> constants = new ArrayList<Constant>();
 
@@ -38,25 +48,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         region = table.getLibFunc();
         biggestRegion = region;
         this.writer = writer;
-        this.initRegisters();
         this.initHashMap();
-    }
-
-    public void initRegisters() {
-        // Init ARMv7 registers
-        registers.add(new Register("r0", 0));
-        registers.add(new Register("r1", 0));
-        registers.add(new Register("r2", 0));
-        registers.add(new Register("r3", 0));
-        registers.add(new Register("r4", 0));
-        registers.add(new Register("r5", 0));
-        registers.add(new Register("r6", 0));
-        registers.add(new Register("r7", 0));
-        registers.add(new Register("r8", 0));
-        registers.add(new Register("r9", 0));
-        registers.add(new Register("r10", 0));
-        // registers.add(new Register("r11", 0)); BP
-        // registers.add(new Register("r12", 0)); UNUSED
     }
 
     public void initHashMap() {
@@ -138,9 +130,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         a.left.accept(this);
         a.right.accept(this);
 
-        Register r0 = new Register("r0", 0);
-        Register r1 = new Register("r1", 0);
-
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
         // We have :
@@ -164,9 +153,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // System.out.println("Et");
         a.left.accept(this);
         a.right.accept(this);
-
-        Register r0 = new Register("r0", 0);
-        Register r1 = new Register("r1", 0);
 
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
@@ -198,9 +184,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         if (leftType.equals(new Primitive(Integer.class))) {
             // We have to compare two integers
-
-            Register r0 = new Register("r0", 0);
-            Register r1 = new Register("r1", 0);
 
             Register[] load_register = { r0, r1 };
             Register[] store_registers = { r0 };
@@ -324,9 +307,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         a.left.accept(this);
         a.right.accept(this);
 
-        Register r0 = new Register("r0", 0);
-        Register r1 = new Register("r1", 0);
-
         Register[] load_register = { r0, r1 };
         Register[] store_registers = { r0 };
 
@@ -353,9 +333,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         a.left.accept(this);
         a.right.accept(this);
 
-        Register r0 = new Register("r0", 0);
-        Register r1 = new Register("r1", 0);
-
         Register[] load_register = { r0, r1 };
         Register[] store_registers = { r0 };
 
@@ -380,9 +357,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // System.out.println("Multiplication");
         a.left.accept(this);
         a.right.accept(this);
-        Register r2 = new Register("r2", 0);
-        Register r1 = new Register("r1", 0);
-        Register r0 = new Register("r0",0);
+
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
         // We have :
@@ -407,9 +382,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // System.out.println("Division");
         a.left.accept(this);
         a.right.accept(this);
-        Register r2 = new Register("r2", 0);
-        Register r1 = new Register("r1", 0);
-        Register r0 = new Register("r0",0);
+
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
         // We have :
@@ -439,8 +412,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(Negation a) {
         // System.out.println("Negation");
         a.expression.accept(this);
-        Register r0 = new Register("r0", 0);
-        Register r1 = new Register("r1", 0);
+
         Register[] load_register = { r0 };
         Register[] store_registers = { r0 };
 
@@ -466,7 +438,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(Int a) {
         // System.out.println("Int");
-        Register r0 = new Register("r0", 0);
+
         Register[] store_registers = { r0 };
         writer.Mov(r0, a.toInt(), Flags.NI);
         writer.Stmfd(StackPointer, store_registers);
@@ -503,10 +475,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 def = "format_str";
             }
 
-            Register r0 = new Register("r0", 0);
             writer.Ldr(r0, def);
 
-            Register r1 = new Register("r1", 0);
             writer.Ldr(r1, StackPointer, Flags.NI, 0);
 
             writer.Bl("printf", Flags.NI);
@@ -557,10 +527,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(While a) {
         // System.out.println("While");
         int temp = region;
-
-        Register r0 = new Register("r0", 0);
-        Register r1 = new Register("r1", 0);
-        Register r3 = new Register("r3", 0);
 
         Register[] store = {r0};
 
@@ -622,7 +588,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             ast.accept(this);
         }
 
-        Register r0 = new Register("r0", 0);
         registers = new Register[] { r0 };
         for (int i = 0 ; i < a.declarations.size() ; i++) {
             writer.Ldmfd(StackPointer, registers);
@@ -698,7 +663,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         Constant c = new Constant(a.getValeur());
         constants.add(c);
 
-        Register r0 = new Register("r0", 0);
         Register[] store_registers = { r0 };
         writer.Ldr(r0, c.getId());
         writer.Stmfd(StackPointer, store_registers);
