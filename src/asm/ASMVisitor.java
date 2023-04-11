@@ -350,6 +350,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         writer.SkipLine();
         writer.Comment("Add the two values and send it back to the parent", 1);
+        // on recupère la valeur du fils gauche dans r0 pour pouvoir l'ajouter à celle du fils droit 
         writer.Ldmfd(StackPointer, new Register[] { r0 });
         writer.Add(r8, r0, r8, Flags.NI);
 
@@ -360,70 +361,18 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(Soustraction a) {
         // System.out.println("Soustraction");
         a.left.accept(this);
+
+        writer.SkipLine();
+        writer.Comment("Store left side of soustraction",1);
+
+        writer.Stmfd(StackPointer, new Register[] { r8 });
+
         a.right.accept(this);
 
-        if (a.left instanceof ID) {
-            ID id = (ID) a.left;
-
-            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
-            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
-                
-            writer.SkipLine();
-            writer.Comment("Use the static chain to get back " + id.nom, 1);
-            writer.Mov(r0, BasePointer, Flags.NI);
-
-            if (offset > 0) {
-                writer.Mov(r1, offset, Flags.NI);
-                writer.Bl("_stack_var", Flags.NI);
-            }
-
-            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
-
-            writer.Comment("Add " + id.nom + " to the stack", 1);
-            writer.Stmfd(StackPointer, new Register[] { r0 });
-            writer.SkipLine();
-        }
-
-        if (a.right instanceof ID) {
-            ID id = (ID) a.left;
-
-            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
-            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
-                
-            writer.SkipLine();
-            writer.Comment("Use the static chain to get back " + id.nom, 1);
-            writer.Mov(r0, BasePointer, Flags.NI);
-
-            if (offset > 0) {
-                writer.Mov(r1, offset, Flags.NI);
-                writer.Bl("_stack_var", Flags.NI);
-            }
-
-            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
-
-            writer.Comment("Add " + id.nom + " to the stack", 1);
-            writer.Stmfd(StackPointer, new Register[] { r0 });
-            writer.SkipLine();
-        }
-
-
-
-
-        Register[] load_register = { r0, r1 };
-        Register[] store_registers = { r0 };
-
-
-        writer.Ldmfd(StackPointer, load_register);
-
-        // SUB R1 and R0
-        // We have :
-        //      R0 = a.right
-        //      R1 = a.left
-        
-        writer.Sub(r0, r1, r0, Flags.NI);
-
-        // Store R0 in the stack
-        writer.Stmfd(StackPointer, store_registers);
+        writer.SkipLine();
+        writer.Comment("Substract the two values and send it back to the parent", 1);
+        writer.Ldmfd(StackPointer, new Register[] { r0 });
+        writer.Sub(r8, r0, r8, Flags.NI);
 
         return a.ctx;
     }

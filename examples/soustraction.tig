@@ -1,0 +1,6 @@
+let
+    var x := 64
+in
+    print(x-63)
+    print(62-x)
+end
