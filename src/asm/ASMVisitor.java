@@ -406,6 +406,53 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         a.left.accept(this);
         a.right.accept(this);
 
+        if (a.left instanceof ID) {
+            ID id = (ID) a.left;
+
+            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
+            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
+                
+            writer.SkipLine();
+            writer.Comment("Use the static chain to get back " + id.nom, 1);
+            writer.Mov(r0, BasePointer, Flags.NI);
+
+            if (offset > 0) {
+                writer.Mov(r1, offset, Flags.NI);
+                writer.Bl("_stack_var", Flags.NI);
+            }
+
+            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
+
+            writer.Comment("Add " + id.nom + " to the stack", 1);
+            writer.Stmfd(StackPointer, new Register[] { r0 });
+            writer.SkipLine();
+        }
+
+        if (a.right instanceof ID) {
+            ID id = (ID) a.left;
+
+            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
+            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
+                
+            writer.SkipLine();
+            writer.Comment("Use the static chain to get back " + id.nom, 1);
+            writer.Mov(r0, BasePointer, Flags.NI);
+
+            if (offset > 0) {
+                writer.Mov(r1, offset, Flags.NI);
+                writer.Bl("_stack_var", Flags.NI);
+            }
+
+            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
+
+            writer.Comment("Add " + id.nom + " to the stack", 1);
+            writer.Stmfd(StackPointer, new Register[] { r0 });
+            writer.SkipLine();
+        }
+
+
+
+
         Register[] load_register = { r0, r1 };
         Register[] store_registers = { r0 };
 
@@ -431,6 +478,51 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         a.left.accept(this);
         a.right.accept(this);
 
+        if (a.left instanceof ID) {
+            ID id = (ID) a.left;
+
+            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
+            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
+                
+            writer.SkipLine();
+            writer.Comment("Use the static chain to get back " + id.nom, 1);
+            writer.Mov(r0, BasePointer, Flags.NI);
+
+            if (offset > 0) {
+                writer.Mov(r1, offset, Flags.NI);
+                writer.Bl("_stack_var", Flags.NI);
+            }
+
+            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
+
+            writer.Comment("Add " + id.nom + " to the stack", 1);
+            writer.Stmfd(StackPointer, new Register[] { r0 });
+            writer.SkipLine();
+        }
+
+
+        if (a.right instanceof ID) {
+            ID id = (ID) a.left;
+
+            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
+            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
+                
+            writer.SkipLine();
+            writer.Comment("Use the static chain to get back " + id.nom, 1);
+            writer.Mov(r0, BasePointer, Flags.NI);
+
+            if (offset > 0) {
+                writer.Mov(r1, offset, Flags.NI);
+                writer.Bl("_stack_var", Flags.NI);
+            }
+
+            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
+
+            writer.Comment("Add " + id.nom + " to the stack", 1);
+            writer.Stmfd(StackPointer, new Register[] { r0 });
+            writer.SkipLine();
+        }
+
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
         // We have :
@@ -455,6 +547,50 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // System.out.println("Division");
         a.left.accept(this);
         a.right.accept(this);
+
+        if (a.left instanceof ID) {
+            ID id = (ID) a.left;
+
+            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
+            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
+                
+            writer.SkipLine();
+            writer.Comment("Use the static chain to get back " + id.nom, 1);
+            writer.Mov(r0, BasePointer, Flags.NI);
+
+            if (offset > 0) {
+                writer.Mov(r1, offset, Flags.NI);
+                writer.Bl("_stack_var", Flags.NI);
+            }
+
+            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
+
+            writer.Comment("Add " + id.nom + " to the stack", 1);
+            writer.Stmfd(StackPointer, new Register[] { r0 });
+            writer.SkipLine();
+        }
+
+        if (a.right instanceof ID) {
+            ID id = (ID) a.left;
+
+            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
+            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
+                
+            writer.SkipLine();
+            writer.Comment("Use the static chain to get back " + id.nom, 1);
+            writer.Mov(r0, BasePointer, Flags.NI);
+
+            if (offset > 0) {
+                writer.Mov(r1, offset, Flags.NI);
+                writer.Bl("_stack_var", Flags.NI);
+            }
+
+            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
+
+            writer.Comment("Add " + id.nom + " to the stack", 1);
+            writer.Stmfd(StackPointer, new Register[] { r0 });
+            writer.SkipLine();
+        }
 
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
