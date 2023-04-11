@@ -39,16 +39,16 @@ public class Primitive extends Type {
         switch (type) {
             case INT:
                 // Int size
-                return 8;
+                return 4;
             case CHAR:
                 // String size
-                return 8;
+                return 4;
             case BOOL:
                 // Bool size
                 return 1;
             case ANY:
                 // Any size
-                return 8;
+                return 4;
             default:
                 return null;
         }

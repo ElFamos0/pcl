@@ -9,9 +9,11 @@ import ast.*;
 import parser.exprParser.*;
 import sl.Array;
 import sl.Primitive;
+import sl.Symbol;
 import sl.SymbolLookup;
 import sl.Type;
 import sl.TypeInferer;
+import sl.Variable;
 
 public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     
@@ -22,10 +24,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     private ASMWriter writer;
 
-    private Register BasePointer = new Register("BP", 0);
-    private Register StackPointer = new Register("SP", 0);
-    private Register LinkRegister = new Register("LR", 0);
-    private Register ProgramCounter = new Register("PC", 0);
+    private Register BasePointer = new Register("r11", 0);
+    private Register StackPointer = new Register("r13", 0);
+    private Register LinkRegister = new Register("r14", 0);
+    private Register ProgramCounter = new Register("r15", 0);
 
     private Register r0 = new Register("r0", 0);
     private Register r1 = new Register("r1", 0);
@@ -40,29 +42,33 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     private List<Constant> constants = new ArrayList<Constant>();
 
-    private HashMap<String, Integer> labels = new HashMap<String, Integer>();
-
     public ASMVisitor(SymbolLookup table, ASMWriter writer) {
         this.table = table;
         // permet de récuperer le premier offset (on l'a déjà oublié donc on le note)
         region = table.getLibFunc();
         biggestRegion = region;
         this.writer = writer;
-        this.initHashMap();
     }
 
-    public void initHashMap() {
-        labels.put("def", 0);
-        labels.put("seq", 0);
-        labels.put("if", 0);
-        labels.put("while", 0);
-        labels.put("for", 0);
+    public String getLabel() {
+        String label = "_blk_";
+
+        SymbolLookup sl = this.table.getSymbolLookup(this.region);
+
+        label += sl.getScope() + "_" + sl.getRegion();
+
+        return label;
     }
 
-    public int getLabel(String label) {
-        int i = labels.get(label);
-        labels.put(label, i + 1);
-        return i;
+    public String[] getSonsLabels() {
+        SymbolLookup sl = this.table.getSymbolLookup(this.region);
+        String[] labels = new String[sl.getChildren().size()];
+
+        for (int i = 0; i < sl.getChildren().size(); i++) {
+            labels[i] = "_blk_" + sl.getChildren().get(i).getScope() + "_" + sl.getChildren().get(i).getRegion();
+        }
+
+        return labels;
     }
 
     public void initStack() {
@@ -72,13 +78,13 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Label("main");
         writer.Comment("Init stack", 1);
 
-        Register[] registers = { StackPointer };
+        writer.SkipLine();
+        writer.Comment("Add stack pointer in base pointer", 1);
+        writer.Mov(BasePointer, StackPointer, Flags.NI);
+        
+        String label = "_blk_1_" + (this.region + 1);
+        writer.Bl(label, Flags.NI);
 
-        writer.Stmfd(StackPointer, registers);
-        writer.Mov(r0, StackPointer, Flags.NI);
-        writer.Stmfd(StackPointer, new Register[] { r0 });
-        writer.Bl("def_0", Flags.NI);
-        writer.Ldmfd(StackPointer, new Register[] { r0 });
         writer.SkipLine();
         writer.Bl("exit", Flags.NI);
     }
@@ -102,7 +108,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.SkipLine();
 
         writer.SkipLine();
-        writer.Comment("syscall exit(int status = 0)", 1);
+        writer.Comment("syscall exit(int status = 0)", 0);
         writer.Label("exit");
         writer.Exit(0);
         writer.SkipLine();
@@ -478,9 +484,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 def = "format_str";
             }
 
+            writer.Comment("Load param values inside r0 and r1", 1);
             writer.Ldr(r0, def);
-
-            writer.Ldr(r1, StackPointer, Flags.NI, 0);
+            writer.Ldmfd(StackPointer, new Register[] { r1 });
+            writer.SkipLine();
 
             writer.Bl("printf", Flags.NI);
         } else {
@@ -494,6 +501,26 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // System.out.println("ArgFonction");
         for (Ast e : a.args) {
             e.accept(this);
+
+            if (e instanceof ID) {
+                ID id = (ID) e;
+
+                int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
+                Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
+                
+                writer.SkipLine();
+                writer.Comment("Use the static chain to get back " + id.nom + " addr", 1);
+                writer.Mov(r0, BasePointer, Flags.NI);
+
+                for (int i = 0; i < offset; i++) {
+                    writer.Ldr(r0, r0, Flags.NI, 4);
+                }
+                writer.Ldr(r0, r0, Flags.NI, v.getOffset() - 4);
+
+                writer.Comment("Add " + id.nom + " addr to the stack", 1);
+                writer.Stmfd(StackPointer, new Register[] { r0 });
+                writer.SkipLine();
+            }
         }
         return a.ctx;
     }
@@ -577,19 +604,27 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         StepOneRegion();
         // Do the definition block
 
-        for (Ast ast : a.exprs) {
-            ast.accept(this);
-        }
-
         // Add StackPointer + Return address and create label
         writer.SkipLine();
-        writer.Label("def_" + this.getLabel("def"));
+        writer.Comment("Definition block", 0);
+        writer.Label(this.getLabel());
         
-        Register[] registers = { LinkRegister };
+        Register[] registers = { BasePointer, LinkRegister };
         writer.Stmfd(StackPointer, registers);
+        writer.Mov(BasePointer, StackPointer, Flags.NI);
 
         for (Ast ast : a.declarations) {
             ast.accept(this);
+        }
+
+        for (Ast ast : a.exprs) {
+            if (!(ast instanceof Definition)) {
+                ast.accept(this);
+            }
+        }
+
+        for (String label : this.getSonsLabels()) {
+            writer.Bl(label, Flags.NI);
         }
 
         registers = new Register[] { r0 };
@@ -597,9 +632,15 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             writer.Ldmfd(StackPointer, registers);
         }
 
-        registers = new Register[] { ProgramCounter };
+        registers = new Register[] { ProgramCounter, BasePointer };
         writer.Ldmfd(StackPointer, registers);
         writer.SkipLine();
+
+        for (Ast ast : a.exprs) {
+            if (ast instanceof Definition) {
+                ast.accept(this);
+            }
+        }
 
         // Get back to the original region
         this.region = temp;

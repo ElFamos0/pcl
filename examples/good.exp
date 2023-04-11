@@ -2,9 +2,9 @@ let
     var x := "caca"
 in
     let
-        var y := 5
+        var y := 4
     in
-        print(x);
-        print(y)
+        print(y);
+        print(x)
     end
 end

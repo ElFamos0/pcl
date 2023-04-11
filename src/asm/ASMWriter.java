@@ -53,7 +53,7 @@ public class ASMWriter {
 
         instr += "/* "
             + comment
-            + "*/"
+            + " */"
             + "\n";
 
         // Write instruction to file

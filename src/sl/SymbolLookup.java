@@ -269,4 +269,14 @@ public class SymbolLookup {
         types.put("string", new Array(new Primitive(Character.class)));
         types.put("void", new Primitive(Void.class));
     }
+
+    public int getVarOffset(String var) {
+        if (funcAndVar.containsKey(var)) {
+            return 0;
+        } else if (parent == null) {
+            return -1;
+        } else {
+            return parent.getVarOffset(var) + 1;
+        }
+    }
 }
