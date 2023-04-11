@@ -509,15 +509,15 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
                 
                 writer.SkipLine();
-                writer.Comment("Use the static chain to get back " + id.nom + " addr", 1);
+                writer.Comment("Use the static chain to get back " + id.nom, 1);
                 writer.Mov(r0, BasePointer, Flags.NI);
 
                 for (int i = 0; i < offset; i++) {
-                    writer.Ldr(r0, r0, Flags.NI, 4);
+                    writer.Ldr(r0, r0, Flags.NI, 0);
                 }
                 writer.Ldr(r0, r0, Flags.NI, v.getOffset() - 4);
 
-                writer.Comment("Add " + id.nom + " addr to the stack", 1);
+                writer.Comment("Add " + id.nom + " to the stack", 1);
                 writer.Stmfd(StackPointer, new Register[] { r0 });
                 writer.SkipLine();
             }
