@@ -210,7 +210,13 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(Compar a) {
         // System.out.println("Compar");
         ParserRuleContext left = a.left.accept(this);
+
+        writer.Stmfd(StackPointer, new Register[] { r8 });
+
         a.right.accept(this);
+
+        writer.Mov(r0, r8, Flags.NI);
+        writer.Ldmfd(StackPointer, new Register[] { r1 });
 
         SymbolLookup table = this.table.getSymbolLookup(this.region);
 
@@ -219,20 +225,16 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         if (leftType.equals(new Primitive(Integer.class))) {
             // We have to compare two integers
 
-            Register[] load_register = { r0, r1 };
-            Register[] store_registers = { r0 };
-
             // Load two last values in the stack in R0 and R1.
             // We have :
             //      R0 = a.right
             //      R1 = a.left
-            writer.Ldmfd(StackPointer, load_register);
 
             // CMP R0 and R1 following the operator.
             switch (a.operator) {
             case "<":
                 // CMP R0 and R1
-                // CMP does R0 - R1
+                // CMP does R1 - R0
                 // We need here R0 > R1
                 writer.Cmp(r1, r0);
 
@@ -240,46 +242,37 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 // N flag is set if R0 > R1
 
                 // Set R0 to 1 if N flag is not set.
-                writer.Mov(r0, 0, Flags.PL);
+                writer.Mov(r8, 0, Flags.PL);
 
                 // Set R0 to 0 if N flag is set.
-                writer.Mov(r0, 1, Flags.MI);
+                writer.Mov(r8, 1, Flags.MI);
 
                 // Set R0 to 0 if Z flag is set because we want R0 != R1.
-                writer.Mov(r0, 0, Flags.EQ);
-
-                // Store R0 in the stack
-                writer.Stmfd(StackPointer, store_registers);
+                writer.Mov(r8, 0, Flags.EQ);
                 break;
             case ">":
                 // CMP R0 and R1
                 // CMP does R0 - R1
                 // We need here R0 < R1
-                writer.Cmp(r1, r0);
+                writer.Cmp(r0, r1);
 
                 // Set R0 to 1 if N flag is set.
-                writer.Mov(r0, 0, Flags.MI);
+                writer.Mov(r8, 0, Flags.PL);
 
                 // Set R0 to 0 otherwise.
-                writer.Mov(r0, 1, Flags.PL);
-
-                // Store R0 in the stack
-                writer.Stmfd(StackPointer, store_registers);
+                writer.Mov(r8, 1, Flags.MI);
                 break;
             case "=":
                 // CMP R0 and R1
-                // CMP does R0 - R1
+                // CMP does R1 - R0
                 // We need here R0 = R1
                 writer.Cmp(r1, r0);
 
                 // Set R0 to 1 if Z flag is set.
-                writer.Mov(r0, 1, Flags.EQ);
+                writer.Mov(r8, 1, Flags.EQ);
 
                 // Set R0 to 0 otherwise.
-                writer.Mov(r0, 0, Flags.NE);
-
-                // Store R0 in the stack
-                writer.Stmfd(StackPointer, store_registers);
+                writer.Mov(r8, 0, Flags.NE);
                 break;
             case "<=":
                 // CMP R0 and R1
@@ -288,13 +281,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 writer.Cmp(r0, r1);
 
                 // Set R0 to 1 if N flag is not set.
-                writer.Mov(r0, 1, Flags.PL);
+                writer.Mov(r8, 1, Flags.PL);
 
                 // Set R0 to 0 if N flag is set.
-                writer.Mov(r0, 0, Flags.MI);
-
-                // Store R0 in the stack
-                writer.Stmfd(StackPointer, store_registers);
+                writer.Mov(r8, 0, Flags.MI);
                 break;
             case ">=":
                 // CMP R0 and R1
@@ -303,28 +293,22 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 writer.Cmp(r1, r0);
 
                 // Set R0 to 1 if N flag is not set.
-                writer.Mov(r0, 1, Flags.PL);
+                writer.Mov(r8, 1, Flags.PL);
 
                 // Set R0 to 0 if N flag is set.
-                writer.Mov(r0, 0, Flags.MI);
-
-                // Store R0 in the stack
-                writer.Stmfd(StackPointer, store_registers);
+                writer.Mov(r8, 0, Flags.MI);
                 break;
             case "<>":
                 // CMP R0 and R1
-                // CMP does R0 - R1
+                // CMP does R1 - R0
                 // We need here R0 != R1
                 writer.Cmp(r1, r0);
 
                 // Set R0 to 1 if Z flag is not set.
-                writer.Mov(r0, 1, Flags.NE);
+                writer.Mov(r8, 1, Flags.NE);
 
                 // Set R0 to 0 if Z flag is set.
-                writer.Mov(r0, 0, Flags.EQ);
-
-                // Store R0 in the stack
-                writer.Stmfd(StackPointer, store_registers);
+                writer.Mov(r8, 0, Flags.EQ);
                 break;
             default:
                 throw new UnsupportedOperationException("Unimplemented operator '" + a.operator + "'");
@@ -566,6 +550,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             writer.Bl("_stack_var", Flags.NI);
         }
 
+        System.out.println("Offset : " + v.getOffset());
         writer.Add(r0, r0, v.getOffset(), Flags.NI);
 
         // writer.Comment("Add " + id.nom + " to the stack", 1);
@@ -752,7 +737,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 writer.Bl("_stack_var", Flags.NI);
             }
 
-            writer.Add(r0, r0,v.getOffset(), Flags.NI );
+            writer.Add(r0, r0, v.getOffset(), Flags.NI );
             writer.Ldr(r0,r0, Flags.NI, 0);
 
             writer.Comment("Add " + id.nom + " to the stack", 1);
