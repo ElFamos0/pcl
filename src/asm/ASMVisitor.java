@@ -42,6 +42,17 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     private Register r8 = new Register("r8", 0);
     private Register r9 = new Register("r9", 0);
 
+    private Register r0adr = new Register("[r0]", 0);
+    private Register r1adr = new Register("[r1]", 0);
+    private Register r2adr = new Register("[r2]", 0);
+    private Register r3adr = new Register("[r3]", 0);
+    private Register r4adr = new Register("[r4]", 0);
+    private Register r5adr = new Register("[r5]", 0);
+    private Register r6adr = new Register("[r6]", 0);
+    private Register r7adr = new Register("[r7]", 0);
+    private Register r8adr = new Register("[r8]", 0);
+    private Register r9adr = new Register("[r9]", 0);
+
     private List<Constant> constants = new ArrayList<Constant>();
 
     public ASMVisitor(SymbolLookup table, ASMWriter writer) {
@@ -655,26 +666,49 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(While a) {
         // System.out.println("While");
         int temp = region;
-
-        Register[] store = {r0};
-
-        // TODO: Remove this code
-        writer.Add(r0, r0, 10, Flags.NI);
-        writer.Stmfd(StackPointer, store);
-
         StepOneRegion();
-        // Do the while block
-        writer.SkipLine();
-        writer.Label("while_" + this.region);
+        SymbolLookup table = this.table.getSymbolLookup(this.region);
+        Ast cond = a.condition;
+        writer.Comment("While block", 0);
+        writer.Label(this.getLabel(table));
 
-        
+        cond.accept(this);
 
+        if (cond instanceof ID) {
+            ID id = (ID) cond;
 
-        // End of the while
-        writer.SkipLine();
-        writer.Label("while_exit_" + this.region);
-        writer.B("_exit", Flags.NI);
-        writer.SkipLine();
+            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
+            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
+            
+            writer.SkipLine();
+            writer.Comment("Use the static chain to get back " + id.nom, 1);
+            writer.Mov(r0, BasePointer, Flags.NI);
+
+            if (offset > 0) {
+                writer.Mov(r1, offset, Flags.NI);
+                writer.Bl("_stack_var", Flags.NI);
+            }
+
+            writer.Add(r0, r0,v.getOffset(), Flags.NI );
+            writer.Mov(r0,r0adr, Flags.NI);
+
+            writer.Comment("Add " + id.nom + " to the stack", 1);
+            writer.Stmfd(StackPointer, new Register[] { r0 });
+            writer.SkipLine();
+        }
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Cmp(r0, 0);
+        writer.B(this.getLabel(table) + "_end", Flags.EQ);
+
+        Ast block = a.block;
+        writer.Comment("While content", 1);
+        block.accept(this);
+
+        writer.B(this.getLabel(table),Flags.NI);
+        writer.Comment("While EndBlock", 1);
+
+        writer.Label(this.getLabel(table) + "_end");
 
         // Get back to the original region
         this.region = temp;
