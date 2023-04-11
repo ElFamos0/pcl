@@ -797,13 +797,31 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         
         Register[] registers = { BasePointer, LinkRegister };
         // Begin
+        writer.Comment("begin:", 1);
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
+        writer.SkipLine();
 
         // Block
+        writer.Comment("block:", 1);
         a.expr.accept(this);
+        writer.SkipLine();
+
+        // Return
+        writer.Comment("return:", 1);
+        if (!(f.getType().equals(new Primitive(Void.class)))) {
+            // Load the return value in r0 and store it in the return value slot
+            registers = new Register[] { r0 };
+            writer.Ldmfd(StackPointer, registers);
+            // r11 in r1
+            writer.Mov(r1, BasePointer, Flags.NI);
+            writer.Add(r1, r1, 8, Flags.NI);
+            writer.Str(r0, r1, 0);
+        }
+        writer.SkipLine();
 
         // End
+        writer.Comment("end:", 1);
         registers = new Register[] { ProgramCounter, BasePointer };
         writer.Ldmfd(StackPointer, registers);
         writer.SkipLine();

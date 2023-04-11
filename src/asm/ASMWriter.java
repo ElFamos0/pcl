@@ -608,8 +608,8 @@ public class ASMWriter {
 
     // STR function
     // STR stores a word from a register into memory.
-    public void Str(Register dst, Register addr) {
-        String instr = "STR" + " " + dst.getName() + ", [" + addr.getName() + "]" + "\n";
+    public void Str(Register dst, Register addr, Integer offset) {
+        String instr = "\tSTR" + " " + dst.getName() + ", [" + addr.getName() + ", #"+offset.toString()+"]" + "\n";
 
         // Write instruction to file
         write(instr);

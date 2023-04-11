@@ -3,6 +3,5 @@ let
     function f(x: int): int =
         x + 4
 in
-    print(1);
     print(f(x))
 end
