@@ -558,6 +558,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
             // Branch to the function
             writer.Bl(funclabel, Flags.NI);
+
+            // Pop args
+            int nbArgs = f.getParamsCount();
+            writer.Add(StackPointer, StackPointer, 4 * (nbArgs + 1), Flags.NI);
         }
         
         return a.ctx;
@@ -602,14 +606,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         return a.ctx;
     }
 
-
-<<<<<<< Updated upstream
-
-=======
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
-    }
->>>>>>> Stashed changes
-
     @Override
     public ParserRuleContext visit(IfThenElse a) {
         // System.out.println("IfThenElse");
@@ -651,7 +647,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Label(this.getLabel(table));
 
         cond.accept(this);
-<<<<<<< Updated upstream
 
         if (cond instanceof ID) {
             ID id = (ID) cond;
@@ -677,9 +672,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         }
 
         writer.Ldmfd(StackPointer, new Register[] {r0});
-=======
-        writer.Mov(r0,r8,Flags.NI);
->>>>>>> Stashed changes
         writer.Cmp(r0, 0);
         writer.B(this.getLabel(table) + "_end", Flags.EQ);
 
