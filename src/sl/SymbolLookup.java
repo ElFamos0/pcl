@@ -10,7 +10,7 @@ public class SymbolLookup {
     private HashMap<String, Type> types;
     private int scope;
     private int region;
-    private int varOffset = 0;
+    private int varOffset = -4;
     private int libFunc = 0;
     private static int regionCount = 0;
     private SymbolLookup parent;
@@ -204,7 +204,7 @@ public class SymbolLookup {
         ArrayList<Variable> result = new ArrayList<Variable>();
 
         for (Symbol s : funcAndVar.values()) {
-            if (s instanceof Variable && ((Variable) s).getOffset() < 0) {
+            if (s instanceof Variable && ((Variable) s).getOffset() > 0) {
                 result.add((Variable) s);
             }
         }
@@ -226,7 +226,7 @@ public class SymbolLookup {
         if (s instanceof Variable) {
             ((Variable) s).setOffset(varOffset);
 
-            varOffset += 8;
+            varOffset -= 4;
         }
         if (s instanceof Function) {
             // Get the last children

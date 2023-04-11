@@ -29,10 +29,10 @@ public class Function extends FuncOrVariable {
     }
 
     public void addParams(ArrayList<Variable> params) {
-        int offset = 0;
+        int offset = 8;
 
         for (Variable p : params) {
-            offset -= 4;
+            offset += 4;
             p.setOffset(offset);
             table.addSymbolParam(p);
         }

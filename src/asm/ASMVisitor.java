@@ -341,7 +341,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
             int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
             Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
-                
+
             writer.SkipLine();
             writer.Comment("Use the static chain to get back " + id.nom, 1);
             writer.Mov(r0, BasePointer, Flags.NI);
@@ -987,8 +987,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             writer.Ldmfd(StackPointer, registers);
             // r11 in r1
             writer.Mov(r1, BasePointer, Flags.NI);
-            writer.Add(r1, r1, 8, Flags.NI);
-            writer.Str(r0, r1, 0);
+            writer.Str(r0, r1, 8);
         }
         writer.SkipLine();
 
