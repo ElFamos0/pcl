@@ -69,7 +69,7 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
         writer.write(".globl main\n");
         writer.Label("main");
 
-        a.expression.accept(this,false);
+        a.expression.accept(this,true);
 
         writer.SkipLine();
         writer.Comment("syscall exit(int status = 0)", 1);
@@ -89,31 +89,8 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Expression a, boolean bool) {
-
-        // Si on visite une expression, c'est forcément qu'on a un truc style  x:= y 
         a.left.accept(this,true);
         a.right.accept(this,true);
-
-        Register r0 = new Register("r0", 0);
-        Register r1 = new Register("r1", 0);
-
-        // Generate arm code
-        // Load two last values in the stack in R0 and R1.
-        // We have :
-        //      R0 = a.right
-        //      R1 = a.left
-        Register[] load_register = { r0, r1 };
-        writer.Ldmfd(StackPointer, load_register);
-
-        // MOV R0 in R1
-        writer.Mov(r1, r0, Flags.NI);
-
-        // Store R0 in the stack if necessary
-        if (bool) {
-            Register[] store_registers = { r0 };
-            writer.Stmfd(StackPointer, store_registers);
-        }
-        
 
         return a.ctx;
     }
@@ -462,7 +439,6 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
         // Only implement "print" for integers
         if (id.nom.equals("print")) {
             // Get the argument
-            //Bool is set to false cause we don't expect it to put a value in the stack
             a.args.accept(this,false);
 
             SymbolLookup table = this.table.getSymbolLookup(this.region);
