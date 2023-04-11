@@ -279,7 +279,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 // CMP R0 and R1
                 // CMP does R0 - R1
                 // We need here R0 >= R1
-                writer.Cmp(r1, r0);
+                writer.Cmp(r0, r1);
 
                 // Set R0 to 1 if N flag is not set.
                 writer.Mov(r0, 1, Flags.PL);
@@ -294,7 +294,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 // CMP R0 and R1
                 // CMP does R1 - R0
                 // We need here R1 >= R0
-                writer.Cmp(r0, r1);
+                writer.Cmp(r1, r0);
 
                 // Set R0 to 1 if N flag is not set.
                 writer.Mov(r0, 1, Flags.PL);
@@ -341,7 +341,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
             int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
             Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
-
+                
             writer.SkipLine();
             writer.Comment("Use the static chain to get back " + id.nom, 1);
             writer.Mov(r0, BasePointer, Flags.NI);
@@ -1017,7 +1017,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             writer.Ldmfd(StackPointer, registers);
             // r11 in r1
             writer.Mov(r1, BasePointer, Flags.NI);
-            writer.Str(r0, r1, 8);
+            writer.Add(r1, r1, 8, Flags.NI);
+            writer.Str(r0, r1, 0);
         }
         writer.SkipLine();
 
