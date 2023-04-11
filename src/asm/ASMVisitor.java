@@ -467,7 +467,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(Sequence a) {
         // System.out.println("Sequence");
-        // TODO Auto-generated method stub
+        for (Ast expr : a.seqs){
+            expr.accept(this);
+        }
         return a.ctx;
     }
 
@@ -616,7 +618,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         int temp = region;
 
         writer.SkipLine();
-        writer.Comment("IfThen", 0);
+        writer.Comment("If-Then", 0);
+
+        SymbolLookup table = this.table.getSymbolLookup(this.region+1);
+        String label = "_blk_" + table.getScope()+ "_"+ table.getRegion();
 
 
         a.condition.accept(this);
@@ -624,17 +629,19 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // si c'est 0 on saute a la fin du if
         // sinon on continue
         Register[] load_register = { r0 };
-
         writer.Ldmfd(StackPointer, load_register);
         writer.Cmp(r0, 0);
-        writer.B("if_exit", Flags.EQ);
+        writer.B("exit", Flags.EQ);
+        writer.B(label, Flags.NI);
 
         StepOneRegion();
         // Do the then block
         writer.SkipLine();
-        a.thenBlock.accept(this);
+
         writer.SkipLine();
-        writer.Label("if_exit");
+        writer.Label(label);
+
+        a.thenBlock.accept(this);
         writer.SkipLine();
     
         // Get back to the original region
@@ -715,9 +722,11 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         }
 
         String[] labels = getSonsLabels();
+        Integer j = 0;
         for (int i = 0; i < a.exprs.size(); i++) {
-            if (!(a.exprs.get(i) instanceof AppelFonction)) {
-                writer.Bl(labels[i], Flags.NI);
+            if (!(a.exprs.get(i) instanceof AppelFonction) ) {
+                writer.Bl(labels[j], Flags.NI);
+                j++;
             }
         }
 

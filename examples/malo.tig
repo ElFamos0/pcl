@@ -1,5 +1,5 @@
 let
     var x := "c'est fou"
 in
-    if 2>1 then print(x)
+    print(2<1)
 end
