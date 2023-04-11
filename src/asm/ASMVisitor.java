@@ -103,10 +103,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Comment("Add stack pointer in base pointer", 1);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
         
-        String label = "_blk_1_" + (this.region + 1);
-        writer.Bl(label, Flags.NI);
-        writer.SkipLine();
-        writer.Bl("exit", Flags.NI);
     }
 
     public void StepOneRegion() {
@@ -125,6 +121,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         a.expression.accept(this);
 
+        writer.SkipLine();
+        writer.Bl("exit", Flags.NI);
         writer.SkipLine();
         writer.StackVar();
 
@@ -534,6 +532,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(AppelFonction a) {
         // System.out.println("AppelFonction");
         ID id = (ID) a.id;
+        System.out.println(id.nom + " " + this.region);
 
         // Only implement "print" for integers
         if (id.nom.equals("print")) {
@@ -575,6 +574,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             // Branch to the function
             writer.Bl(funclabel, Flags.NI);
         }
+        
         return a.ctx;
     }
 
@@ -587,6 +587,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             if (e instanceof ID) {
                 ID id = (ID) e;
 
+                System.out.println("ID: " + id.nom + " " + this.region);
                 int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
                 Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
                 
@@ -734,6 +735,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         int temp = region;
 
         StepOneRegion();
+        System.out.println("Definition: " + this.region);
         // Do the definition block
 
         // Add StackPointer + Return address and create label
@@ -741,7 +743,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Comment("Definition block", 0);
         writer.Label(this.getLabel());
         
-        Register[] registers = { BasePointer, LinkRegister };
+        Register[] registers = { BasePointer };
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
 
@@ -750,6 +752,16 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 ast.accept(this);
             }
         }
+
+        writer.B(this.getLabel() + "_dead_zone", Flags.NI);
+
+        for (Ast ast : a.declarations) {
+            if (ast instanceof DeclarationFonction) {
+                ast.accept(this);
+            }
+        }
+
+        writer.Label(this.getLabel() + "_dead_zone");
 
         for (Ast ast : a.exprs) {
             ast.accept(this);
@@ -760,15 +772,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             writer.Ldmfd(StackPointer, registers);
         }
 
-        registers = new Register[] { ProgramCounter, BasePointer };
+        registers = new Register[] { BasePointer };
         writer.Ldmfd(StackPointer, registers);
         writer.SkipLine();
-
-        for (Ast ast : a.declarations) {
-            if (ast instanceof DeclarationFonction) {
-                ast.accept(this);
-            }
-        }
 
         // Get back to the original region
         this.region = temp;
@@ -811,6 +817,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         SymbolLookup sl = this.table.getSymbolLookup(this.region);
 
         StepOneRegion();
+        System.out.println("DeclarationFonction:");
         writer.SkipLine();
 
         for (Ast ast : a.args) {
