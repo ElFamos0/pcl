@@ -3,6 +3,7 @@ package asm;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import ast.*;
@@ -557,7 +558,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             a.args.accept(this);
 
             // Add #4 to the stack pointer to leave a place for the return value
-            writer.Add(StackPointer, StackPointer, 4, Flags.NI);
+            Register[] registers = { r0 };
+            writer.Stmfd(StackPointer, registers);
 
             // Branch to the function
             writer.Bl(funclabel, Flags.NI);
