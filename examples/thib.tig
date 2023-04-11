@@ -1,0 +1,10 @@
+let
+    var x := "caca"
+    function f(x: string) =
+        print(x)
+    function b(x: string) = 
+        f(x)
+in
+    b(x);
+    print(x)
+end

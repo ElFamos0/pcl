@@ -550,7 +550,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             writer.Bl("_stack_var", Flags.NI);
         }
 
-        System.out.println("Offset : " + v.getOffset());
         writer.Add(r0, r0, v.getOffset(), Flags.NI);
 
         // writer.Comment("Add " + id.nom + " to the stack", 1);
@@ -574,14 +573,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(ExpressionIdentifiant a) {
         // System.out.println("ExpressionIdentifiant");
-        // TODO Auto-generated method stub
-
-
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
-
-
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        
+        return a.ctx;
     }
 
     @Override
@@ -598,19 +591,17 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             ArrayList<Ast> args = argF.args;
             Type t = type.inferType(table, args.get(0));
 
+            String def = "format_int";
+            if (t.equals(new Array(new Primitive(Character.class)))) {
+                def = "format_str";
+            }
+
             String profile = "printf(" + t + ")";
 
             writer.SkipLine();
             writer.Comment("call: "+profile, 1);
-
-            if (t.equals(new Primitive(Integer.class))) {
-                writer.Ldr(r0, "format_int");
-                writer.Ldmfd(StackPointer, new Register[] { r1 });
-                writer.Ldr(r1, r1, Flags.NI, 0);
-            } else {
-                writer.Ldr(r0, "format_str");
-                writer.Ldmfd(StackPointer, new Register[] { r1 });
-            }
+            writer.Ldr(r0, def);
+            writer.Ldmfd(StackPointer, new Register[] { r1 });
 
             writer.Bl("printf", Flags.NI);
         } else {
@@ -643,7 +634,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         for (Ast e : a.args) {
             e.accept(this);
 
-            writer.Stmfd(StackPointer, new Register[] { r9 });
+            writer.Stmfd(StackPointer, new Register[] { r8 });
         }
         return a.ctx;
     }
@@ -940,7 +931,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.SkipLine();
         writer.Comment("Declare variable " + id.nom, 1);
 
-        a.id.accept(this);
+        // a.id.accept(this);
 
         a.expr.accept(this);
 
@@ -959,7 +950,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         Constant c = new Constant(a.getValeur());
         constants.add(c);
 
-        writer.Ldr(r9, c.getId());
+        writer.Ldr(r8, c.getId());
         
         return a.ctx;
     }
