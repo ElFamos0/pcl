@@ -32,7 +32,7 @@ public class Function extends FuncOrVariable {
         int offset = 0;
 
         for (Variable p : params) {
-            offset -= 8;
+            offset -= 4;
             p.setOffset(offset);
             table.addSymbolParam(p);
         }
