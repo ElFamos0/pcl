@@ -42,17 +42,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     private Register r8 = new Register("r8", 0);
     private Register r9 = new Register("r9", 0);
 
-    private Register r0adr = new Register("[r0]", 0);
-    private Register r1adr = new Register("[r1]", 0);
-    private Register r2adr = new Register("[r2]", 0);
-    private Register r3adr = new Register("[r3]", 0);
-    private Register r4adr = new Register("[r4]", 0);
-    private Register r5adr = new Register("[r5]", 0);
-    private Register r6adr = new Register("[r6]", 0);
-    private Register r7adr = new Register("[r7]", 0);
-    private Register r8adr = new Register("[r8]", 0);
-    private Register r9adr = new Register("[r9]", 0);
-
     private List<Constant> constants = new ArrayList<Constant>();
 
     public ASMVisitor(SymbolLookup table, ASMWriter writer) {
@@ -837,7 +826,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             }
 
             writer.Add(r0, r0,v.getOffset(), Flags.NI );
-            writer.Mov(r0,r0adr, Flags.NI);
+            writer.Ldr(r0,r0, Flags.NI, 0);
 
             writer.Comment("Add " + id.nom + " to the stack", 1);
             writer.Stmfd(StackPointer, new Register[] { r0 });
