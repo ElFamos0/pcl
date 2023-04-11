@@ -661,6 +661,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(ExpressionIdentifiant a) {
         // System.out.println("ExpressionIdentifiant");
         // TODO Auto-generated method stub
+
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
+
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
@@ -760,6 +766,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         // Get back to the original region
         this.region = temp;
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
@@ -920,30 +930,50 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(DeclarationType a) {
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(DeclarationTypeClassique a) {
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(DeclarationArrayType a) {
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(DeclarationRecordType a) {
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(DeclarationChamp a) {
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         return a.ctx; 
     }
 
@@ -1029,36 +1059,63 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Nil a) {
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(Break a) {
+
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(InstanciationType a) {
+
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(ListeAcces a) {
+
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(ExpressionArray a) {
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(AccesChamp a) {
+
+        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Stmfd(StackPointer, new Register[] {r1});
+
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
