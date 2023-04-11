@@ -651,35 +651,27 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(IfThen a) {
         int temp = region;
-
+        
         writer.SkipLine();
         writer.Comment("If-Then", 0);
-
-        SymbolLookup table = this.table.getSymbolLookup(this.region+1);
-        String label = "_blk_" + table.getScope()+ "_"+ table.getRegion();
-
-
         a.condition.accept(this);
-        // on recupere la valeur de la condition dans r0
-        // si c'est 0 on saute a la fin du if
-        // sinon on continue
-        Register[] load_register = { r0 };
-        writer.Ldmfd(StackPointer, load_register);
-        writer.Cmp(r0, 0);
-        writer.B("exit", Flags.EQ);
-        writer.B(label, Flags.NI);
-
+        // on store le resultat de la condition dans r0
+        writer.Mov(r0,r8,Flags.NI);
+        // on compare r0 a 0
+        writer.Cmp(r0,0);
+        // on saute a la fin du if si la condition est fausse
         StepOneRegion();
-        // Do the then block
-        writer.SkipLine();
+        SymbolLookup table = this.table.getSymbolLookup(this.region);
+        writer.B(this.getLabel(table)+"_end",Flags.EQ);
+        // on execute le then
+        Ast then = a.thenBlock;
+        then.accept(this);
 
-        writer.SkipLine();
-        writer.Label(label);
+        writer.Comment("End of If-Then", 1);
 
-        a.thenBlock.accept(this);
-        writer.SkipLine();
-    
-        // Get back to the original region
+        writer.Label(this.getLabel(table)+"_end");
+        
+        // Get back to the original region 
         this.region = temp;
         return a.ctx;
     }
@@ -691,22 +683,29 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(IfThenElse a) {
         // System.out.println("IfThenElse");
         int temp = region;
+        String label = this.getLabel(this.table.getSymbolLookup(this.region));
+        writer.SkipLine();
+        writer.Comment("If-Then-Else", 0);
+        a.condition.accept(this);
+        // on store le resultat de la condition dans r0
+        writer.Mov(r0,r8,Flags.NI);
+        // on compare r0 a 0
+        writer.Cmp(r0,0);
+        // on saute dans le else si la condition est fausse
+        StepOneRegion();
+        writer.B(label+"_else",Flags.EQ);
 
+        Ast then = a.thenBlock;
+        then.accept(this);
 
+        writer.B(label+"_end",Flags.NI);
+        StepOneRegion();
+        writer.Label(label+"_else");
+        Ast elseBlock = a.elseBlock;
         
-        StepOneRegion();
-        // Do the then block
-
-        StepOneRegion();
-        // Do the else block
-
-        // Get back to the original region
+        elseBlock.accept(this);
         this.region = temp;
-
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
-
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        return a.ctx; 
     }
 
 
