@@ -9,10 +9,6 @@ public class ArgFonction implements Ast {
         return visitor.visit(this);
     }
 
-    public <T> T accept(AstVisitorBool<T> visitor, boolean bool) {
-        return visitor.visit(this,bool);
-    }
-
     public ArrayList<Ast> args;
     public AppelFonctionContext ctx;
 

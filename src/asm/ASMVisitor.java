@@ -12,7 +12,7 @@ import sl.SymbolLookup;
 import sl.Type;
 import sl.TypeInferer;
 
-public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
+public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     
     private SymbolLookup table;
     private int region;
@@ -64,12 +64,12 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(Program a, boolean bool) {
+    public ParserRuleContext visit(Program a) {
         writer.write(".text\n");
         writer.write(".globl main\n");
         writer.Label("main");
 
-        a.expression.accept(this,true);
+        a.expression.accept(this);
 
         writer.SkipLine();
         writer.Comment("syscall exit(int status = 0)", 1);
@@ -88,17 +88,17 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(Expression a, boolean bool) {
-        a.left.accept(this,true);
-        a.right.accept(this,true);
+    public ParserRuleContext visit(Expression a) {
+        a.left.accept(this);
+        a.right.accept(this);
 
         return a.ctx;
     }
 
     @Override
-    public ParserRuleContext visit(Ou a, boolean bool) {
-        a.left.accept(this,true);
-        a.right.accept(this,true);
+    public ParserRuleContext visit(Ou a) {
+        a.left.accept(this);
+        a.right.accept(this);
 
         Register r0 = new Register("r0", 0);
         Register r1 = new Register("r1", 0);
@@ -122,9 +122,9 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(Et a, boolean bool) {
-        a.left.accept(this,true);
-        a.right.accept(this,true);
+    public ParserRuleContext visit(Et a) {
+        a.left.accept(this);
+        a.right.accept(this);
 
         Register r0 = new Register("r0", 0);
         Register r1 = new Register("r1", 0);
@@ -148,9 +148,9 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(Compar a, boolean bool) {
-        ParserRuleContext left = a.left.accept(this,true);
-        a.right.accept(this,true);
+    public ParserRuleContext visit(Compar a) {
+        ParserRuleContext left = a.left.accept(this);
+        a.right.accept(this);
 
         SymbolLookup table = this.table.getSymbolLookup(this.region);
 
@@ -279,9 +279,9 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(Addition a, boolean bool) {
-        a.left.accept(this,true);
-        a.right.accept(this,true);
+    public ParserRuleContext visit(Addition a) {
+        a.left.accept(this);
+        a.right.accept(this);
 
         Register r0 = new Register("r0", 0);
         Register r1 = new Register("r1", 0);
@@ -307,9 +307,9 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(Soustraction a, boolean bool) {
-        a.left.accept(this,true);
-        a.right.accept(this,true);
+    public ParserRuleContext visit(Soustraction a) {
+        a.left.accept(this);
+        a.right.accept(this);
 
         Register r0 = new Register("r0", 0);
         Register r1 = new Register("r1", 0);
@@ -334,9 +334,9 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(Multiplication a, boolean bool) {
-        a.left.accept(this,true);
-        a.right.accept(this,true);
+    public ParserRuleContext visit(Multiplication a) {
+        a.left.accept(this);
+        a.right.accept(this);
         Register r2 = new Register("r2", 0);
         Register r1 = new Register("r1", 0);
         Register r0 = new Register("r0",0);
@@ -360,9 +360,9 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
 
 
     @Override
-    public ParserRuleContext visit(Division a, boolean bool) {
-        a.left.accept(this,true);
-        a.right.accept(this,true);
+    public ParserRuleContext visit(Division a) {
+        a.left.accept(this);
+        a.right.accept(this);
         Register r2 = new Register("r2", 0);
         Register r1 = new Register("r1", 0);
         Register r0 = new Register("r0",0);
@@ -385,14 +385,14 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(Sequence a, boolean bool) {
+    public ParserRuleContext visit(Sequence a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(Negation a, boolean bool) {
-        a.expression.accept(this,true);
+    public ParserRuleContext visit(Negation a) {
+        a.expression.accept(this);
         Register r0 = new Register("r0", 0);
         Register r1 = new Register("r1", 0);
         Register[] load_register = { r0 };
@@ -411,13 +411,13 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(ID a, boolean bool) {
+    public ParserRuleContext visit(ID a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(Int a, boolean bool) {
+    public ParserRuleContext visit(Int a) {
         Register r0 = new Register("r0", 0);
         Register[] store_registers = { r0 };
         writer.Mov(r0, a.toInt(), Flags.NI);
@@ -427,19 +427,19 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(ExpressionIdentifiant a, boolean bool) {
+    public ParserRuleContext visit(ExpressionIdentifiant a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(AppelFonction a, boolean bool) {
+    public ParserRuleContext visit(AppelFonction a) {
         ID id = (ID) a.id;
 
         // Only implement "print" for integers
         if (id.nom.equals("print")) {
             // Get the argument
-            a.args.accept(this,false);
+            a.args.accept(this);
 
             SymbolLookup table = this.table.getSymbolLookup(this.region);
 
@@ -468,15 +468,15 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(ArgFonction a, boolean bool) {
+    public ParserRuleContext visit(ArgFonction a) {
         for (Ast e : a.args) {
-            e.accept(this,false);
+            e.accept(this);
         }
         return a.ctx;
     }
 
     @Override
-    public ParserRuleContext visit(IfThenElse a, boolean bool) {
+    public ParserRuleContext visit(IfThenElse a) {
         int temp = region;
 
         StepOneRegion();
@@ -491,7 +491,7 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(IfThen a, boolean bool) {
+    public ParserRuleContext visit(IfThen a) {
         int temp = region;
 
         StepOneRegion();
@@ -503,7 +503,7 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(While a, boolean bool) {
+    public ParserRuleContext visit(While a) {
         int temp = region;
 
         StepOneRegion();
@@ -515,7 +515,7 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(For a, boolean bool) {
+    public ParserRuleContext visit(For a) {
         int temp = region;
 
         StepOneRegion();
@@ -527,7 +527,7 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(Definition a, boolean bool) {
+    public ParserRuleContext visit(Definition a) {
         int temp = region;
 
         StepOneRegion();
@@ -539,37 +539,37 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(DeclarationType a, boolean bool) {
+    public ParserRuleContext visit(DeclarationType a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(DeclarationTypeClassique a, boolean bool) {
+    public ParserRuleContext visit(DeclarationTypeClassique a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(DeclarationArrayType a, boolean bool) {
+    public ParserRuleContext visit(DeclarationArrayType a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(DeclarationRecordType a, boolean bool) {
+    public ParserRuleContext visit(DeclarationRecordType a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(DeclarationChamp a, boolean bool) {
+    public ParserRuleContext visit(DeclarationChamp a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(DeclarationFonction a, boolean bool) {
+    public ParserRuleContext visit(DeclarationFonction a) {
         int temp = region;
 
         StepOneRegion();
@@ -581,13 +581,13 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(DeclarationValeur a, boolean bool) {
+    public ParserRuleContext visit(DeclarationValeur a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(ChaineChr a, boolean bool) {
+    public ParserRuleContext visit(ChaineChr a) {
         Constant c = new Constant(a.getValeur());
         constants.add(c);
 
@@ -600,37 +600,37 @@ public class ASMVisitor implements AstVisitorBool<ParserRuleContext> {
     }
 
     @Override
-    public ParserRuleContext visit(Nil a, boolean bool) {
+    public ParserRuleContext visit(Nil a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(Break a, boolean bool) {
+    public ParserRuleContext visit(Break a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(InstanciationType a, boolean bool) {
+    public ParserRuleContext visit(InstanciationType a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(ListeAcces a, boolean bool) {
+    public ParserRuleContext visit(ListeAcces a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(ExpressionArray a, boolean bool) {
+    public ParserRuleContext visit(ExpressionArray a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
-    public ParserRuleContext visit(AccesChamp a, boolean bool) {
+    public ParserRuleContext visit(AccesChamp a) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }

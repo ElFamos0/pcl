@@ -5,10 +5,6 @@ public class AccesChamp implements Ast{
         return visitor.visit(this);
     }
 
-    public <T> T accept(AstVisitorBool<T> visitor, boolean bool) {
-        return visitor.visit(this,bool);
-    }
-
     boolean isArrayAccess;
     Ast child;
 
