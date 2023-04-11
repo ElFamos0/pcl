@@ -22,21 +22,21 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     private ASMWriter writer;
 
-    private Register BasePointer = new Register("r11", 0);
-    private Register StackPointer = new Register("r13", 0);
-    private Register LinkRegister = new Register("r14", 0);
-    private Register ProgramCounter = new Register("r15", 0);
+    private Register BasePointer = new Register("BP", 0);
+    private Register StackPointer = new Register("SP", 0);
+    private Register LinkRegister = new Register("LR", 0);
+    private Register ProgramCounter = new Register("PC", 0);
 
-    private Register r0 = new Register("r1", 0);
-    private Register r1 = new Register("r2", 0);
-    private Register r2 = new Register("r3", 0);
+    private Register r0 = new Register("r0", 0);
+    private Register r1 = new Register("r1", 0);
+    private Register r2 = new Register("r2", 0);
+    private Register r3 = new Register("r3", 0);
     private Register r4 = new Register("r4", 0);
     private Register r5 = new Register("r5", 0);
     private Register r6 = new Register("r6", 0);
     private Register r7 = new Register("r7", 0);
     private Register r8 = new Register("r8", 0);
     private Register r9 = new Register("r9", 0);
-    private Register r10 = new Register("r10", 0);
 
     private List<Constant> constants = new ArrayList<Constant>();
 
@@ -75,7 +75,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         Register[] registers = { StackPointer };
 
         writer.Stmfd(StackPointer, registers);
+        writer.Mov(r0, StackPointer, Flags.NI);
+        writer.Stmfd(StackPointer, new Register[] { r0 });
         writer.Bl("def_0", Flags.NI);
+        writer.Ldmfd(StackPointer, new Register[] { r0 });
         writer.SkipLine();
         writer.Bl("exit", Flags.NI);
     }
@@ -578,7 +581,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.SkipLine();
         writer.Label("def_" + this.getLabel("def"));
         
-        Register[] registers = { StackPointer, LinkRegister };
+        Register[] registers = { LinkRegister };
         writer.Stmfd(StackPointer, registers);
 
         for (Ast ast : a.declarations) {
@@ -593,7 +596,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             writer.Ldmfd(StackPointer, registers);
         }
 
-        registers = new Register[] { ProgramCounter, r0 };
+        registers = new Register[] { ProgramCounter };
         writer.Ldmfd(StackPointer, registers);
         writer.SkipLine();
 
