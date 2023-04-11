@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.sql.Time;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -27,12 +28,14 @@ public class Main {
 
         // Create a new thread to update and print elapsed time
         Thread timerThread = new Thread(() -> {
-            int elapsedTime = 0;
+            Time startTime = new Time(System.currentTimeMillis());
             while (true) {
-                System.out.print("\r\033[0;34m COMPILING... (" + elapsedTime + "s) \033[0m");
-                elapsedTime++;
+                long ms = (System.currentTimeMillis() - startTime.getTime());
+                // Format ms to 0.000s
+                String elapsedSeconds = String.format("%.3f", ms / 1000.0);
+                System.out.print("\r\033[0;34m COMPILING... (" + elapsedSeconds + "s) \033[0m");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(1);
                 } catch (InterruptedException e) {
                     // Thread was interrupted, exit the loop
                     break;
@@ -61,7 +64,7 @@ public class Main {
             AstCreator creator = new AstCreator(table, errorHandler);
             Ast ast = program.accept(creator);
 
-            System.out.println(table.toString());
+            // System.out.println(table.toString());
 
             // Visiteur de représentation graphique + appel
             GraphVizVisitor graphViz = new GraphVizVisitor();
@@ -77,6 +80,12 @@ public class Main {
 
             ASMVisitor asmv = new ASMVisitor(table, writer);
             ast.accept(asmv);
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             timerThread.interrupt();
             System.out.println("\r\033[0;32m COMPILATION SUCCESSFUL \033[0m");
