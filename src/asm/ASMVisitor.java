@@ -712,24 +712,13 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Mov(BasePointer, StackPointer, Flags.NI);
 
         for (Ast ast : a.declarations) {
-            if (!(ast instanceof Definition) && !(ast instanceof DeclarationFonction)) {
+            if (!(ast instanceof DeclarationFonction)) {
                 ast.accept(this);
             }
         }
 
         for (Ast ast : a.exprs) {
-            if (!(ast instanceof Definition) && !(ast instanceof DeclarationFonction)) {
-                ast.accept(this);
-            }
-        }
-
-        String[] labels = getSonsLabels();
-        Integer j = 0;
-        for (int i = 0; i < a.exprs.size(); i++) {
-            if (!(a.exprs.get(i) instanceof AppelFonction) ) {
-                writer.Bl(labels[j], Flags.NI);
-                j++;
-            }
+            ast.accept(this);
         }
 
         registers = new Register[] { r0 };
@@ -741,13 +730,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Ldmfd(StackPointer, registers);
         writer.SkipLine();
 
-        for (Ast ast : a.exprs) {
-            if (ast instanceof Definition || ast instanceof DeclarationFonction) {
-                ast.accept(this);
-            }
-        }
         for (Ast ast : a.declarations) {
-            if ((ast instanceof Definition) || (ast instanceof DeclarationFonction)) {
+            if (ast instanceof DeclarationFonction) {
                 ast.accept(this);
             }
         }
