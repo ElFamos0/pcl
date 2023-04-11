@@ -7,6 +7,10 @@ public class Addition implements Ast {
 		return visitor.visit(this);
 	}
 
+    public <T> T accept(AstVisitorBool<T> visitor, boolean bool) {
+        return visitor.visit(this,bool);
+    }
+
     public Ast left;
     public Ast right;
     public OperationAdditionContext ctx;

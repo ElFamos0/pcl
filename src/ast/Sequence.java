@@ -17,6 +17,9 @@ public class Sequence implements Ast {
         this.ctx = ctx;
         this.seqs = new ArrayList<>();
     }
+    public <T> T accept(AstVisitorBool<T> visitor, boolean bool) {
+        return visitor.visit(this,bool);
+    }
 
     public void addSeq(Ast seq) {
         this.seqs.add(seq);

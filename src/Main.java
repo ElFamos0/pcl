@@ -74,7 +74,7 @@ public class Main {
             ASMWriter writer = new ASMWriter("test.asm");
 
             ASMVisitor asmv = new ASMVisitor(table, writer);
-            ast.accept(asmv);
+            ast.accept(asmv,true);
 
             timerThread.interrupt();
             System.out.println("\r\033[0;32m COMPILATION SUCCESSFUL \033[0m");
