@@ -5,6 +5,15 @@ in
         var y := 4
     in
         print(y);
-        print(x)
+        print(x);
+        let
+            var g := 5
+        in
+            print(g);
+            print(x);
+            print(y)
+        end
     end
+
+
 end
