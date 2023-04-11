@@ -365,67 +365,33 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(Multiplication a) {
         // System.out.println("Multiplication");
         a.left.accept(this);
+        
+        writer.SkipLine();
+        writer.Comment("Store left side of Multiplication",1);
+
+        writer.Stmfd(StackPointer, new Register[] { r8 });
+        
+        // Receive right in r8
         a.right.accept(this);
 
-        if (a.left instanceof ID) {
-            ID id = (ID) a.left;
+        writer.SkipLine();
+        writer.Comment("Mult the two values and send them to r8", 1);
 
-            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
-            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
-                
-            writer.SkipLine();
-            writer.Comment("Use the static chain to get back " + id.nom, 1);
-            writer.Mov(r0, BasePointer, Flags.NI);
-
-            if (offset > 0) {
-                writer.Mov(r1, offset, Flags.NI);
-                writer.Bl("_stack_var", Flags.NI);
-            }
-
-            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
-
-            writer.Comment("Add " + id.nom + " to the stack", 1);
-            writer.Stmfd(StackPointer, new Register[] { r0 });
-            writer.SkipLine();
-        }
-
-
-        if (a.right instanceof ID) {
-            ID id = (ID) a.left;
-
-            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
-            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
-                
-            writer.SkipLine();
-            writer.Comment("Use the static chain to get back " + id.nom, 1);
-            writer.Mov(r0, BasePointer, Flags.NI);
-
-            if (offset > 0) {
-                writer.Mov(r1, offset, Flags.NI);
-                writer.Bl("_stack_var", Flags.NI);
-            }
-
-            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
-
-            writer.Comment("Add " + id.nom + " to the stack", 1);
-            writer.Stmfd(StackPointer, new Register[] { r0 });
-            writer.SkipLine();
-        }
+        // Store the left result in r1 and move the right result to r2
+        writer.Ldmfd(StackPointer, new Register[] { r1 });
+        writer.Mov(r2,r8, Flags.NI);
 
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
         // We have :
         //      R2 = a.right
         //      R1 = a.left
-        Register[] load_register = { r2, r1 };
-        writer.Ldmfd(StackPointer, load_register);
 
         // Mult R2 and R1
         writer.Bl("mul", Flags.NI);
 
-        // Store R0 in the stack
-        Register[] store_registers = { r0 };
-        writer.Stmfd(StackPointer, store_registers);
+        // Mov R0 (result of mult) to R8 
+        writer.Mov(r8, r0,Flags.NI);
 
         return a.ctx;
     }
@@ -435,51 +401,21 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(Division a) {
         // System.out.println("Division");
         a.left.accept(this);
+        
+        writer.SkipLine();
+        writer.Comment("Store left side of Division",1);
+
+        writer.Stmfd(StackPointer, new Register[] { r8 });
+        
+        // Receive right in r8
         a.right.accept(this);
 
-        if (a.left instanceof ID) {
-            ID id = (ID) a.left;
+        writer.SkipLine();
+        writer.Comment("Divide the two values and send them to r8", 1);
 
-            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
-            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
-                
-            writer.SkipLine();
-            writer.Comment("Use the static chain to get back " + id.nom, 1);
-            writer.Mov(r0, BasePointer, Flags.NI);
-
-            if (offset > 0) {
-                writer.Mov(r1, offset, Flags.NI);
-                writer.Bl("_stack_var", Flags.NI);
-            }
-
-            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
-
-            writer.Comment("Add " + id.nom + " to the stack", 1);
-            writer.Stmfd(StackPointer, new Register[] { r0 });
-            writer.SkipLine();
-        }
-
-        if (a.right instanceof ID) {
-            ID id = (ID) a.left;
-
-            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
-            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
-                
-            writer.SkipLine();
-            writer.Comment("Use the static chain to get back " + id.nom, 1);
-            writer.Mov(r0, BasePointer, Flags.NI);
-
-            if (offset > 0) {
-                writer.Mov(r1, offset, Flags.NI);
-                writer.Bl("_stack_var", Flags.NI);
-            }
-
-            writer.Ldr(r0, r0, Flags.NI, v.getOffset());
-
-            writer.Comment("Add " + id.nom + " to the stack", 1);
-            writer.Stmfd(StackPointer, new Register[] { r0 });
-            writer.SkipLine();
-        }
+        // Store the left result in r1 and move the right result to r2
+        writer.Ldmfd(StackPointer, new Register[] { r1 });
+        writer.Mov(r2,r8, Flags.NI);
 
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
@@ -492,9 +428,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // Div R2 and R1
         writer.Bl("div", Flags.NI);
 
-        // Store R0 in the stack
-        Register[] store_registers = { r0 };
-        writer.Stmfd(StackPointer, store_registers);
+        // Mov R0 (result of div) to R8 
+        writer.Mov(r8, r0,Flags.NI);
 
         return a.ctx;
     }
@@ -668,7 +603,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     }
 
 
+<<<<<<< Updated upstream
 
+=======
+        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+    }
+>>>>>>> Stashed changes
 
     @Override
     public ParserRuleContext visit(IfThenElse a) {
@@ -711,6 +651,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Label(this.getLabel(table));
 
         cond.accept(this);
+<<<<<<< Updated upstream
 
         if (cond instanceof ID) {
             ID id = (ID) cond;
@@ -736,11 +677,15 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         }
 
         writer.Ldmfd(StackPointer, new Register[] {r0});
+=======
+        writer.Mov(r0,r8,Flags.NI);
+>>>>>>> Stashed changes
         writer.Cmp(r0, 0);
         writer.B(this.getLabel(table) + "_end", Flags.EQ);
 
         Ast block = a.block;
         writer.Comment("While content", 1);
+
         block.accept(this);
 
         writer.B(this.getLabel(table),Flags.NI);
@@ -750,7 +695,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         // Get back to the original region
         this.region = temp;
-        
         return a.ctx;
     }
 
@@ -759,7 +703,27 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         int temp = region;
 
         StepOneRegion();
-        // Do the for block
+        SymbolLookup table = this.table.getSymbolLookup(this.region);
+        Ast variant = a.start;
+        Ast startValue = a.startValue;
+        Ast endValue = a.endValue;
+        Ast block = a.block;
+        writer.Comment("For block", 0);
+        writer.Label(this.getLabel(table));
+
+        variant.accept(this);
+        writer.Stmfd(StackPointer,new Register[] {r9});
+
+        startValue.accept(this);
+        writer.Ldr(r0, StackPointer, Flags.NI,4);
+        writer.Str(r8, r0, 0);
+
+        endValue.accept(this);
+        writer.Stmfd(StackPointer,new Register[] {r8});
+        writer.Ldr(r0,StackPointer,Flags.NI,8);
+
+
+
 
         // Get back to the original region
         this.region = temp;
@@ -822,8 +786,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(DeclarationType a) {
 
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
 
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
@@ -832,8 +794,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(DeclarationTypeClassique a) {
 
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
 
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
@@ -842,9 +802,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(DeclarationArrayType a) {
 
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
-
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
@@ -852,18 +809,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(DeclarationRecordType a) {
 
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
-
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(DeclarationChamp a) {
-
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
 
         return a.ctx; 
     }
@@ -958,9 +909,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(Nil a) {
 
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
-
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
@@ -969,19 +917,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(Break a) {
 
 
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
-
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(InstanciationType a) {
-
-
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
 
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
@@ -991,9 +932,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(ListeAcces a) {
 
 
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
-
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
@@ -1001,18 +939,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(ExpressionArray a) {
 
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
-
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 
     @Override
     public ParserRuleContext visit(AccesChamp a) {
-
-        writer.Ldmfd(StackPointer, new Register[] {r0});
-        writer.Stmfd(StackPointer, new Register[] {r1});
 
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visit'");
