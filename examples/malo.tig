@@ -1,1 +1,5 @@
-print(67-9)
+let
+    var x := "c'est fou"
+in
+    if 2>1 then print(x)
+end
