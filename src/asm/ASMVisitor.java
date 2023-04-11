@@ -568,6 +568,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(IfThen a) {
         int temp = region;
 
+        // do the if block
+
+
         StepOneRegion();
         // Do the then block
 
