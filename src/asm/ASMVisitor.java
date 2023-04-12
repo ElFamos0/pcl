@@ -715,7 +715,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         int temp = region;
 
         StepOneRegion();
-        System.out.println("Definition: " + this.region);
         // Do the definition block
 
         // Add StackPointer + Return address and create label
@@ -748,8 +747,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         }
 
         registers = new Register[] { r0 };
-        for (int i = 0 ; i < a.declarations.size() ; i++) {
-            writer.Ldmfd(StackPointer, registers);
+        for (Ast dec : a.declarations) {
+            if (!(dec instanceof DeclarationFonction))
+                writer.Ldmfd(StackPointer, registers);
         }
 
         registers = new Register[] { BasePointer };
@@ -774,9 +774,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(DeclarationArrayType a) {
-
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        return a.ctx;
     }
 
     @Override
@@ -788,7 +786,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(DeclarationChamp a) {
-
         return a.ctx; 
     }
 
@@ -798,7 +795,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         SymbolLookup sl = this.table.getSymbolLookup(this.region);
 
         StepOneRegion();
-        System.out.println("DeclarationFonction:");
         writer.SkipLine();
 
         for (Ast ast : a.args) {
@@ -851,17 +847,26 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(DeclarationValeur a) {
         ID id = (ID) a.id;
+        System.out.println("DeclarationValeur: " + type.inferType(table.getSymbolLookup(region), id));
         
         writer.SkipLine();
         writer.Comment("Declare variable " + id.nom, 1);
 
         // a.id.accept(this);
-
         a.expr.accept(this);
+        Register[] registers = { r8 };
 
         // Save the value in the stack
-        Register[] registers = { r8 };
-        writer.Stmfd(StackPointer, registers);
+        Type t = type.inferType(table.getSymbolLookup(region), id);
+        if (t instanceof Array) {
+            Array arr = (Array) t;
+
+            for (int i = 0 ; i < arr.getSize() ; i++) {
+                writer.Stmfd(StackPointer, registers);
+            }
+        } else {
+            writer.Stmfd(StackPointer, registers);
+        }
         
         // We let the expression inside the stack
         // because we declare the variable in the stack.
@@ -903,24 +908,45 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(ListeAcces a) {
+        a.id.accept(this);
 
+        Register[] regs = new Register[] { r9 };
 
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        writer.SkipLine();
+        writer.Comment("Acces of a list", 1);
+        writer.Stmfd(StackPointer, regs);
+
+        for (Ast ast : a.accesChamps) {
+            ast.accept(this);
+
+            // Load the value in r8 in r0
+            writer.SkipLine();
+            writer.Comment("Load the value of the access in r0 and read the pointed value", 1);
+            writer.Mov(r0, r8, Flags.NI);
+            writer.Ldmfd(StackPointer, new Register[] { r1 });
+            writer.Lsl(r0, r0, 2, Flags.NI);
+            writer.Sub(r1, r1, r0, Flags.NI);
+            writer.Ldr(r2, r1, Flags.NI, 0);
+            writer.Stmfd(StackPointer, new Register[] { r2 });
+        }
+
+        writer.SkipLine();
+        writer.Comment("Load the value accessed in r9", 1);
+        writer.Ldmfd(StackPointer, new Register[] { r8 });
+
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(ExpressionArray a) {
+        a.getExpr().accept(this);
 
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(AccesChamp a) {
-
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        return a.getChild().accept(this);
     }
     
 }

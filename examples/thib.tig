@@ -1,11 +1,8 @@
 let
-    var x := "caca"
-    function f(x: string) =
-        print(x)
-    function b(x: string) = 
-        f(x)
+    type intArray = array of int
+
+    var x := intArray [ 4 ] of 1
+    var n := 4
 in
-    b(x);
-    print(x);
-    print(-5)
+    print(x[1])
 end

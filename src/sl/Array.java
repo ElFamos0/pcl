@@ -22,7 +22,7 @@ public class Array extends Type {
 
     public Integer getOffset() {
         // Array size is 8 because it is a ptr to the heap
-        return 8;
+        return 4;
     }
 
     public boolean equals(Type t) {

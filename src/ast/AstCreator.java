@@ -477,12 +477,13 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                 if (t == null) {
                     errorHandler.error(ctx, "Type '" + expr + "' not defined");
                 } else {
-                    table.addSymbolVarAndFunc(new Variable(idf, t));
+                    Variable v = new Variable(idf, t);
                     if (t instanceof Array) {
+                        Array a = (Array) t;
                         int size;
                         if (expr.contains("[")) {
                             String temp = expr.substring(expr.indexOf("[") + 1, expr.indexOf("]"));
-
+                            
                             try {
                                 size = Integer.parseInt(temp);
                             } catch (NumberFormatException e) {
@@ -492,8 +493,11 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                             size = expr.length();
                         }
 
-                        ((Array) t).setSize(size);
+                        a.setSize(size);
+                        v.setType(a);
                     }
+
+                    table.addSymbolVarAndFunc(v);
                 }
             }
             dv.setType(ctx.getChild(3).accept(this));
@@ -504,11 +508,13 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                         "Variable '" + idf + "' already defined as a " + s.toString() + " in this scope");
             else {
                 Type t = typeInferer.inferType(table, ctx.getChild(3));
+                Variable v = null;
                 if (t != null) {
-                    table.addSymbolVarAndFunc(new Variable(idf, t));
+                    v = new Variable(idf, t);
                 }
 
                 if (t instanceof Array) {
+                    Array a = (Array) t;
                     int size;
                     if (expr.contains("[")) {
                         String temp = expr.substring(expr.indexOf("[") + 1, expr.indexOf("]"));
@@ -522,8 +528,12 @@ public class AstCreator extends exprBaseVisitor<Ast> {
                         size = expr.length();
                     }
 
-                    ((Array) t).setSize(size);
+                    a.setSize(size);
+                    v.setType(a);
                 }
+
+                if (v != null)
+                    table.addSymbolVarAndFunc(v);
             }
 
             dv.setExpr(ctx.getChild(3).accept(this));
