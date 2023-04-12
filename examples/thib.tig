@@ -1,7 +1,14 @@
 let
-    var x := 4
-    var y := 2
-    function f(x:int,y:int) : int = x*y
+    type intArray = array of int
+
+    var x := intArray [ 4 ] of 2
 in
-    print(f(x,y))
+    x[1] := 4;
+    print(x[1]);
+    print(x[0]);
+    print(x[2]);
+    print(x[3]);
+    x := intArray [ 4 ] of 6;
+    print(x[1]);
+    print(x[2])
 end

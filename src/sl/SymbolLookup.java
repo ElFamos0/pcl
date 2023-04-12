@@ -226,11 +226,7 @@ public class SymbolLookup {
         if (s instanceof Variable) {
             ((Variable) s).setOffset(varOffset);
 
-            if (((Variable) s).getType() instanceof Array) {
-                varOffset -= ((Array) s.getType()).getSize() * 4;
-            } else {
-                varOffset -= 4;
-            }
+            varOffset -= 4;
         }
         if (s instanceof Function) {
             // Get the last children
