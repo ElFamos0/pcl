@@ -1,0 +1,5 @@
+let
+    var x :int := -8;
+in
+    if x = 7 then print(1) else if x>8 then print(2) else print(3)
+end
