@@ -448,17 +448,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // System.out.println("Negation");
         a.expression.accept(this);
 
-        Register[] load_register = { r0 };
-        Register[] store_registers = { r0 };
-
-        // Load the last value in the stack in R0.
-        writer.Ldmfd(StackPointer, load_register);
         // Mov 0 in R1
         writer.Mov(r1, 0, Flags.NI);
-        // Negate R0 using the MVN instruction
-        writer.Sub(r0, r1, r0, Flags.NI);
-        // Store R0 in the stack
-        writer.Stmfd(StackPointer, store_registers);
+        // Negate R0 using the SUB instruction
+        writer.Sub(r8, r1, r8, Flags.NI);
 
         return a.ctx;
     }

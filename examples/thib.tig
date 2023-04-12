@@ -6,5 +6,6 @@ let
         f(x)
 in
     b(x);
-    print(x)
+    print(x);
+    print(-5)
 end
