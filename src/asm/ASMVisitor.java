@@ -699,12 +699,13 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         block.accept(this);
         writer.B(this.getLabel(table)+"_cond",Flags.NI);
+        writer.Label(this.getLabel(table)+ "_end");
         
         writer.Stmfd(StackPointer, new Register[] {r0,r1});
 
         // Get back to the original region
         this.region = temp;
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        return a.ctx;
     }
 
     @Override
