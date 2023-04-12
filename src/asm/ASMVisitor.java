@@ -3,6 +3,7 @@ package asm;
 import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
+import parser.exprParser.*;
 import ast.*;
 import sl.Array;
 import sl.Function;
@@ -699,6 +700,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         Register[] registers = { BasePointer };
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
+        writer.Stmfd(StackPointer, new Register[] { r7 });
+        writer.Mov(r7, StackPointer, Flags.NI);
+
         SymbolLookup table = this.table.getSymbolLookup(this.region);
         Ast cond = a.condition;
         writer.Comment("While block", 0);
@@ -718,6 +722,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.B(this.getLabel(table), Flags.NI);
         writer.Comment("While EndBlock", 1);
 
+        writer.Mov(StackPointer, r7, Flags.NI);
+        writer.Ldmfd(StackPointer, new Register[] { r7 });
         writer.Label(this.getLabel(table) + "_end");
         registers = new Register[] { BasePointer };
         writer.Ldmfd(StackPointer, registers);
@@ -753,7 +759,19 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Stmfd(StackPointer, new Register[] { r8 });
 
         endValue.accept(this);
-        writer.Stmfd(StackPointer, new Register[] { r8 });
+        writer.Stmfd(StackPointer,new Register[] {r8});
+
+        // Add the current value of the r7 register to the stack
+        writer.Stmfd(StackPointer,new Register[] {r7});
+
+        // Save the current StackPointer value in r7
+        writer.Mov(r7, StackPointer, Flags.NI);
+        
+        writer.Label(this.getLabel(table)+ "_cond");
+        writer.Ldr(r0,BasePointer,Flags.NI,-4);
+        writer.Ldr(r1,BasePointer,Flags.NI,-8);
+        writer.Cmp(r0,r1);
+        writer.B(this.getLabel(table)+"_end",Flags.GE);
 
         writer.Label(this.getLabel(table) + "_cond");
         writer.Ldr(r0, BasePointer, Flags.NI, -4);
@@ -765,11 +783,17 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         writer.Ldr(r0, BasePointer, Flags.NI, -4);
         writer.Add(r0, r0, 1, Flags.NI);
-        writer.Str(r0, BasePointer, -4);
-        writer.B(this.getLabel(table) + "_cond", Flags.NI);
-        writer.Label(this.getLabel(table) + "_end");
+        writer.Str(r0,BasePointer,-4);
+        writer.B(this.getLabel(table)+"_cond",Flags.NI);
+        writer.Label(this.getLabel(table)+ "_end");
+        
+        // Get back the value of the r7 register inside the stack pointer
+        writer.Mov(StackPointer, r7, Flags.NI);
 
-        writer.Stmfd(StackPointer, new Register[] { r0, r1 });
+        // Unstack the value of the r7 register
+        writer.Ldmfd(StackPointer,new Register[] {r7});
+
+        writer.Ldmfd(StackPointer, new Register[] {r0,r1});
         registers = new Register[] { BasePointer };
         writer.Ldmfd(StackPointer, registers);
         // Get back to the original region
@@ -955,13 +979,33 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Nil a) {
+        writer.SkipLine();
+        writer.Comment("Nil value", 1);
+        writer.Mov(r8, 0, Flags.NI);
+        writer.Mov(r9, 0, Flags.NI);
 
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(Break a) {
+        ParserRuleContext c = a.ctx;
+        SymbolLookup sl = this.table.getSymbolLookup(this.region);
+
+        while (c != null) {
+            if (c instanceof PourContext || c instanceof TantQueContext) {
+                break;
+            }
+            if (c instanceof SiAlorsContext || c instanceof SiAlorsSinonContext) {
+                sl = sl.getParent();
+            }
+
+            c = c.getParent();
+        }
+
+        String label = "_blk_" + sl.getScope() + "_" + sl.getRegion() + "_end";
+        writer.B(label, Flags.NI);
+
         return a.ctx;
     }
 
