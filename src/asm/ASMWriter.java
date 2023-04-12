@@ -751,12 +751,12 @@ public class ASMWriter {
     // The result is stored in R0 register.
     public void Mul() {
         String fn = """
-            mul         STMFD SP!, {R1,R2}
+            mul:\n         STMFD SP!, {R1,R2}
                         MOV R0, #0
                 """;
 
         String fn_loop = """
-            _mul_loop   LSRS R2, R2, #1
+            _mul_loop:\n   LSRS R2, R2, #1
                         ADDCS R0, R0, R1
                         LSL R1, R1, #1
                         TST R2, R2
@@ -774,7 +774,7 @@ public class ASMWriter {
     // The result is stored in R0 register.
     public void Div() {
         String fn = """
-            div         STMFD SP!, {R2-R5}
+            div:\n         STMFD SP!, {R2-R5}
                         MOV R0, #0
                         MOV R3, #0
                         CMP R1, #0
@@ -788,14 +788,14 @@ public class ASMWriter {
                 """;
         
         String fn_max = """
-            _div_max    LSL R4, R4, #1
+            _div_max:\n    LSL R4, R4, #1
                         LSL R5, R5, #1
                         CMP R4, R1
                         BLE _div_max
                 """;
         
         String fn_loop = """
-            _div_loop   LSR R4, R4, #1
+            _div_loop:\n   LSR R4, R4, #1
                         LSR R5, R5, #1
                         CMP R4,R1
                         BGT _div_loop
@@ -813,7 +813,7 @@ public class ASMWriter {
                 """;
         
         String fn_exit = """
-            _div_exit   LDMFD SP!, {R2-R5}
+            _div_exit:\n   LDMFD SP!, {R2-R5}
                         LDR PC, [R13, #-4]!
                 """;
 
