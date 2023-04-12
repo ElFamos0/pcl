@@ -212,9 +212,9 @@ public class SymbolLookup {
         // Sort result by offset
         Collections.sort(result, new Comparator<Variable>() {
             public int compare(Variable v1, Variable v2) {
-                return v1.getOffset() - v2.getOffset();
+                // return v1.getOffset() - v2.getOffset();
                 // To flip it
-                // return v2.getOffset() - v1.getOffset();
+                return v2.getOffset() - v1.getOffset();
             }
         });
 

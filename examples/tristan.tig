@@ -14,11 +14,10 @@ let
             fibo(n-1)+fibo(n-2)
         )
     )
-
     type intArray = array of int
-    function fibo_arr(n: int):intArray = (
+    var x := intArray [20] of 0
+    function fibo_arr(x:intArray, n: int) = (
         let
-	        var x := intArray [n] of 0
             var i := 0
         in
             if n <= 2 then (
@@ -31,17 +30,47 @@ let
                 for i := 2 to n do (
                     x[i] := x[i-2] + x[i-1]
                 )
-            );
-            x
+            )
         end
     )
 
-    var f := fibo_arr(15)
-in
-    print(factorial(8));
-    print(fibo(15));
-    for i := 0 to 15 do (
-        print(i);
-        print(f[i])
+    function isOdd(n:int):int = (
+        (n+1)-(((n+1)/2)*2)
     )
+
+    function isEven(n:int):int = (
+        !isOdd(n)
+    )
+
+    function oddity(n:int):string = (
+        let 
+            var even := "Even"
+            var odd := "Odd"
+        in
+            if isEven(n) then (
+                even
+            ) else (
+                odd
+            )
+        end
+    )
+
+in
+    print("---");
+    print(factorial(8));
+    print("---");
+    print(fibo(15));
+    print("---");
+    fibo_arr(x, 20);
+    for i := 0 to 20 do (
+        print(x[i])
+    );
+    print("---");
+    if (isEven(64)) then (
+        print("64 is even")
+    ) else (
+        print("how??")
+    );
+    print("---");
+    print(oddity(63))
 end
