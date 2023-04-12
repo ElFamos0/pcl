@@ -128,6 +128,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         for (Constant c : constants) {
             writer.write("\t" + c.toASM() + "\n");
         }
+        writer.Mul();
+        writer.Div();
 
         return null;
     }
@@ -646,30 +648,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         cond.accept(this);
 
-        if (cond instanceof ID) {
-            ID id = (ID) cond;
-
-            int offset = this.table.getSymbolLookup(this.region).getVarOffset(id.nom);
-            Variable v = (Variable) this.table.getSymbolLookup(this.region).getSymbol(id.nom);
-            
-            writer.SkipLine();
-            writer.Comment("Use the static chain to get back " + id.nom, 1);
-            writer.Mov(r0, BasePointer, Flags.NI);
-
-            if (offset > 0) {
-                writer.Mov(r1, offset, Flags.NI);
-                writer.Bl("_stack_var", Flags.NI);
-            }
-
-            writer.Add(r0, r0, v.getOffset(), Flags.NI );
-            writer.Ldr(r0,r0, Flags.NI, 0);
-
-            writer.Comment("Add " + id.nom + " to the stack", 1);
-            writer.Stmfd(StackPointer, new Register[] { r0 });
-            writer.SkipLine();
-        }
-
-        writer.Ldmfd(StackPointer, new Register[] {r0});
+        writer.Mov(r0,r8,Flags.NI);
         writer.Cmp(r0, 0);
         writer.B(this.getLabel(table) + "_end", Flags.EQ);
 
@@ -705,15 +684,25 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Stmfd(StackPointer,new Register[] {r9});
 
         startValue.accept(this);
-        writer.Ldr(r0, StackPointer, Flags.NI,4);
+        writer.Ldr(r0, StackPointer, Flags.NI,0);
         writer.Str(r8, r0, 0);
 
         endValue.accept(this);
         writer.Stmfd(StackPointer,new Register[] {r8});
-        writer.Ldr(r0,StackPointer,Flags.NI,8);
+        
 
+        writer.Label(this.getLabel(table)+ "_cond");
 
+        writer.Ldr(r0,StackPointer,Flags.NI,4);
+        writer.Ldr(r0,r0,Flags.NI,0);
+        writer.Ldr(r1,StackPointer,Flags.NI,0);
+        writer.Cmp(r1,r0);
+        writer.B(this.getLabel(table)+"_end",Flags.GT);
 
+        block.accept(this);
+        writer.B(this.getLabel(table)+"_cond",Flags.NI);
+        
+        writer.Stmfd(StackPointer, new Register[] {r0,r1});
 
         // Get back to the original region
         this.region = temp;
