@@ -751,7 +751,8 @@ public class ASMWriter {
     // The result is stored in R0 register.
     public void Mul() {
         String fn = """
-            mul:\n         STMFD SP!, {R1,R2}
+            mul:\n      STMFD R13!,  {LR} 
+                        STMFD R13!, {R1,R2}
                         MOV R0, #0
                 """;
 
@@ -761,8 +762,8 @@ public class ASMWriter {
                         LSL R1, R1, #1
                         TST R2, R2
                         BNE _mul_loop
-                        LDMFD SP!, {R1,R2}
-                        LDR PC, [R13, #4]!
+                        LDMFD R13!, {R1,R2}
+                        LDMFD R13!, {PC}
                 """;
         
         // Write function to file
