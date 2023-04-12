@@ -270,16 +270,16 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                     // We need here R0 > R1
                     writer.Cmp(r1, r0);
 
-                    // Store the N flag in R0
+                    // Store the N flag in R
                     // N flag is set if R0 > R1
 
-                    // Set R0 to 1 if N flag is not set.
+                    // Set R8 to 1 if N flag is not set.
                     writer.Mov(r8, 0, Flags.PL);
 
-                    // Set R0 to 0 if N flag is set.
+                    // Set R8 to 0 if N flag is set.
                     writer.Mov(r8, 1, Flags.MI);
 
-                    // Set R0 to 0 if Z flag is set because we want R0 != R1.
+                    // Set R8 to 0 if Z flag is set because we want R0 != R1.
                     writer.Mov(r8, 0, Flags.EQ);
                     break;
                 case ">":
@@ -300,10 +300,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                     // We need here R0 = R1
                     writer.Cmp(r1, r0);
 
-                    // Set R0 to 1 if Z flag is set.
+                    // Set R8 to 1 if Z flag is set.
                     writer.Mov(r8, 1, Flags.EQ);
 
-                    // Set R0 to 0 otherwise.
+                    // Set R8 to 0 otherwise.
                     writer.Mov(r8, 0, Flags.NE);
                     break;
                 case "<=":
@@ -312,10 +312,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                     // We need here R0 >= R1
                     writer.Cmp(r0, r1);
 
-                    // Set R0 to 1 if N flag is not set.
+                    // Set R8 to 1 if N flag is not set.
                     writer.Mov(r8, 1, Flags.PL);
 
-                    // Set R0 to 0 if N flag is set.
+                    // Set R8 to 0 if N flag is set.
                     writer.Mov(r8, 0, Flags.MI);
                     break;
                 case ">=":
@@ -324,10 +324,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                     // We need here R1 >= R0
                     writer.Cmp(r1, r0);
 
-                    // Set R0 to 1 if N flag is not set.
+                    // Set R8 to 1 if N flag is not set.
                     writer.Mov(r8, 1, Flags.PL);
 
-                    // Set R0 to 0 if N flag is set.
+                    // Set R8 to 0 if N flag is set.
                     writer.Mov(r8, 0, Flags.MI);
                     break;
                 case "<>":
@@ -336,10 +336,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                     // We need here R0 != R1
                     writer.Cmp(r1, r0);
 
-                    // Set R0 to 1 if Z flag is not set.
+                    // Set R8 to 1 if Z flag is not set.
                     writer.Mov(r8, 1, Flags.NE);
 
-                    // Set R0 to 0 if Z flag is set.
+                    // Set R8 to 0 if Z flag is set.
                     writer.Mov(r8, 0, Flags.EQ);
                     break;
                 default:
