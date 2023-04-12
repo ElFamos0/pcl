@@ -1,12 +1,12 @@
 let
-    type intArray = array of int
-    type intTab = array of intArray
-
-    var x := intArray [4] of 6
-    var y := intTab [2] of x
+    function fibo(n: int):int = (
+        print(n);
+        if n <= 1 then (
+            n
+        ) else (
+            fibo(n-1)+fibo(n-2)
+        )
+    )
 in
-    print(x[0]);
-    y[0][1] := 2;
-    print(y[0][0]);
-    print(y[0][1])
+    print(fibo(2))
 end

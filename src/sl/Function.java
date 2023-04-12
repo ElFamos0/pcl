@@ -29,7 +29,7 @@ public class Function extends FuncOrVariable {
     }
 
     public void addParams(ArrayList<Variable> params) {
-        int offset = 8;
+        int offset = 12;
 
         for (Variable p : params) {
             offset += 4;

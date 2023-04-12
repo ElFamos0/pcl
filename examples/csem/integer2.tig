@@ -1,6 +1,6 @@
 /* Integer underflow sur a */
 let
-    var a:int := -2147483649
+    var a := -2
 in  
 
 end

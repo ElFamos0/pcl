@@ -1,17 +1,31 @@
-let
-    var x := 4
-    var y := 2
-    function f(x:int,y:int) = (
-        print(x);
-        print(y);
-        print(x/y)
-    )
-    function g(x:int,y:int) : int = x*y
+let 
+    type intArray = array of int
+
+    var board := intArray [64] of 0
+
+    function init() :intArray =
+        let
+            var newTab := intArray[64] of 0
+        in 
+            for i := 0 to 8 do
+            for j:= 0 to 8 do
+                (newTab[i*8+j] := i*8+j;print(newTab[i*8+j]);print("\n"));
+            newTab
+        end
+        
+    
+    function findFirstNonZero(board:intArray) :int = 
+       let
+            var retour := 0
+       in
+            for i:=0 to 64 do 
+            (
+                if board[i] then (retour:=i;break)
+            );
+            retour
+        end
+
 in
-    while x > 0 do (
-        x := x - 1;
-        print(x);
-        if x < 2
-        then break
-    )
+    board := init();
+    board[56]
 end
