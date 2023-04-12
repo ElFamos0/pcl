@@ -210,7 +210,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // on recupère la valeur du fils gauche dans r0 pour pouvoir l'ajouter à celle
         // du fils droit
         writer.Ldmfd(StackPointer, new Register[] { r0 });
-        writer.Add(r8, r0, r8, Flags.NI);
+        writer.Orr(r8, r0, r8, Flags.NI);
 
         return a.ctx;
     }
