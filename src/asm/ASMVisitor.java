@@ -195,8 +195,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(Ou a) {
         // System.out.println("Ou");
-        a.left.accept(this);
-        a.right.accept(this);
 
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
