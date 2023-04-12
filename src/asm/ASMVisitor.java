@@ -147,10 +147,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         a.left.accept(this);
 
-<<<<<<< HEAD
-        writer.Stmfd(StackPointer, new Register[] { r9 });
-
-=======
         Type t = type.inferType(table.getSymbolLookup(region), a.left);
 
         // Load addr from r8 if it's an array
@@ -160,7 +156,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             writer.Stmfd(StackPointer, new Register[] { r9 });
         }
         
->>>>>>> master
         writer.SkipLine();
         writer.Comment("Right expr in expression", 1);
 
@@ -928,10 +923,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         if (t instanceof Array) {
             Array arr = (Array) t;
 
-<<<<<<< HEAD
-            for (int i = 0; i < arr.getSize(); i++) {
-                writer.Stmfd(StackPointer, registers);
-=======
             int size = arr.getSize();
             writer.SkipLine();
             writer.Comment("Call to malloc for the array allocation", 1);
@@ -941,7 +932,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
             for (int i = 0; i < size; i++) {
                 writer.Str(r8, r0, -(i * 4));
->>>>>>> master
             }
         } else {
             writer.Stmfd(StackPointer, registers);
