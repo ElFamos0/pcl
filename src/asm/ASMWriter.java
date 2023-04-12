@@ -775,7 +775,8 @@ public class ASMWriter {
     // The result is stored in R0 register.
     public void Div() {
         String fn = """
-            div:\n         STMFD SP!, {R2-R5}
+            div:\n         STMFD R13!,  {LR} 
+                        STMFD R13!, {R2-R5}
                         MOV R0, #0
                         MOV R3, #0
                         CMP R1, #0
@@ -814,8 +815,8 @@ public class ASMWriter {
                 """;
         
         String fn_exit = """
-            _div_exit:\n   LDMFD SP!, {R2-R5}
-                        LDR PC, [R13, #4]!
+            _div_exit:\n   LDMFD R13!, {R2-R5}
+                        LDMFD, R13!, {PC}
                 """;
 
         write(fn + "\n" + fn_max + "\n" + fn_loop + "\n" + fn_exit + "\n");

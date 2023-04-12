@@ -424,8 +424,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // We have :
         //      R2 = a.right
         //      R1 = a.left
-        Register[] load_register = { r2, r1 };
-        writer.Ldmfd(StackPointer, load_register);
 
         // Div R2 and R1
         writer.Bl("div", Flags.NI);
