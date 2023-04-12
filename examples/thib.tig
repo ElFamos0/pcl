@@ -1,1 +1,7 @@
-1*2
+let
+    var x := 4
+    var y := 2
+    function f(x:int,y:int) : int = x*y
+in
+    print(f(x,y))
+end
