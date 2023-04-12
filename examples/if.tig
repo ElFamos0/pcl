@@ -1,0 +1,6 @@
+let
+    var x := 5
+in
+    if 4<5 then print("feur");
+    if x<5 then print("feur2") else print("feur3")
+end

@@ -603,7 +603,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(IfThenElse a) {
         // System.out.println("IfThenElse");
         int temp = region;
-        String label = this.getLabel(this.table.getSymbolLookup(this.region));
+        String label1 = this.getLabel(this.table.getSymbolLookup(this.region));
         writer.SkipLine();
         writer.Comment("If-Then-Else", 0);
         a.condition.accept(this);
@@ -613,17 +613,19 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Cmp(r0,0);
         // on saute dans le else si la condition est fausse
         StepOneRegion();
-        writer.B(label+"_else",Flags.EQ);
+        writer.B(label1+"_else",Flags.EQ);
 
         Ast then = a.thenBlock;
         then.accept(this);
 
-        writer.B(label+"_end",Flags.NI);
+        writer.B(label1+"_end",Flags.NI);
         StepOneRegion();
-        writer.Label(label+"_else");
+        writer.Label(label1+"_else");
         Ast elseBlock = a.elseBlock;
         
         elseBlock.accept(this);
+
+        writer.Label(label1+"_end");
         this.region = temp;
         return a.ctx; 
     }
