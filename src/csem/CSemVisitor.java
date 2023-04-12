@@ -430,6 +430,7 @@ public class CSemVisitor implements AstVisitor<ParserRuleContext> {
         table = this.table.getSymbolLookup(region);
         ParserRuleContext els = a.elseBlock.accept(this);
         Type elseType = tipe.inferType(table.getSymbolLookup(region), a.elseBlock);
+        
 
         // Check if condition is an integer
         if (!condType.equals(new Primitive(Integer.class))) {

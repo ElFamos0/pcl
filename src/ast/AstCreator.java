@@ -610,9 +610,6 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             count++;
         }
         count++;
-        branch = ctx.getChild(count).accept(this);
-        if (type == null || type.equals(new Primitive(Void.class)))
-            type = typeInferer.inferType(table, ctx.getChild(count));
 
         Symbol s = table.getSymbolInScope(idf);
         String err = FuncCSem.checkFuncFromLib(idf);
@@ -632,6 +629,10 @@ public class AstCreator extends exprBaseVisitor<Ast> {
             f.setTable(table.getChildren(id));
             f.addParams(params);
         }
+        
+        branch = ctx.getChild(count).accept(this);
+        if (type == null || type.equals(new Primitive(Void.class)))
+            type = typeInferer.inferType(table, ctx.getChild(count));
 
         drf.setExpr(branch);
 

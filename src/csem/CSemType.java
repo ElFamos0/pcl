@@ -129,7 +129,7 @@ public class CSemType implements AstVisitor<Type> {
             return new Primitive(Void.class);
         }
 
-        return t1;
+        return new Primitive(Integer.class);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class CSemType implements AstVisitor<Type> {
             return new Primitive(Void.class);
         }
 
-        return t1;
+        return new Primitive(Integer.class);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class CSemType implements AstVisitor<Type> {
             return new Primitive(Void.class);
         }
 
-        return t1;
+        return new Primitive(Integer.class);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class CSemType implements AstVisitor<Type> {
             return new Primitive(Void.class);
         }
 
-        return t1;
+        return new Primitive(Integer.class);
     }
 
     @Override

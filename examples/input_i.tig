@@ -1,0 +1,37 @@
+let
+    function pick_random(min:int, max:int): int = (
+        if (max < min) | (max = 0) then (
+            0
+        ) else (
+            let 
+                var x := random()
+                var y := (x+1)-(((x+1)/max)*max)+min
+            in
+                y
+            end
+        )
+    )
+
+    var r := pick_random(0,100);
+    var g:int := -1
+in
+    print("Bienvenue dans le jeu du plus ou moins !\n");
+    print("Voici le nombre aleatoire: ");
+    print(r);
+    print("\n");
+
+    while r <> g do (
+        print("Entrez votre nombre : ");
+        g := input_i();
+        if g = r then (
+            print("Bien joue, le mot de passe est HTN{br4v0} !\n");
+            break
+        ) else (
+            if g > r then (
+                print("C est moins !\n")
+            ) else (
+                print("C est plus !\n")
+            )
+        )
+    )
+end

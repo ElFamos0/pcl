@@ -39,11 +39,7 @@ let
     )
 
     function isEven(n:int):int = (
-        if isOdd(n) then (
-            0
-        ) else (
-            1
-        )
+        not(isOdd)
     )
 
     function oddity(n:int):string = (

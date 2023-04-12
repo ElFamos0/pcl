@@ -267,7 +267,11 @@ public class SymbolLookup {
         this.addSymbolVarAndFunc(not);
         not.addParams(params);
 
-        libFunc = 3;
+        Function input_i = new Function("input_i", new Primitive(Integer.class));
+        this.addChildren();
+        this.addSymbolVarAndFunc(input_i);
+
+        libFunc = 4;
 
         types.put("int", new Primitive(Integer.class));
         types.put("string", new Array(new Primitive(Character.class)));

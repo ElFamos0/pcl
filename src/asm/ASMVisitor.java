@@ -130,11 +130,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         // Enfin on écrit les données statiques du programme
         writer.write(".data\n");
-        writer.write("\tformat_str: .ascii      \"%s\\n\\0\"\n");
-        writer.write("\tformat_int: .ascii      \"%d\\n\\0\"\n");
+        writer.write("\tformat_str: .ascii      \"%s\\0\"\n");
+        writer.write("\tformat_int: .ascii      \"%d\\0\"\n");
         writer.write("\tformat_debug_int: .ascii      \"debug: %d\\n\\0\"\n");
         writer.write("\tformat_debug_x: .ascii      \"debug: %x\\n\\0\"\n");
         writer.write("\tformat_debug_addr: .ascii      \"debug: %p\\n\\0\"\n");
+        writer.write("\tscanf_int: .ascii      \"%d\"\n");
 
         // Ainsi que les données statiques données par l'utilisateur
         for (Constant c : constants) {
@@ -545,65 +546,88 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         ID id = (ID) a.id;
 
         // Only implement "print" for integers
-        if (id.nom.equals("print")) {
-            // Get the argument
-            a.args.accept(this);
-            SymbolLookup table = this.table.getSymbolLookup(this.region);
-            ArgFonction argF = (ArgFonction) a.args;
-            ArrayList<Ast> args = argF.args;
-            Type t = type.inferType(table, args.get(0));
+        switch (id.nom) {
+            case "print":
+                // Get the argument
+                a.args.accept(this);
+                SymbolLookup table = this.table.getSymbolLookup(this.region);
+                ArgFonction argF = (ArgFonction) a.args;
+                ArrayList<Ast> args = argF.args;
+                Type t = type.inferType(table, args.get(0));
+                String def = "format_int";
+                if (t.equals(new Array(new Primitive(Character.class)))) {
+                    def = "format_str";
+                }
+                String profile = "lib_print(" + t + ")";
+                writer.SkipLine();
+                writer.Comment("call: " + profile, 1);
+                writer.Ldr(r0, def);
+                writer.Ldmfd(StackPointer, new Register[] { r1 });
+                writer.Bl("printf", Flags.NI);
+                writer.Mov(r0, 0, Flags.NI);
+                writer.Bl("fflush", Flags.NI);
+                break;
+            case "random":
+                // Get the argument
+                a.args.accept(this);
+                writer.SkipLine();
+                writer.Comment("call: lib_random()", 1);
+                writer.Bl("rand(PLT)", Flags.NI);
+                writer.Mov(r8, r0, Flags.NI);
+                break;
+            case "not":
+                // Get the argument
+                a.args.accept(this);
+                writer.SkipLine();
+                writer.Comment("call: lib_not()", 1);
+                writer.Ldmfd(StackPointer, new Register[] { r8 });
+                writer.Eor(r8, r8, 1, Flags.NI);
+                break;
+            case "input_i":
+                // sub     sp, sp, #4
+                // @ Call scanf and store value in r4
+                // ldr     r0, addrInp
+                // mov     r1, sp
+                // bl      scanf
+                // ldr     r4, [sp]
+                // add     sp, sp, #4
+                writer.SkipLine();
+                writer.Comment("call: lib_input_i()", 1);
+                writer.Sub(StackPointer, StackPointer, 4, Flags.NI);
+                writer.Ldr(r0, "scanf_int");
+                writer.Mov(r1, StackPointer, Flags.NI);
+                writer.Bl("scanf", Flags.NI);
+                writer.Ldr(r8, StackPointer, Flags.NI, 0);
+                writer.Add(StackPointer, StackPointer, 4, Flags.NI);
+                break;
+            default:
+                // Get the sl
+                SymbolLookup sl = this.table.getSymbolLookup(this.region);
+                // Get the function
+                Function f = (Function) sl.getSymbol(id.nom);
+                SymbolLookup fsl = f.getTable();
+                String funclabel = getLabel(fsl);
+                writer.SkipLine();
+                writer.Comment("call: " + f.getProfile(), 1);
 
-            String def = "format_int";
-            if (t.equals(new Array(new Primitive(Character.class)))) {
-                def = "format_str";
-            }
+                // Push args
+                a.args.accept(this);
 
-            String profile = "printf(" + t + ")";
+                // Add #4 to the stack pointer to leave a place for the return value
+                Register[] registers = { r0 };
+                writer.Stmfd(StackPointer, registers);
 
-            writer.SkipLine();
-            writer.Comment("call: " + profile, 1);
-            writer.Ldr(r0, def);
-            writer.Ldmfd(StackPointer, new Register[] { r1 });
+                // Branch to the function
+                writer.Bl(funclabel, Flags.NI);
 
-            writer.Bl("printf", Flags.NI);
-        } else if (id.nom.equals("random")) {
-            // Get the argument
-            a.args.accept(this);
+                // Get the return value in r8
+                writer.Ldmfd(StackPointer, new Register[] { r8 });
+                writer.Mov(r9, r8, Flags.NI);
 
-            String profile = "random()";
-            writer.SkipLine();
-            writer.Comment("call: " + profile, 1);
-
-            writer.Bl("rand(PLT)", Flags.NI);
-
-            writer.Mov(r8, r0, Flags.NI);
-        } else {
-            // Get the sl
-            SymbolLookup sl = this.table.getSymbolLookup(this.region);
-            // Get the function
-            Function f = (Function) sl.getSymbol(id.nom);
-            SymbolLookup fsl = f.getTable();
-            String funclabel = getLabel(fsl);
-            writer.SkipLine();
-            writer.Comment("call: " + f.getProfile(), 1);
-
-            // Push args
-            a.args.accept(this);
-
-            // Add #4 to the stack pointer to leave a place for the return value
-            Register[] registers = { r0 };
-            writer.Stmfd(StackPointer, registers);
-
-            // Branch to the function
-            writer.Bl(funclabel, Flags.NI);
-
-            // Get the return value in r8
-            writer.Ldmfd(StackPointer, new Register[] { r8 });
-            writer.Mov(r9, r8, Flags.NI);
-
-            // Pop args
-            int nbArgs = f.getParamsCount();
-            writer.Add(StackPointer, StackPointer, 4 * (nbArgs), Flags.NI);
+                // Pop args
+                int nbArgs = f.getParamsCount();
+                writer.Add(StackPointer, StackPointer, 4 * (nbArgs), Flags.NI);
+                break;
         }
 
         return a.ctx;
@@ -638,7 +662,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         Register[] registers = { BasePointer };
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
-        // on met en mémoire le base pointer de la région précédente 
+        // on met en mémoire le base pointer de la région précédente
         // on initialise notre nouveau base pointer
 
         SymbolLookup table = this.table.getSymbolLookup(this.region);
@@ -1015,7 +1039,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(InstanciationType a) {
-        // On récupère la TDS afin de pouvoir récuperer chacun des fiels dans l'ordre de la TDS
+        // On récupère la TDS afin de pouvoir récuperer chacun des fiels dans l'ordre de
+        // la TDS
         SymbolLookup table = this.table.getSymbolLookup(this.region);
         Type t = type.inferType(table, a.id);
         Record r = (Record) t;
@@ -1030,7 +1055,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         ArrayList<Symbol> sortedFields = r.getFields();
 
-        // On trie les expressions dans l'ordre des champs pour pouvoir les stocker dans l'ordre
+        // On trie les expressions dans l'ordre des champs pour pouvoir les stocker dans
+        // l'ordre
         ArrayList<Ast> sortedExpressions = new ArrayList<Ast>();
         for (Symbol s : sortedFields) {
             for (int i = 0; i < a.identifiants.size(); i++) {
