@@ -1,0 +1,12 @@
+let
+    type z = {a:int, b:string}
+    type x = {a:z, b:string}
+    var y := z{a=3,b="c"}
+    var x := x{a=y,b="d"}
+in
+    print(y.a);
+    print(y.b);
+    print(x.b);
+    print(x.a.a);
+    print(x.a.b)
+end

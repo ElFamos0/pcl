@@ -8,6 +8,7 @@ import ast.*;
 import sl.Array;
 import sl.Function;
 import sl.Primitive;
+import sl.Record;
 import sl.Symbol;
 import sl.SymbolLookup;
 import sl.Type;
@@ -156,7 +157,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         } else {
             writer.Stmfd(StackPointer, new Register[] { r9 });
         }
-        
+
         writer.SkipLine();
         writer.Comment("Right expr in expression", 1);
 
@@ -567,7 +568,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             String profile = "random()";
             writer.SkipLine();
             writer.Comment("call: " + profile, 1);
-            
+
             writer.Bl("rand(PLT)", Flags.NI);
 
             writer.Mov(r8, r0, Flags.NI);
@@ -756,19 +757,19 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Stmfd(StackPointer, new Register[] { r8 });
 
         endValue.accept(this);
-        writer.Stmfd(StackPointer,new Register[] {r8});
+        writer.Stmfd(StackPointer, new Register[] { r8 });
 
         // Add the current value of the r7 register to the stack
-        writer.Stmfd(StackPointer,new Register[] {r7});
+        writer.Stmfd(StackPointer, new Register[] { r7 });
 
         // Save the current StackPointer value in r7
         writer.Mov(r7, StackPointer, Flags.NI);
-        
-        writer.Label(this.getLabel(table)+ "_cond");
-        writer.Ldr(r0,BasePointer,Flags.NI,-4);
-        writer.Ldr(r1,BasePointer,Flags.NI,-8);
-        writer.Cmp(r0,r1);
-        writer.B(this.getLabel(table)+"_end",Flags.GE);
+
+        writer.Label(this.getLabel(table) + "_cond");
+        writer.Ldr(r0, BasePointer, Flags.NI, -4);
+        writer.Ldr(r1, BasePointer, Flags.NI, -8);
+        writer.Cmp(r0, r1);
+        writer.B(this.getLabel(table) + "_end", Flags.GE);
 
         writer.Label(this.getLabel(table) + "_cond");
         writer.Ldr(r0, BasePointer, Flags.NI, -4);
@@ -780,17 +781,17 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         writer.Ldr(r0, BasePointer, Flags.NI, -4);
         writer.Add(r0, r0, 1, Flags.NI);
-        writer.Str(r0,BasePointer,-4);
-        writer.B(this.getLabel(table)+"_cond",Flags.NI);
-        writer.Label(this.getLabel(table)+ "_end");
-        
+        writer.Str(r0, BasePointer, -4);
+        writer.B(this.getLabel(table) + "_cond", Flags.NI);
+        writer.Label(this.getLabel(table) + "_end");
+
         // Get back the value of the r7 register inside the stack pointer
         writer.Mov(StackPointer, r7, Flags.NI);
 
         // Unstack the value of the r7 register
-        writer.Ldmfd(StackPointer,new Register[] {r7});
+        writer.Ldmfd(StackPointer, new Register[] { r7 });
 
-        writer.Ldmfd(StackPointer, new Register[] {r0,r1});
+        writer.Ldmfd(StackPointer, new Register[] { r0, r1 });
         registers = new Register[] { BasePointer };
         writer.Ldmfd(StackPointer, registers);
         // Get back to the original region
@@ -868,9 +869,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(DeclarationRecordType a) {
-
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        return a.ctx;
     }
 
     @Override
@@ -1008,13 +1007,51 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(InstanciationType a) {
+        SymbolLookup table = this.table.getSymbolLookup(this.region);
+        Type t = type.inferType(table, a.id);
+        Record r = (Record) t;
 
+        int size = r.getFields().size();
+        writer.SkipLine();
+        writer.Comment("Call to malloc for the array allocation", 1);
+        writer.Mov(r0, size * 4, Flags.NI);
+        writer.Bl("malloc", Flags.NI);
+        writer.Stmfd(StackPointer, new Register[] { r0 });
+
+        ArrayList<Symbol> sortedFields = r.getFields();
+
+        // Sort a.expressions in the same order as the fields
+        ArrayList<Ast> sortedExpressions = new ArrayList<Ast>();
+        for (Symbol s : sortedFields) {
+            for (int i = 0; i < a.identifiants.size(); i++) {
+                ID id = (ID) a.identifiants.get(i);
+                Ast expr = a.expressions.get(i);
+                if (id.nom.equals(s.getName())) {
+                    sortedExpressions.add(expr);
+                }
+            }
+        }
+
+        // Accepts the expressions
+        for (int i = 0; i < sortedExpressions.size(); i++) {
+            sortedExpressions.get(i).accept(this);
+
+            // Save the value or its address in the stack
+            writer.Ldmfd(StackPointer, new Register[] { r0 });
+            writer.Str(r8, r0, -(i * 4));
+            writer.Stmfd(StackPointer, new Register[] { r0 });
+        }
+
+        // Ldr malloc * in R8 to find it on :
+        // public ParserRuleContext visit(DeclarationValeur a) {
+        writer.Ldmfd(StackPointer, new Register[] { r8 });
         return a.ctx;
     }
 
     @Override
     public ParserRuleContext visit(ListeAcces a) {
         a.id.accept(this);
+        ID id = (ID) a.id;
 
         Register[] regs = new Register[] { r8 };
 
@@ -1024,11 +1061,25 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         for (Ast ast : a.accesChamps) {
             ast.accept(this);
+            AccesChamp ac = (AccesChamp) ast;
 
             // Load the value in r8 in r0
             writer.SkipLine();
             writer.Comment("Load the value of the access in r0 and read the pointed value", 1);
-            writer.Mov(r0, r8, Flags.NI);
+
+            if (!ac.getisArrayAccess()) {
+                // records
+                ID id2 = (ID) ac.getChild();
+                Type t = type.inferType(table.getSymbolLookup(region), id);
+                Record r = (Record) t;
+                // Get the field index
+                int index = r.getFields().indexOf(r.getField(id2.nom));
+                writer.Mov(r0, index, Flags.NI);
+            } else {
+                // array
+                writer.Mov(r0, r8, Flags.NI);
+            }
+
             writer.Ldmfd(StackPointer, new Register[] { r1 });
             writer.Lsl(r0, r0, 2, Flags.NI);
             writer.Sub(r1, r1, r0, Flags.NI);
