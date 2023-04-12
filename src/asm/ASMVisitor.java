@@ -179,7 +179,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         if (t instanceof Array && (!t.equals(new Array(new Primitive(Character.class))))) {
             Array arr = (Array) t;
 
-            if (a.right instanceof ID) {
+            if (!(a.right instanceof ExpressionArray)) {
                 writer.SkipLine();
                 writer.Comment("Overwrite array pointer", 1);
                 writer.Ldmfd(StackPointer, new Register[] { r1, r2 });
