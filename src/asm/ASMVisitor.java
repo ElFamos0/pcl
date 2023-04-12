@@ -171,7 +171,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         writer.SkipLine();
         writer.Comment("Store the value inside the var addr", 1);
-        if (t instanceof Array) {
+        if (t instanceof Array && (!t.equals(new Array(new Primitive(Character.class))))) {
             Array arr = (Array) t;
 
             writer.SkipLine();
@@ -493,8 +493,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(ID a) {
         // System.out.println("ID");
 
-        int offset = this.table.getSymbolLookup(this.region).getVarOffset(a.nom);
-        Symbol s = this.table.getSymbolLookup(this.region).getSymbol(a.nom);
+        SymbolLookup table = this.table.getSymbolLookup(this.region);
+        int offset = table.getVarOffset(a.nom);
+        Symbol s = table.getSymbol(a.nom);
 
         if (!(s instanceof Variable)) {
             return a.ctx;
@@ -514,9 +515,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Add(r0, r0, v.getOffset(), Flags.NI);
 
         // writer.Comment("Add " + id.nom + " to the stack", 1);
-        writer.Mov(r9, r0, Flags.NI);
         writer.Ldr(r8, r0, Flags.NI, 0);
 
+        writer.Mov(r9, r0, Flags.NI);
         return a.ctx;
     }
 
@@ -947,7 +948,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         // Save the value in the stack
         Type t = type.inferType(table.getSymbolLookup(region), id);
-        if (t instanceof Array) {
+        if (t instanceof Array && (!t.equals(new Array(new Primitive(Character.class))))) {
             Array arr = (Array) t;
 
             int size = arr.getSize();
