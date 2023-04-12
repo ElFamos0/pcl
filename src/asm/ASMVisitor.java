@@ -567,8 +567,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(ArgFonction a) {
         // System.out.println("ArgFonction");
-        for (Ast e : a.args) {
-            e.accept(this);
+        // Reverse args
+        for (int i = a.args.size() - 1; i >= 0; i--) {
+            a.args.get(i).accept(this);
 
             writer.Stmfd(StackPointer, new Register[] { r8 });
         }
@@ -800,6 +801,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         StepOneRegion();
         writer.SkipLine();
 
+        // Reverse for to destack
         for (Ast ast : a.args) {
             ast.accept(this);
         }
