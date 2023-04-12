@@ -1012,8 +1012,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(InstanciationType a) {
 
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        return a.ctx;
     }
 
     @Override
