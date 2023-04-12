@@ -4,10 +4,6 @@ let
     function f(x:int,y:int) : int = x*y
     function g(x:int,y:int) : int = x/y
 in
-    print(f(x,y));
-    print(g(x,y));
-    print(x*y);
-    print(x/y);
     while x > 0 do (x:= x-1; y := y*2);
     print(y);
     if x = 0 then print(1) else print(0);

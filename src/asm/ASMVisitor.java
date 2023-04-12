@@ -130,6 +130,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.write(".data\n");
         writer.write("\tformat_str: .ascii      \"%s\\n\\0\"\n");
         writer.write("\tformat_int: .ascii      \"%d\\n\\0\"\n");
+        writer.write("\tformat_debug_int: .ascii      \"debug: %d\\n\\0\"\n");
+        writer.write("\tformat_debug_x: .ascii      \"debug: %x\\n\\0\"\n");
+        writer.write("\tformat_debug_addr: .ascii      \"debug: %p\\n\\0\"\n");
 
         for (Constant c : constants) {
             writer.write("\t" + c.toASM() + "\n");
@@ -712,10 +715,26 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Label(this.getLabel(table));
 
         variant.accept(this);
+
+        writer.Mov(r1,r9,Flags.NI);
+        writer.Ldr(r0, "format_debug_int");
+        writer.Bl("printf", Flags.NI);
+
         writer.Stmfd(StackPointer,new Register[] {r9});
 
         startValue.accept(this);
         writer.Ldr(r0, StackPointer, Flags.NI,0);
+
+        writer.Mov(r4,r0,Flags.NI);
+        writer.Mov(r5,r1,Flags.NI);
+        writer.Mov(r6,r2,Flags.NI);
+        writer.Mov(r1,StackPointer,Flags.NI);
+        writer.Ldr(r0, "format_debug_int");
+        writer.Bl("printf", Flags.NI);
+        writer.Mov(r0,r4,Flags.NI);
+        writer.Mov(r1,r5,Flags.NI);
+        writer.Mov(r2,r6,Flags.NI);
+
         writer.Str(r8, r0, 0);
 
         endValue.accept(this);
@@ -725,12 +744,27 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Label(this.getLabel(table)+ "_cond");
 
         writer.Ldr(r0,StackPointer,Flags.NI,4);
+
+        writer.Mov(r1,r0,Flags.NI);
+        writer.SkipLine();
+        writer.Comment("call: uuprint", 1);
+        writer.Ldr(r0, "format_debug_int");
+        writer.Bl("printf", Flags.NI);
+
         writer.Ldr(r0,r0,Flags.NI,0);
         writer.Ldr(r1,StackPointer,Flags.NI,0);
-        writer.Cmp(r1,r0);
+        writer.Cmp(r0,r1);
         writer.B(this.getLabel(table)+"_end",Flags.GT);
 
         block.accept(this);
+
+        writer.Ldr(r0,StackPointer,Flags.NI,4);
+        writer.Ldr(r1,r0,Flags.NI,0);
+
+        writer.Add(r1, r1, 1, Flags.NI);
+
+        writer.Str(r1,r0,0);
+        
         writer.B(this.getLabel(table)+"_cond",Flags.NI);
         writer.Label(this.getLabel(table)+ "_end");
         
