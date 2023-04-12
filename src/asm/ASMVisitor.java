@@ -623,25 +623,30 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Mov(r0, r8, Flags.NI);
         // on compare r0 a 0
         writer.Cmp(r0, 0);
-        // on saute a la fin du if si la condition est fausse
         StepOneRegion();
+        // on saute dans une imbrication
         Register[] registers = { BasePointer };
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
+        // on met en mémoire le base pointer de la région précédente 
+        // on initialise notre nouveau base pointer
+
         SymbolLookup table = this.table.getSymbolLookup(this.region);
+        // on saute a la fin du if si la condition est fausse
         writer.B(this.getLabel(table) + "_end", Flags.EQ);
         // on execute le then
         Ast then = a.thenBlock;
         then.accept(this);
 
+        // condition de fin du if then
         writer.Comment("End of If-Then", 1);
-
         writer.Label(this.getLabel(table) + "_end");
 
         registers = new Register[] { BasePointer };
         writer.Ldmfd(StackPointer, registers);
+        // on remet le stack pointer au bon endroit
 
-        // Get back to the original region
+        // on retourne à la région originale
         this.region = temp;
         return a.ctx;
     }
