@@ -762,7 +762,7 @@ public class ASMWriter {
                         TST R2, R2
                         BNE _mul_loop
                         LDMFD SP!, {R1,R2}
-                        LDR PC, [R13, #-4]!
+                        LDR PC, [R13, #4]!
                 """;
         
         // Write function to file
@@ -814,7 +814,7 @@ public class ASMWriter {
         
         String fn_exit = """
             _div_exit:\n   LDMFD SP!, {R2-R5}
-                        LDR PC, [R13, #-4]!
+                        LDR PC, [R13, #4]!
                 """;
 
         write(fn + "\n" + fn_max + "\n" + fn_loop + "\n" + fn_exit + "\n");
