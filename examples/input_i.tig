@@ -1,17 +1,4 @@
 let
-    /*
-    function mod(n:int, m:int):int = (
-        if m = n then (
-            0
-        ) else (
-            if m < n then (
-                mod(n-m, m)
-            ) else (
-                n
-            )
-        )
-    )
-    */
 
     function pick_random(min:int, max:int): int = (
         if (max < min) | (max = 0) then (
@@ -20,9 +7,6 @@ let
             let 
                 var x := random()
                 var range := max-min+1
-                /*
-                var y := mod(x, range) + min 
-                */
                 var y := x - (x/range) * range + min
             in
                 y
@@ -33,11 +17,13 @@ let
     type tries = array of int
     type game_params = {max:int, min:int}
     type game = {answer:int, last_try:int, num_tries:int, all_tries:tries , params:game_params}
+
+    var t := tries[0] of 0
     var g := game{
         answer=0,
         last_try=0,
         num_tries=0,
-        all_tries=tries[0] of 0,
+        all_tries=t,
         params=game_params{max=0, min=0}
     }
 in
@@ -64,29 +50,30 @@ in
 
 
             g.num_tries := g.num_tries + 1;
-            let
-                var new_tries := tries[g.num_tries] of 0
-            in
-                for i := 0 to g.num_tries-1 do (
-                    new_tries[i] = g.all_tries[i]
-                );
-                g.all_tries = new_tries
-            end;
 
+            t := tries[g.num_tries] of 0;
+
+            for i := 0 to g.num_tries do (
+                t[i] := g.all_tries[i]
+            );
+
+            t[g.num_tries-1] := g.last_try;
+
+            g.all_tries := t;
+
+            print("Liste des ");
+            print(g.num_tries);
+            print(" tentatives: [");
+            for i := 0 to g.num_tries do (
+                if (i > 0) & i < g.num_tries then (
+                    print(", ")
+                );
+                print(t[i])
+            );
+            print("]\n");
 
             if g.last_try = g.answer then (
-                print("Bien joue, le mot de passe est HTN{br4v0} !\n");
-
-                print("Liste des ");
-                print(g.num_tries);
-                print(" tentatives: [");
-                for i := 0 to g.num_tries do (
-                    if (i > 0) & i < g.num_tries-1 then (
-                        print(", ")
-                    );
-                    print(g.all_tries[i])
-                );
-                print("]")
+                print("Bien joue, le mot de passe est HTN{br4v0} !\n")
             ) else (
                 if g.last_try > g.answer then (
                     print("C est moins !\n")

@@ -1129,7 +1129,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             // Load the value in r8 in r0
             writer.SkipLine();
             writer.Comment("Load the value of the access in r0 and read the pointed value", 1);
-
             if (!ac.getisArrayAccess()) {
                 // records
                 ID id2 = (ID) ac.getChild();
