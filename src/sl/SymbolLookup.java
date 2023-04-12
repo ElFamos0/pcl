@@ -58,6 +58,19 @@ public class SymbolLookup {
         return libFunc;
     }
 
+    public int getMaxScope() {
+        int max = scope;
+
+        for (SymbolLookup child : children) {
+            int childMax = child.getMaxScope();
+            if (childMax > max) {
+                max = childMax;
+            }
+        }
+
+        return max;
+    }
+
     public String toString() {
         String indent = "";
         ArrayList<Integer> regions = new ArrayList<Integer>();
