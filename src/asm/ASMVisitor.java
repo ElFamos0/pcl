@@ -196,20 +196,21 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(Ou a) {
         // System.out.println("Ou");
 
-        // Generate arm code
-        // Load two last values in the stack in R0 and R1.
-        // We have :
-        // R0 = a.right
-        // R1 = a.left
-        Register[] load_register = { r0, r1 };
-        writer.Ldmfd(StackPointer, load_register);
+        a.left.accept(this);
 
-        // ORR R0 and R1
-        writer.Orr(r0, r0, r1, Flags.NI);
+        writer.SkipLine();
+        writer.Comment("Store left side of the OR", 1);
 
-        // Store R0 in the stack
-        Register[] store_registers = { r0 };
-        writer.Stmfd(StackPointer, store_registers);
+        writer.Stmfd(StackPointer, new Register[] { r8 });
+
+        a.right.accept(this);
+
+        writer.SkipLine();
+        writer.Comment("OR the two values and send it back to the parent", 1);
+        // on recupère la valeur du fils gauche dans r0 pour pouvoir l'ajouter à celle
+        // du fils droit
+        writer.Ldmfd(StackPointer, new Register[] { r0 });
+        writer.Add(r8, r0, r8, Flags.NI);
 
         return a.ctx;
     }
@@ -217,23 +218,21 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(Et a) {
         // System.out.println("Et");
+
         a.left.accept(this);
+
+        writer.SkipLine();
+        writer.Comment("Store left side of the AND", 1);
+
+        writer.Stmfd(StackPointer, new Register[] { r8 });
+
         a.right.accept(this);
 
-        // Generate arm code
-        // Load two last values in the stack in R0 and R1.
-        // We have :
-        // R0 = a.right
-        // R1 = a.left
-        Register[] load_register = { r0, r1 };
-        writer.Ldmfd(StackPointer, load_register);
+        writer.SkipLine();
+        writer.Comment("AND the two values and send it back to the parent", 1);
 
-        // AND R0 and R1
-        writer.And(r0, r0, r1, Flags.NI);
-
-        // Store R0 in the stack
-        Register[] store_registers = { r0 };
-        writer.Stmfd(StackPointer, store_registers);
+        writer.Ldmfd(StackPointer, new Register[] { r0 });
+        writer.And(r8, r0, r8, Flags.NI);
 
         return a.ctx;
     }
