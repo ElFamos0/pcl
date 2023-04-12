@@ -116,7 +116,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Bl("_exit", Flags.NI);
         writer.SkipLine();
         writer.StackVar();
+        writer.SkipLine();
         writer.Mul();
+        writer.SkipLine();
         writer.Div();
 
         writer.SkipLine();

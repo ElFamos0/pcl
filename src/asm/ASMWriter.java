@@ -769,7 +769,7 @@ public class ASMWriter {
                 """;
         
         // Write function to file
-        write(fn + "\n" + fn_loop + "\n");
+        write(fn + "\n" + fn_loop);
     }
 
     // Div function
@@ -825,7 +825,7 @@ public class ASMWriter {
                 LDMFD R13!, {PC}
                 """;
 
-        write(fn + "\n" + fn_max + "\n" + fn_loop + "\n" + fn_exit + "\n");
+        write(fn + "\n" + fn_max + "\n" + fn_loop + "\n" + fn_exit);
     }
 
     // Itoa function
