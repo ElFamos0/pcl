@@ -700,6 +700,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         int temp = region;
 
         StepOneRegion();
+        Register[] registers = { BasePointer };
+        writer.Stmfd(StackPointer, registers);
+        writer.Mov(BasePointer, StackPointer, Flags.NI);
         SymbolLookup table = this.table.getSymbolLookup(this.region);
         Ast variant = a.start;
         Ast startValue = a.startValue;
@@ -732,7 +735,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Label(this.getLabel(table)+ "_end");
         
         writer.Stmfd(StackPointer, new Register[] {r0,r1});
-
+        registers = new Register[] { BasePointer };
+        writer.Ldmfd(StackPointer, registers);
         // Get back to the original region
         this.region = temp;
         return a.ctx;
