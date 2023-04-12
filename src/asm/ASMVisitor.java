@@ -113,7 +113,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         a.expression.accept(this);
 
         writer.SkipLine();
-        writer.Bl("exit", Flags.NI);
+        writer.Bl("_exit", Flags.NI);
         writer.SkipLine();
         writer.StackVar();
         writer.Mul();
@@ -121,7 +121,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         writer.SkipLine();
         writer.Comment("syscall exit(int status = 0)", 0);
-        writer.Label("exit");
+        writer.Label("_exit");
         writer.Exit(0);
         writer.SkipLine();
 
