@@ -931,8 +931,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         }
 
         writer.SkipLine();
-        writer.Comment("Load the value accessed in r9", 1);
+        writer.Comment("Load the value accessed in r8 and the addr in r9", 1);
         writer.Ldmfd(StackPointer, new Register[] { r8 });
+        writer.Mov(r9, r1, Flags.NI);
 
         return a.ctx;
     }

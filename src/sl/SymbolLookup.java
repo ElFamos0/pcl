@@ -226,10 +226,10 @@ public class SymbolLookup {
         if (s instanceof Variable) {
             ((Variable) s).setOffset(varOffset);
 
-            varOffset -= 4;
-
             if (((Variable) s).getType() instanceof Array) {
                 varOffset -= ((Array) s.getType()).getSize() * 4;
+            } else {
+                varOffset -= 4;
             }
         }
         if (s instanceof Function) {

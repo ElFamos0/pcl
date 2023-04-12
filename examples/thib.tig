@@ -4,5 +4,7 @@ let
     var x := intArray [ 4 ] of 1
     var n := 4
 in
+    x[0] := n;
+    print(x[0]);
     print(x[1])
 end
