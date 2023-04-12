@@ -16,9 +16,11 @@ let
     var g:int := -1
 in
     print("Bienvenue dans le jeu du plus ou moins !\n");
+    /*
     print("Voici le nombre aleatoire: ");
     print(r);
     print("\n");
+    */
 
     while r <> g do (
         print("Entrez votre nombre : ");
