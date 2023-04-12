@@ -1,0 +1,7 @@
+let
+    var x := 5
+    var y := "caca"
+in
+    print(x);
+    print(y)
+end
