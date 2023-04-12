@@ -72,13 +72,13 @@ in
             print("]\n");
 
             if g.last_try = g.answer then (
-                print("Bien joue, le mot de passe est HTN{br4v0} !\n")
+                print("Bien joue, le mot de passe est HTN{br4v0} !\n");
+                break
+            );
+            if g.last_try > g.answer then (
+                print("C est moins !\n")
             ) else (
-                if g.last_try > g.answer then (
-                    print("C est moins !\n")
-                ) else (
-                    print("C est plus !\n")
-                )
+                print("C est plus !\n")
             )
         )
     )
