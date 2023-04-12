@@ -644,6 +644,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // System.out.println("While");
         int temp = region;
         StepOneRegion();
+        Register[] registers = { BasePointer };
+        writer.Stmfd(StackPointer, registers);
+        writer.Mov(BasePointer, StackPointer, Flags.NI);
         SymbolLookup table = this.table.getSymbolLookup(this.region);
         Ast cond = a.condition;
         writer.Comment("While block", 0);
@@ -664,6 +667,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Comment("While EndBlock", 1);
 
         writer.Label(this.getLabel(table) + "_end");
+        registers = new Register[] { BasePointer };
+        writer.Ldmfd(StackPointer, registers);
+
+        writer.SkipLine();
 
         // Get back to the original region
         this.region = temp;
@@ -891,10 +898,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Break a) {
-
-
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visit'");
+        return a.ctx;
     }
 
     @Override
