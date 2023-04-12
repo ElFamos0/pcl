@@ -3,5 +3,7 @@ let
     var y:=2
 in
     print(x*y);
-    print(x/y)
+    print(x*3);
+    print(x/y);
+    print(8/4)
 end

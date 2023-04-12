@@ -589,6 +589,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Cmp(r0,0);
         // on saute a la fin du if si la condition est fausse
         StepOneRegion();
+        Register[] registers = { BasePointer };
+        writer.Stmfd(StackPointer, registers);
+        writer.Mov(BasePointer, StackPointer, Flags.NI);
         SymbolLookup table = this.table.getSymbolLookup(this.region);
         writer.B(this.getLabel(table)+"_end",Flags.EQ);
         // on execute le then
@@ -598,6 +601,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Comment("End of If-Then", 1);
 
         writer.Label(this.getLabel(table)+"_end");
+
+        registers = new Register[] { BasePointer };
+        writer.Ldmfd(StackPointer, registers);
         
         // Get back to the original region 
         this.region = temp;
@@ -619,6 +625,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Cmp(r0,0);
         // on saute dans le else si la condition est fausse
         StepOneRegion();
+        Register[] registers = { BasePointer };
+        writer.Stmfd(StackPointer, registers);
+        writer.Mov(BasePointer, StackPointer, Flags.NI);
         String label1 = this.getLabel(this.table.getSymbolLookup(this.region));
         writer.B(label1+"_else",Flags.EQ);
 
@@ -626,7 +635,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         then.accept(this);
 
         writer.B(label1+"_end",Flags.NI);
+        registers = new Register[] { BasePointer };
+        writer.Ldmfd(StackPointer, registers);
         StepOneRegion();
+        Register[] registers2 = { BasePointer };
+        writer.Stmfd(StackPointer, registers2);
+        writer.Mov(BasePointer, StackPointer, Flags.NI);
 
         writer.Label(label1+"_else");
         Ast elseBlock = a.elseBlock;
@@ -634,6 +648,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         elseBlock.accept(this);
 
         writer.Label(label1+"_end");
+
+
+        registers2 = new Register[] { BasePointer };
+        writer.Ldmfd(StackPointer, registers2);
         this.region = temp;
         return a.ctx; 
     }

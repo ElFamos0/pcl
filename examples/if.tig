@@ -1,7 +1,7 @@
 let
     var x := 5
 in
-    if 4<5 then print("feur");
+    if 4<5 then print(x);
     if x>4 then print("swag");
     if x<5 then print("feur2") else print("feur3");
     if x<>0 then print("feur4") else print("feur5")
