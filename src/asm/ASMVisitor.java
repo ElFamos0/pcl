@@ -835,7 +835,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             if (!(dec instanceof DeclarationFonction))
                 writer.Ldmfd(StackPointer, registers);
         }
-
+        
         registers = new Register[] { BasePointer };
         writer.Ldmfd(StackPointer, registers);
         writer.SkipLine();

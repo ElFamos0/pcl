@@ -1,0 +1,11 @@
+let
+    function fibo(n:int):int = (
+        if n <= 1 then (
+            n
+        ) else (
+            fibo(n-1)+fibo(n-2)
+        )
+    )
+in
+    print(fibo(15))
+end

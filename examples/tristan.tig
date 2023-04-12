@@ -1,0 +1,47 @@
+let
+    function factorial(n: int):int = (
+        if n = 1 then (
+            1
+        ) else (
+            n * factorial(n-1)
+        )
+    )
+
+    function fibo(n: int):int = (
+        if n <= 1 then (
+            n
+        ) else (
+            fibo(n-1)+fibo(n-2)
+        )
+    )
+
+    type intArray = array of int
+    function fibo_arr(n: int):intArray = (
+        let
+	        var x := intArray [n] of 0
+            var i := 0
+        in
+            if n <= 2 then (
+                for i := 0 to n do (
+                    x[i] := 1
+                )
+            ) else (
+                x[0] := 1;
+                x[1] := 1;
+                for i := 2 to n do (
+                    x[i] := x[i-2] + x[i-1]
+                )
+            );
+            x
+        end
+    )
+
+    var f := fibo_arr(15)
+in
+    print(factorial(8));
+    print(fibo(15));
+    for i := 0 to 15 do (
+        print(i);
+        print(f[i])
+    )
+end

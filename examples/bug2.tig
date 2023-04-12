@@ -1,0 +1,9 @@
+let 
+    var x := let
+                var y := 2
+            in
+                y
+            end
+in
+    print(x)
+end

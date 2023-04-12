@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.sql.Time;
 
-import org.antlr.v4.parse.ANTLRParser.throwsSpec_return;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -34,7 +33,7 @@ public class Main {
                 long ms = (System.currentTimeMillis() - startTime.getTime());
                 // Format ms to 0.000s
                 String elapsedSeconds = String.format("%.3f", ms / 1000.0);
-                System.out.print("\r\033[0;34m COMPILING... (" + elapsedSeconds + "s)           \033[0m");
+                System.out.print("\r\033[0;34m COMPILING... (" + elapsedSeconds + "s) \033[0m");
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
@@ -65,7 +64,7 @@ public class Main {
             AstCreator creator = new AstCreator(table, errorHandler);
             Ast ast = program.accept(creator);
 
-            // System.out.println(table.toString());
+            System.out.println(table.toString());
 
             // Visiteur de représentation graphique + appel
             GraphVizVisitor graphViz = new GraphVizVisitor();
@@ -89,14 +88,14 @@ public class Main {
             }
 
             timerThread.interrupt();
-            System.out.println("\r\033[0;32m COMPILATION SUCCESSFUL              \033[0m");
+            System.out.println("\r\033[0;32m COMPILATION SUCCESSFUL \033[0m");
             System.exit(0);
-        } catch (Exception e) {
-            timerThread.interrupt();
-            System.out.println("\r\033[0;31m COMPILATION FAILED                 \033[0m");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (RecognitionException e) {
             e.printStackTrace();
         }
-        // Exit with error code
-        System.exit(1);
+        timerThread.interrupt();
+        System.out.println("\r\033[0;31m COMPILATION FAILED \033[0m");
     }
 }
