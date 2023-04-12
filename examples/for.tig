@@ -1,0 +1,6 @@
+let
+    var x := 4
+in
+    for i := 0 to x do 
+        print(i)
+end

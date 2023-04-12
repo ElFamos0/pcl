@@ -39,6 +39,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     private Register r7 = new Register("r7", 0);
     private Register r8 = new Register("r8", 0);
     private Register r9 = new Register("r9", 0);
+    private Register r10 = new Register("r10", 0);
 
     private List<Constant> constants = new ArrayList<Constant>();
 
@@ -93,6 +94,11 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Comment("Add stack pointer in base pointer", 1);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
 
+        writer.SkipLine();
+        writer.Comment("Display allocation", 1);
+        writer.Mov(r0, table.getMaxScope() * 4, Flags.NI);
+        writer.Bl("malloc", Flags.NI);
+        writer.Mov(r10, r0, Flags.NI);
     }
 
     public void StepOneRegion() {
@@ -114,8 +120,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // On écrit ensuite les fonctions de la librairie
         writer.SkipLine();
         writer.Bl("_exit", Flags.NI);
-        writer.SkipLine();
-        writer.StackVar();
         writer.SkipLine();
         writer.Mul();
         writer.SkipLine();
@@ -505,12 +509,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         writer.SkipLine();
         writer.Comment("Use the static chain to get back " + a.nom, 1);
-        writer.Mov(r0, BasePointer, Flags.NI);
-
-        if (offset > 0) {
-            writer.Mov(r1, offset, Flags.NI);
-            writer.Bl("_stack_var", Flags.NI);
-        }
+        writer.Ldr(r0, r10, Flags.NI, -((table.getScope() - offset) * 4));
 
         writer.Add(r0, r0, v.getOffset(), Flags.NI);
 
@@ -634,14 +633,16 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Cmp(r0, 0);
 
         StepOneRegion();
+        SymbolLookup table = this.table.getSymbolLookup(this.region);
         // on saute dans une imbrication pour écrire le code du then
-        Register[] registers = { BasePointer };
+        Register[] registers = { BasePointer, r0 };
+        writer.Ldr(r0, r10, Flags.NI, - (table.getScope() * 4));
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
+        writer.Str(BasePointer, r10, - (table.getScope() * 4));
         // on met en mémoire le base pointer de la région précédente 
         // on initialise notre nouveau base pointer
 
-        SymbolLookup table = this.table.getSymbolLookup(this.region);
         // on saute a la fin du if si la condition est fausse
         writer.B(this.getLabel(table) + "_end", Flags.EQ);
         // on écrit le code du then
@@ -652,8 +653,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Comment("End of If-Then", 1);
         writer.Label(this.getLabel(table) + "_end");
 
-        registers = new Register[] { BasePointer };
+        registers = new Register[] { BasePointer, r0 };
         writer.Ldmfd(StackPointer, registers);
+        writer.Str(r0, r10, - (table.getScope() * 4));
         // on remet le stack pointer au bon endroit
 
         // on retourne à la région originale
@@ -675,22 +677,29 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Cmp(r0, 0);
         // on saute dans le else si la condition est fausse
         StepOneRegion();
-        Register[] registers = { BasePointer };
+        SymbolLookup table = this.table.getSymbolLookup(this.region);
+        Register[] registers = { BasePointer, r0 };
+        writer.Ldr(r0, r10, Flags.NI, - (table.getScope() * 4));
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
-        String label1 = this.getLabel(this.table.getSymbolLookup(this.region));
+        writer.Str(BasePointer, r10, - (table.getScope() * 4));
+        String label1 = this.getLabel(table);
         writer.B(label1 + "_else", Flags.EQ);
 
         Ast then = a.thenBlock;
         then.accept(this);
 
         writer.B(label1 + "_end", Flags.NI);
-        registers = new Register[] { BasePointer };
+        registers = new Register[] { BasePointer, r0 };
         writer.Ldmfd(StackPointer, registers);
+        writer.Str(r0, r10, - (table.getScope() * 4));
         StepOneRegion();
-        Register[] registers2 = { BasePointer };
+        table = this.table.getSymbolLookup(this.region);
+        Register[] registers2 = { BasePointer, r0 };
+        writer.Ldr(r0, r10, Flags.NI, - (table.getScope() * 4));
         writer.Stmfd(StackPointer, registers2);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
+        writer.Str(BasePointer, r10, - (table.getScope() * 4));
 
         writer.Label(label1 + "_else");
         Ast elseBlock = a.elseBlock;
@@ -699,8 +708,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         writer.Label(label1 + "_end");
 
-        registers2 = new Register[] { BasePointer };
+        registers2 = new Register[] { BasePointer, r0 };
         writer.Ldmfd(StackPointer, registers2);
+        writer.Str(r0, r10, - (table.getScope() * 4));
         this.region = temp;
         return a.ctx;
     }
@@ -710,13 +720,15 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // System.out.println("While");
         int temp = region;
         StepOneRegion();
-        Register[] registers = { BasePointer };
+        SymbolLookup table = this.table.getSymbolLookup(this.region);
+        Register[] registers = { BasePointer, r0 };
+        writer.Ldr(r0, r10, Flags.NI, - (table.getScope() * 4));
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
+        writer.Str(BasePointer, r10, - (table.getScope() * 4));
         writer.Stmfd(StackPointer, new Register[] { r7 });
         writer.Mov(r7, StackPointer, Flags.NI);
 
-        SymbolLookup table = this.table.getSymbolLookup(this.region);
         Ast cond = a.condition;
         writer.Comment("While block", 0);
         writer.Label(this.getLabel(table));
@@ -738,8 +750,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Mov(StackPointer, r7, Flags.NI);
         writer.Ldmfd(StackPointer, new Register[] { r7 });
         writer.Label(this.getLabel(table) + "_end");
-        registers = new Register[] { BasePointer };
+        registers = new Register[] { BasePointer, r0 };
         writer.Ldmfd(StackPointer, registers);
+        writer.Str(r0, r10, - (table.getScope() * 4));
 
         writer.SkipLine();
 
@@ -753,10 +766,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         int temp = region;
 
         StepOneRegion();
-        Register[] registers = { BasePointer };
+        SymbolLookup table = this.table.getSymbolLookup(this.region);
+        Register[] registers = { BasePointer, r0 };
+        writer.Ldr(r0, r10, Flags.NI, - (table.getScope() * 4));
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
-        SymbolLookup table = this.table.getSymbolLookup(this.region);
+        writer.Str(BasePointer, r10, - (table.getScope() * 4));
         // Ast variant = a.start;
         Ast startValue = a.startValue;
         Ast endValue = a.endValue;
@@ -792,6 +807,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Add(r0, r0, 1, Flags.NI);
         writer.Str(r0, BasePointer, -4);
         writer.B(this.getLabel(table) + "_cond", Flags.NI);
+
+        writer.SkipLine();
         writer.Label(this.getLabel(table) + "_end");
 
         // Get back the value of the r7 register inside the stack pointer
@@ -801,8 +818,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Ldmfd(StackPointer, new Register[] { r7 });
 
         writer.Ldmfd(StackPointer, new Register[] { r0, r1 });
-        registers = new Register[] { BasePointer };
+        registers = new Register[] { BasePointer, r0 };
         writer.Ldmfd(StackPointer, registers);
+        writer.Str(r0, r10, - (table.getScope() * 4));
         // Get back to the original region
         this.region = temp;
         return a.ctx;
@@ -815,15 +833,18 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         StepOneRegion();
         // Do the definition block
+        SymbolLookup sl = this.table.getSymbolLookup(this.region);
 
         // Add StackPointer + Return address and create label
         writer.SkipLine();
         writer.Comment("Definition block", 0);
         writer.Label(this.getLabel());
 
-        Register[] registers = { BasePointer };
+        Register[] registers = { BasePointer, r0 };
+        writer.Ldr(r0, r10, Flags.NI, - (sl.getScope() * 4));
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
+        writer.Str(BasePointer, r10, - (sl.getScope() * 4));
 
         for (Ast ast : a.declarations) {
             if (!(ast instanceof DeclarationFonction)) {
@@ -851,8 +872,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
                 writer.Ldmfd(StackPointer, registers);
         }
 
-        registers = new Register[] { BasePointer };
+        registers = new Register[] { BasePointer, r0 };
         writer.Ldmfd(StackPointer, registers);
+        writer.Str(r0, r10, - (sl.getScope() * 4));
         writer.SkipLine();
 
         // Get back to the original region
@@ -889,14 +911,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(DeclarationFonction a) {
         int temp = region;
-        SymbolLookup sl = this.table.getSymbolLookup(this.region);
 
         StepOneRegion();
+        SymbolLookup sl = this.table.getSymbolLookup(this.region);
         writer.SkipLine();
-
-        for (Ast ast : a.args) {
-            // ast.accept(this);
-        }
 
         ID id = (ID) a.id;
         Symbol s = sl.getSymbol(id.nom);
@@ -905,11 +923,13 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         String l = getLabel();
         writer.Label(l);
 
-        Register[] registers = { BasePointer, LinkRegister };
+        Register[] registers = { BasePointer, LinkRegister, r0 };
         // Begin
         writer.Comment("begin:", 1);
+        writer.Ldr(r0, r10, Flags.NI, - (sl.getScope() * 4));
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
+        writer.Str(BasePointer, r10, - (sl.getScope() * 4));
         writer.SkipLine();
 
         // Block
@@ -919,15 +939,14 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         // Return
         writer.Comment("return:", 1);
-        if (!(f.getType().equals(new Primitive(Void.class)))) {
-            writer.Str(r8, BasePointer, 8);
-        }
+        writer.Str(r8, BasePointer, 12);
         writer.SkipLine();
 
         // End
         writer.Comment("end:", 1);
-        registers = new Register[] { ProgramCounter, BasePointer };
+        registers = new Register[] { ProgramCounter, BasePointer, r0 };
         writer.Ldmfd(StackPointer, registers);
+        writer.Str(r0, r10, - (sl.getScope() * 4));
         writer.SkipLine();
 
         // Get back to the original region

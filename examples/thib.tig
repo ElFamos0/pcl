@@ -1,12 +1,22 @@
 let
-    type intArray = array of int
-    type intTab = array of intArray
+    var N := 8
 
-    var x := intArray [4] of 6
-    var y := intTab [2] of x
+    var y := let
+        function f(n: int): int = (
+            print(N);
+            print(n);
+            if n > 0
+            then f(n - 1)
+            else (
+                for i := 0 to 5 do (
+                    print(i)
+                );
+                1
+            )
+        )
+    in
+        f(4)
+    end
 in
-    print(x[0]);
-    y[0][1] := 2;
-    print(y[0][0]);
-    print(y[0][1])
+    print(y)
 end
