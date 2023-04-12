@@ -3,5 +3,6 @@ let
 in
     x := x + 4;
     print(x);
-    print("caca")
+    print("\n");
+    print("bonsoir")
 end
