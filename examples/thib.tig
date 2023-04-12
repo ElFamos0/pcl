@@ -1,14 +1,12 @@
 let
     type intArray = array of int
+    type intTab = array of intArray
 
-    var x := intArray [ 4 ] of 2
+    var x := intArray [4] of 6
+    var y := intTab [2] of x
 in
-    x[1] := 4;
-    print(x[1]);
     print(x[0]);
-    print(x[2]);
-    print(x[3]);
-    x := intArray [ 4 ] of 6;
-    print(x[1]);
-    print(x[2])
+    y[0][1] := 2;
+    print(y[0][0]);
+    print(y[0][1])
 end

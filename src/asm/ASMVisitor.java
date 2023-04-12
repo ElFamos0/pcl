@@ -241,7 +241,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(Compar a) {
         // System.out.println("Compar");
-        ParserRuleContext left = a.left.accept(this);
+        a.left.accept(this);
 
         writer.Stmfd(StackPointer, new Register[] { r8 });
 
@@ -252,7 +252,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         SymbolLookup table = this.table.getSymbolLookup(this.region);
 
-        Type leftType = this.type.inferType(table, left);
+        Type leftType = this.type.inferType(table, a.left);
 
         if (leftType.equals(new Primitive(Integer.class))) {
             // We have to compare two integers
@@ -764,12 +764,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         // Save the current StackPointer value in r7
         writer.Mov(r7, StackPointer, Flags.NI);
-
-        writer.Label(this.getLabel(table) + "_cond");
-        writer.Ldr(r0, BasePointer, Flags.NI, -4);
-        writer.Ldr(r1, BasePointer, Flags.NI, -8);
-        writer.Cmp(r0, r1);
-        writer.B(this.getLabel(table) + "_end", Flags.GE);
 
         writer.Label(this.getLabel(table) + "_cond");
         writer.Ldr(r0, BasePointer, Flags.NI, -4);
