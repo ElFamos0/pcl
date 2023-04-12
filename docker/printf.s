@@ -14,10 +14,12 @@ main:
     ldr     %r0, =format_int
     mov     %r1, #42
     BL      printf
+    
+
+
 
     /* libc call printf(format, 48) */
     ldr     %r0, =format_int
-    mov     %r1, #48
     BL      printf
 
     /* libc call printf(format, &hello) */

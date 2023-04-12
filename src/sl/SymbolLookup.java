@@ -260,6 +260,10 @@ public class SymbolLookup {
         this.addSymbolVarAndFunc(print);
         print.addParams(params);
 
+        Function random = new Function("random", new Primitive(Integer.class));
+        this.addChildren();
+        this.addSymbolVarAndFunc(random);
+
         Function not = new Function("not", new Primitive(Integer.class));
         params = new ArrayList<Variable>();
         params.add(new Variable("int", new Primitive(Integer.class)));
@@ -267,7 +271,7 @@ public class SymbolLookup {
         this.addSymbolVarAndFunc(not);
         not.addParams(params);
 
-        libFunc = 2;
+        libFunc = 3;
 
         types.put("int", new Primitive(Integer.class));
         types.put("string", new Array(new Primitive(Character.class)));

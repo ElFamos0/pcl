@@ -1,8 +1,12 @@
 let
     var x := 4
     var y := 2
-    function f(x:int,y:int) : int = x*y
-    function g(x:int,y:int) : int = x/y
+    function f(x:int,y:int) = (
+        print(x);
+        print(y);
+        print(x/y)
+    )
+    function g(x:int,y:int) : int = x*y
 in
     while x > 0 do (x:= x-1; y := y*2);
     print(y);

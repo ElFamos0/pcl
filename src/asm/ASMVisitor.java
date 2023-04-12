@@ -18,7 +18,7 @@ import sl.TypeInferer;
 import sl.Variable;
 
 public class ASMVisitor implements AstVisitor<ParserRuleContext> {
-    
+
     private SymbolLookup table;
     private int region;
     private int biggestRegion = 0;
@@ -85,15 +85,16 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // Init stack
         writer.write(".text\n");
         writer.write(".globl main\n");
-        writer.B("main",Flags.NI);
+        writer.B("main", Flags.NI);
 
         writer.Label("main");
+        writer.Comment("Init rdm", 1);
+        writer.SRand();
         writer.Comment("Init stack", 1);
-
         writer.SkipLine();
         writer.Comment("Add stack pointer in base pointer", 1);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
-        
+
     }
 
     public void StepOneRegion() {
@@ -137,7 +138,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         for (Constant c : constants) {
             writer.write("\t" + c.toASM() + "\n");
         }
-        
+
         return null;
     }
 
@@ -146,15 +147,15 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // System.out.println("Expression");
 
         writer.SkipLine();
-        writer.Comment("Id in expression",1);
-        
+        writer.Comment("Id in expression", 1);
+
         a.left.accept(this);
 
         writer.Stmfd(StackPointer, new Register[] { r9 });
-        
+
         writer.SkipLine();
-        writer.Comment("Right expr in expression",1);
-        
+        writer.Comment("Right expr in expression", 1);
+
         a.right.accept(this);
 
         writer.Mov(r0, r8, Flags.NI);
@@ -176,8 +177,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
         // We have :
-        //      R0 = a.right
-        //      R1 = a.left
+        // R0 = a.right
+        // R1 = a.left
         Register[] load_register = { r0, r1 };
         writer.Ldmfd(StackPointer, load_register);
 
@@ -200,8 +201,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
         // We have :
-        //      R0 = a.right
-        //      R1 = a.left
+        // R0 = a.right
+        // R1 = a.left
         Register[] load_register = { r0, r1 };
         writer.Ldmfd(StackPointer, load_register);
 
@@ -236,94 +237,93 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
             // Load two last values in the stack in R0 and R1.
             // We have :
-            //      R0 = a.right
-            //      R1 = a.left
+            // R0 = a.right
+            // R1 = a.left
 
             // CMP R0 and R1 following the operator.
             switch (a.operator) {
-            case "<":
-                // CMP R0 and R1
-                // CMP does R1 - R0
-                // We need here R0 > R1
-                writer.Cmp(r1, r0);
+                case "<":
+                    // CMP R0 and R1
+                    // CMP does R1 - R0
+                    // We need here R0 > R1
+                    writer.Cmp(r1, r0);
 
-                // Store the N flag in R0
-                // N flag is set if R0 > R1
+                    // Store the N flag in R0
+                    // N flag is set if R0 > R1
 
-                // Set R0 to 1 if N flag is not set.
-                writer.Mov(r8, 0, Flags.PL);
+                    // Set R0 to 1 if N flag is not set.
+                    writer.Mov(r8, 0, Flags.PL);
 
-                // Set R0 to 0 if N flag is set.
-                writer.Mov(r8, 1, Flags.MI);
+                    // Set R0 to 0 if N flag is set.
+                    writer.Mov(r8, 1, Flags.MI);
 
-                // Set R0 to 0 if Z flag is set because we want R0 != R1.
-                writer.Mov(r8, 0, Flags.EQ);
-                break;
-            case ">":
-                // CMP R0 and R1
-                // CMP does R0 - R1
-                // We need here R0 < R1
-                writer.Cmp(r0, r1);
+                    // Set R0 to 0 if Z flag is set because we want R0 != R1.
+                    writer.Mov(r8, 0, Flags.EQ);
+                    break;
+                case ">":
+                    // CMP R0 and R1
+                    // CMP does R0 - R1
+                    // We need here R0 < R1
+                    writer.Cmp(r0, r1);
 
-                // Set R0 to 1 if N flag is set.
-                writer.Mov(r8, 0, Flags.PL);
+                    // Set R0 to 1 if N flag is set.
+                    writer.Mov(r8, 0, Flags.PL);
 
-                // Set R0 to 0 otherwise.
-                writer.Mov(r8, 1, Flags.MI);
-                break;
-            case "=":
-                // CMP R0 and R1
-                // CMP does R1 - R0
-                // We need here R0 = R1
-                writer.Cmp(r1, r0);
+                    // Set R0 to 0 otherwise.
+                    writer.Mov(r8, 1, Flags.MI);
+                    break;
+                case "=":
+                    // CMP R0 and R1
+                    // CMP does R1 - R0
+                    // We need here R0 = R1
+                    writer.Cmp(r1, r0);
 
-                // Set R0 to 1 if Z flag is set.
-                writer.Mov(r8, 1, Flags.EQ);
+                    // Set R0 to 1 if Z flag is set.
+                    writer.Mov(r8, 1, Flags.EQ);
 
-                // Set R0 to 0 otherwise.
-                writer.Mov(r8, 0, Flags.NE);
-                break;
-            case "<=":
-                // CMP R0 and R1
-                // CMP does R0 - R1
-                // We need here R0 >= R1
-                writer.Cmp(r0, r1);
+                    // Set R0 to 0 otherwise.
+                    writer.Mov(r8, 0, Flags.NE);
+                    break;
+                case "<=":
+                    // CMP R0 and R1
+                    // CMP does R0 - R1
+                    // We need here R0 >= R1
+                    writer.Cmp(r0, r1);
 
-                // Set R0 to 1 if N flag is not set.
-                writer.Mov(r8, 1, Flags.PL);
+                    // Set R0 to 1 if N flag is not set.
+                    writer.Mov(r8, 1, Flags.PL);
 
-                // Set R0 to 0 if N flag is set.
-                writer.Mov(r8, 0, Flags.MI);
-                break;
-            case ">=":
-                // CMP R0 and R1
-                // CMP does R1 - R0
-                // We need here R1 >= R0
-                writer.Cmp(r1, r0);
+                    // Set R0 to 0 if N flag is set.
+                    writer.Mov(r8, 0, Flags.MI);
+                    break;
+                case ">=":
+                    // CMP R0 and R1
+                    // CMP does R1 - R0
+                    // We need here R1 >= R0
+                    writer.Cmp(r1, r0);
 
-                // Set R0 to 1 if N flag is not set.
-                writer.Mov(r8, 1, Flags.PL);
+                    // Set R0 to 1 if N flag is not set.
+                    writer.Mov(r8, 1, Flags.PL);
 
-                // Set R0 to 0 if N flag is set.
-                writer.Mov(r8, 0, Flags.MI);
-                break;
-            case "<>":
-                // CMP R0 and R1
-                // CMP does R1 - R0
-                // We need here R0 != R1
-                writer.Cmp(r1, r0);
+                    // Set R0 to 0 if N flag is set.
+                    writer.Mov(r8, 0, Flags.MI);
+                    break;
+                case "<>":
+                    // CMP R0 and R1
+                    // CMP does R1 - R0
+                    // We need here R0 != R1
+                    writer.Cmp(r1, r0);
 
-                // Set R0 to 1 if Z flag is not set.
-                writer.Mov(r8, 1, Flags.NE);
+                    // Set R0 to 1 if Z flag is not set.
+                    writer.Mov(r8, 1, Flags.NE);
 
-                // Set R0 to 0 if Z flag is set.
-                writer.Mov(r8, 0, Flags.EQ);
-                break;
-            default:
-                throw new UnsupportedOperationException("Unimplemented operator '" + a.operator + "'");
+                    // Set R0 to 0 if Z flag is set.
+                    writer.Mov(r8, 0, Flags.EQ);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unimplemented operator '" + a.operator + "'");
             }
         }
-
 
         return a.ctx;
     }
@@ -331,19 +331,20 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(Addition a) {
         // System.out.println("Addition");
-        
+
         a.left.accept(this);
-        
+
         writer.SkipLine();
-        writer.Comment("Store left side of addition",1);
+        writer.Comment("Store left side of addition", 1);
 
         writer.Stmfd(StackPointer, new Register[] { r8 });
-        
+
         a.right.accept(this);
 
         writer.SkipLine();
         writer.Comment("Add the two values and send it back to the parent", 1);
-        // on recupère la valeur du fils gauche dans r0 pour pouvoir l'ajouter à celle du fils droit 
+        // on recupère la valeur du fils gauche dans r0 pour pouvoir l'ajouter à celle
+        // du fils droit
         writer.Ldmfd(StackPointer, new Register[] { r0 });
         writer.Add(r8, r0, r8, Flags.NI);
 
@@ -356,7 +357,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         a.left.accept(this);
 
         writer.SkipLine();
-        writer.Comment("Store left side of soustraction",1);
+        writer.Comment("Store left side of soustraction", 1);
 
         writer.Stmfd(StackPointer, new Register[] { r8 });
 
@@ -374,12 +375,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(Multiplication a) {
         // System.out.println("Multiplication");
         a.left.accept(this);
-        
+
         writer.SkipLine();
-        writer.Comment("Store left side of Multiplication",1);
+        writer.Comment("Store left side of Multiplication", 1);
 
         writer.Stmfd(StackPointer, new Register[] { r8 });
-        
+
         // Receive right in r8
         a.right.accept(this);
 
@@ -388,34 +389,33 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         // Store the left result in r1 and move the right result to r2
         writer.Ldmfd(StackPointer, new Register[] { r1 });
-        writer.Mov(r2,r8, Flags.NI);
+        writer.Mov(r2, r8, Flags.NI);
 
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
         // We have :
-        //      R2 = a.right
-        //      R1 = a.left
+        // R2 = a.right
+        // R1 = a.left
 
         // Mult R2 and R1
         writer.Bl("_mul", Flags.NI);
 
-        // Mov R0 (result of mult) to R8 
-        writer.Mov(r8, r0,Flags.NI);
+        // Mov R0 (result of mult) to R8
+        writer.Mov(r8, r0, Flags.NI);
 
         return a.ctx;
     }
-
 
     @Override
     public ParserRuleContext visit(Division a) {
         // System.out.println("Division");
         a.left.accept(this);
-        
+
         writer.SkipLine();
-        writer.Comment("Store left side of Division",1);
+        writer.Comment("Store left side of Division", 1);
 
         writer.Stmfd(StackPointer, new Register[] { r8 });
-        
+
         // Receive right in r8
         a.right.accept(this);
 
@@ -424,19 +424,19 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         // Store the left result in r1 and move the right result to r2
         writer.Ldmfd(StackPointer, new Register[] { r1 });
-        writer.Mov(r2,r8, Flags.NI);
+        writer.Mov(r2, r8, Flags.NI);
 
         // Generate arm code
         // Load two last values in the stack in R0 and R1.
         // We have :
-        //      R2 = a.right
-        //      R1 = a.left
+        // R2 = a.right
+        // R1 = a.left
 
         // Div R2 and R1
         writer.Bl("_div", Flags.NI);
 
-        // Mov R0 (result of div) to R8 
-        writer.Mov(r8, r0,Flags.NI);
+        // Mov R0 (result of div) to R8
+        writer.Mov(r8, r0, Flags.NI);
 
         return a.ctx;
     }
@@ -444,7 +444,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(Sequence a) {
         // System.out.println("Sequence");
-        for (Ast expr : a.seqs){
+        for (Ast expr : a.seqs) {
             expr.accept(this);
         }
         return a.ctx;
@@ -475,7 +475,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         }
 
         Variable v = (Variable) s;
-                
+
         writer.SkipLine();
         writer.Comment("Use the static chain to get back " + a.nom, 1);
         writer.Mov(r0, BasePointer, Flags.NI);
@@ -490,7 +490,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // writer.Comment("Add " + id.nom + " to the stack", 1);
         writer.Mov(r9, r0, Flags.NI);
         writer.Ldr(r8, r0, Flags.NI, 0);
-        
+
         return a.ctx;
     }
 
@@ -508,7 +508,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(ExpressionIdentifiant a) {
         // System.out.println("ExpressionIdentifiant");
-        
+
         return a.ctx;
     }
 
@@ -534,13 +534,24 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             String profile = "printf(" + t + ")";
 
             writer.SkipLine();
-            writer.Comment("call: "+profile, 1);
+            writer.Comment("call: " + profile, 1);
             writer.Ldr(r0, def);
             writer.Ldmfd(StackPointer, new Register[] { r1 });
 
             writer.Bl("printf", Flags.NI);
+        } else if (id.nom.equals("random")) {
+            // Get the argument
+            a.args.accept(this);
+
+            String profile = "random()";
+            writer.SkipLine();
+            writer.Comment("call: " + profile, 1);
+            
+            writer.Bl("rand(PLT)", Flags.NI);
+
+            writer.Mov(r8, r0, Flags.NI);
         } else {
-            // Get the sl 
+            // Get the sl
             SymbolLookup sl = this.table.getSymbolLookup(this.region);
             // Get the function
             Function f = (Function) sl.getSymbol(id.nom);
@@ -563,7 +574,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             int nbArgs = f.getParamsCount();
             writer.Add(StackPointer, StackPointer, 4 * (nbArgs + 1), Flags.NI);
         }
-        
+
         return a.ctx;
     }
 
@@ -582,33 +593,33 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(IfThen a) {
         int temp = region;
-        
+
         writer.SkipLine();
         writer.Comment("If-Then", 0);
         a.condition.accept(this);
         // on store le resultat de la condition dans r0
-        writer.Mov(r0,r8,Flags.NI);
+        writer.Mov(r0, r8, Flags.NI);
         // on compare r0 a 0
-        writer.Cmp(r0,0);
+        writer.Cmp(r0, 0);
         // on saute a la fin du if si la condition est fausse
         StepOneRegion();
         Register[] registers = { BasePointer };
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
         SymbolLookup table = this.table.getSymbolLookup(this.region);
-        writer.B(this.getLabel(table)+"_end",Flags.EQ);
+        writer.B(this.getLabel(table) + "_end", Flags.EQ);
         // on execute le then
         Ast then = a.thenBlock;
         then.accept(this);
 
         writer.Comment("End of If-Then", 1);
 
-        writer.Label(this.getLabel(table)+"_end");
+        writer.Label(this.getLabel(table) + "_end");
 
         registers = new Register[] { BasePointer };
         writer.Ldmfd(StackPointer, registers);
-        
-        // Get back to the original region 
+
+        // Get back to the original region
         this.region = temp;
         return a.ctx;
     }
@@ -617,27 +628,26 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(IfThenElse a) {
         // System.out.println("IfThenElse");
         int temp = region;
-        
-        
+
         writer.SkipLine();
         writer.Comment("If-Then-Else", 0);
         a.condition.accept(this);
         // on store le resultat de la condition dans r0
-        writer.Mov(r0,r8,Flags.NI);
+        writer.Mov(r0, r8, Flags.NI);
         // on compare r0 a 0
-        writer.Cmp(r0,0);
+        writer.Cmp(r0, 0);
         // on saute dans le else si la condition est fausse
         StepOneRegion();
         Register[] registers = { BasePointer };
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
         String label1 = this.getLabel(this.table.getSymbolLookup(this.region));
-        writer.B(label1+"_else",Flags.EQ);
+        writer.B(label1 + "_else", Flags.EQ);
 
         Ast then = a.thenBlock;
         then.accept(this);
 
-        writer.B(label1+"_end",Flags.NI);
+        writer.B(label1 + "_end", Flags.NI);
         registers = new Register[] { BasePointer };
         writer.Ldmfd(StackPointer, registers);
         StepOneRegion();
@@ -645,20 +655,18 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Stmfd(StackPointer, registers2);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
 
-        writer.Label(label1+"_else");
+        writer.Label(label1 + "_else");
         Ast elseBlock = a.elseBlock;
-        
+
         elseBlock.accept(this);
 
-        writer.Label(label1+"_end");
-
+        writer.Label(label1 + "_end");
 
         registers2 = new Register[] { BasePointer };
         writer.Ldmfd(StackPointer, registers2);
         this.region = temp;
-        return a.ctx; 
+        return a.ctx;
     }
-
 
     @Override
     public ParserRuleContext visit(While a) {
@@ -675,7 +683,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         cond.accept(this);
 
-        writer.Mov(r0,r8,Flags.NI);
+        writer.Mov(r0, r8, Flags.NI);
         writer.Cmp(r0, 0);
         writer.B(this.getLabel(table) + "_end", Flags.EQ);
 
@@ -684,7 +692,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         block.accept(this);
 
-        writer.B(this.getLabel(table),Flags.NI);
+        writer.B(this.getLabel(table), Flags.NI);
         writer.Comment("While EndBlock", 1);
 
         writer.Label(this.getLabel(table) + "_end");
@@ -719,26 +727,26 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // writer.Stmfd(StackPointer,new Register[] {r9});
 
         startValue.accept(this);
-        writer.Stmfd(StackPointer,new Register[] {r8});
+        writer.Stmfd(StackPointer, new Register[] { r8 });
 
         endValue.accept(this);
-        writer.Stmfd(StackPointer,new Register[] {r8});
-        
-        writer.Label(this.getLabel(table)+ "_cond");
-        writer.Ldr(r0,BasePointer,Flags.NI,-4);
-        writer.Ldr(r1,BasePointer,Flags.NI,-8);
-        writer.Cmp(r0,r1);
-        writer.B(this.getLabel(table)+"_end",Flags.GE);
+        writer.Stmfd(StackPointer, new Register[] { r8 });
+
+        writer.Label(this.getLabel(table) + "_cond");
+        writer.Ldr(r0, BasePointer, Flags.NI, -4);
+        writer.Ldr(r1, BasePointer, Flags.NI, -8);
+        writer.Cmp(r0, r1);
+        writer.B(this.getLabel(table) + "_end", Flags.GE);
 
         block.accept(this);
 
-        writer.Ldr(r0,BasePointer,Flags.NI,-4);
+        writer.Ldr(r0, BasePointer, Flags.NI, -4);
         writer.Add(r0, r0, 1, Flags.NI);
-        writer.Str(r0,BasePointer,-4);
-        writer.B(this.getLabel(table)+"_cond",Flags.NI);
-        writer.Label(this.getLabel(table)+ "_end");
-        
-        writer.Stmfd(StackPointer, new Register[] {r0,r1});
+        writer.Str(r0, BasePointer, -4);
+        writer.B(this.getLabel(table) + "_cond", Flags.NI);
+        writer.Label(this.getLabel(table) + "_end");
+
+        writer.Stmfd(StackPointer, new Register[] { r0, r1 });
         registers = new Register[] { BasePointer };
         writer.Ldmfd(StackPointer, registers);
         // Get back to the original region
@@ -758,7 +766,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.SkipLine();
         writer.Comment("Definition block", 0);
         writer.Label(this.getLabel());
-        
+
         Register[] registers = { BasePointer };
         writer.Stmfd(StackPointer, registers);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
@@ -795,7 +803,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         // Get back to the original region
         this.region = temp;
-        
+
         return a.ctx;
     }
 
@@ -823,7 +831,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(DeclarationChamp a) {
-        return a.ctx; 
+        return a.ctx;
     }
 
     @Override
@@ -845,7 +853,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Comment("func: " + f.getProfile(), 0);
         String l = getLabel();
         writer.Label(l);
-        
+
         Register[] registers = { BasePointer, LinkRegister };
         // Begin
         writer.Comment("begin:", 1);
@@ -879,7 +887,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(DeclarationValeur a) {
         ID id = (ID) a.id;
-        
+
         writer.SkipLine();
         writer.Comment("Declare variable " + id.nom, 1);
 
@@ -892,13 +900,13 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         if (t instanceof Array) {
             Array arr = (Array) t;
 
-            for (int i = 0 ; i < arr.getSize() ; i++) {
+            for (int i = 0; i < arr.getSize(); i++) {
                 writer.Stmfd(StackPointer, registers);
             }
         } else {
             writer.Stmfd(StackPointer, registers);
         }
-        
+
         // We let the expression inside the stack
         // because we declare the variable in the stack.
 
@@ -911,7 +919,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         constants.add(c);
 
         writer.Ldr(r8, c.getId());
-        
+
         return a.ctx;
     }
 
@@ -977,5 +985,5 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(AccesChamp a) {
         return a.getChild().accept(this);
     }
-    
+
 }
