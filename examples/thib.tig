@@ -1,12 +1,10 @@
 let
-    function fibo(n: int):int = (
-        print(n);
-        if n <= 1 then (
-            n
-        ) else (
-            fibo(n-1)+fibo(n-2)
-        )
-    )
+    type arrayOfInt = array of int
+    type rec = {arr: arrayOfInt}
+    var x := arrayOfInt [ 6 ] of 0
+    var r := rec{arr=x}
 in
-    print(fibo(2))
+    print(r[0]);
+    r.arr := arrayOfInt [ 6 ] of 2;
+    print(r[1])
 end

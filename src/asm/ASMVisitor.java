@@ -179,20 +179,27 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         if (t instanceof Array && (!t.equals(new Array(new Primitive(Character.class))))) {
             Array arr = (Array) t;
 
-            writer.SkipLine();
-            writer.Comment("Call malloc for allocation", 1);
-            writer.Stmfd(StackPointer, new Register[] { r8 });
-            writer.Mov(r0, r9, Flags.NI);
-            writer.Lsl(r0, r0, 2, Flags.NI);
-            writer.Bl("malloc", Flags.NI);
+            if (a.right instanceof ID) {
+                writer.SkipLine();
+                writer.Comment("Overwrite array pointer", 1);
+                writer.Ldmfd(StackPointer, new Register[] { r1, r2 });
+                writer.Str(r8, r2, 0);
+            } else {
+                writer.SkipLine();
+                writer.Comment("Call malloc for allocation", 1);
+                writer.Stmfd(StackPointer, new Register[] { r8 });
+                writer.Mov(r0, r9, Flags.NI);
+                writer.Lsl(r0, r0, 2, Flags.NI);
+                writer.Bl("malloc", Flags.NI);
 
-            writer.SkipLine();
-            writer.Comment("Alloc the fields of the array", 1);
-            writer.Ldmfd(StackPointer, new Register[] { r3 });
-            writer.Ldmfd(StackPointer, new Register[] { r1, r2 });
-            writer.Str(r0, r2, 0);
-            for (int i = 0; i < arr.getSize(); i++) {
-                writer.Str(r3, r0, -(i * 4));
+                writer.SkipLine();
+                writer.Comment("Alloc the fields of the array", 1);
+                writer.Ldmfd(StackPointer, new Register[] { r3 });
+                writer.Ldmfd(StackPointer, new Register[] { r1, r2 });
+                writer.Str(r0, r2, 0);
+                for (int i = 0; i < arr.getSize(); i++) {
+                    writer.Str(r3, r0, -(i * 4));
+                }
             }
         } else if (a.left instanceof ListeAcces) {
             writer.Ldmfd(StackPointer, new Register[] { r1 });
