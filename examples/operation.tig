@@ -1,0 +1,7 @@
+let
+    var x:=8
+    var y:=2
+in
+    print(x*y);
+    print(x/y)
+end
