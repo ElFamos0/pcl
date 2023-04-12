@@ -85,6 +85,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         // Init stack
         writer.write(".text\n");
         writer.write(".globl main\n");
+        writer.B("main",Flags.NI);
+
         writer.Label("main");
         writer.Comment("Init stack", 1);
 
@@ -114,6 +116,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Bl("exit", Flags.NI);
         writer.SkipLine();
         writer.StackVar();
+        writer.Mul();
+        writer.Div();
 
         writer.SkipLine();
         writer.Comment("syscall exit(int status = 0)", 0);
@@ -128,9 +132,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         for (Constant c : constants) {
             writer.write("\t" + c.toASM() + "\n");
         }
-        writer.Mul();
-        writer.Div();
-
+        
         return null;
     }
 
