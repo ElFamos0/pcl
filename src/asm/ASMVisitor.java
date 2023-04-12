@@ -690,21 +690,23 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         then.accept(this);
 
         writer.B(label1 + "_end", Flags.NI);
-        registers = new Register[] { BasePointer, r0 };
-        writer.Ldmfd(StackPointer, registers);
-        writer.Str(r0, r10, - (table.getScope() * 4));
+        
         StepOneRegion();
         table = this.table.getSymbolLookup(this.region);
+        writer.Label(label1 + "_else");
         Register[] registers2 = { BasePointer, r0 };
         writer.Ldr(r0, r10, Flags.NI, - (table.getScope() * 4));
         writer.Stmfd(StackPointer, registers2);
         writer.Mov(BasePointer, StackPointer, Flags.NI);
         writer.Str(BasePointer, r10, - (table.getScope() * 4));
 
-        writer.Label(label1 + "_else");
         Ast elseBlock = a.elseBlock;
 
         elseBlock.accept(this);
+
+        registers = new Register[] { BasePointer, r0 };
+        writer.Ldmfd(StackPointer, registers);
+        writer.Str(r0, r10, - (table.getScope() * 4));
 
         writer.Label(label1 + "_end");
 
@@ -923,11 +925,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         String l = getLabel();
         writer.Label(l);
 
-        Register[] registers = { BasePointer, LinkRegister, r0 };
+        Register[] registers = { BasePointer, LinkRegister };
         // Begin
         writer.Comment("begin:", 1);
         writer.Ldr(r0, r10, Flags.NI, - (sl.getScope() * 4));
         writer.Stmfd(StackPointer, registers);
+        writer.Stmfd(StackPointer, new Register[] { r0 });
         writer.Mov(BasePointer, StackPointer, Flags.NI);
         writer.Str(BasePointer, r10, - (sl.getScope() * 4));
         writer.SkipLine();
@@ -944,9 +947,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         // End
         writer.Comment("end:", 1);
-        registers = new Register[] { ProgramCounter, BasePointer, r0 };
-        writer.Ldmfd(StackPointer, registers);
+        registers = new Register[] { ProgramCounter, BasePointer };
+        writer.Ldmfd(StackPointer, new Register[] { r0 });
         writer.Str(r0, r10, - (sl.getScope() * 4));
+        writer.Ldmfd(StackPointer, registers);
         writer.SkipLine();
 
         // Get back to the original region
