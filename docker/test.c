@@ -3,9 +3,14 @@
 #include <string.h>
 #include <time.h>
 
-int main(int argc, char** argv) {
-    srand(time(NULL));
-    int n = rand();
+int f(int n) {
+    if (n == 0) {
+        return 0;
+    }
     printf("%d\n", n);
-    return 0;
+    return f(n-1);
+}
+
+int main(int argc, char** argv) {
+    return f(5);
 }

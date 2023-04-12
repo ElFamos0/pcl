@@ -190,6 +190,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             for (int i = 0; i < arr.getSize(); i++) {
                 writer.Str(r3, r0, -(i * 4));
             }
+        } else if (a.left instanceof ListeAcces) {
+            writer.Ldmfd(StackPointer, new Register[] { r1 });
+            if (t.equals(new Array(new Primitive(Character.class)))) {
+                writer.Ldr(r3, r3, Flags.NI, 0);
+            }
+            writer.Str(r3, r1, 0);
         } else {
             writer.Ldmfd(StackPointer, new Register[] { r1 });
             writer.Str(r3, r1, 0);
@@ -1092,6 +1098,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Comment("Access of a list", 1);
         writer.Stmfd(StackPointer, regs);
 
+        Record r = null;
         for (Ast ast : a.accesChamps) {
             ast.accept(this);
             AccesChamp ac = (AccesChamp) ast;
@@ -1103,11 +1110,18 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             if (!ac.getisArrayAccess()) {
                 // records
                 ID id2 = (ID) ac.getChild();
-                Type t = type.inferType(table.getSymbolLookup(region), id);
-                Record r = (Record) t;
+                if (r == null) {
+                    Type t = type.inferType(table.getSymbolLookup(region), id);
+                    r = (Record) t;
+                } else {
+                    // We are in a nested record
+                    int idx = r.getFields().indexOf(r.getField(id.nom));
+                    r = (Record) r.getFields().get(idx).getType();
+                }
                 // Get the field index
                 int index = r.getFields().indexOf(r.getField(id2.nom));
                 writer.Mov(r0, index, Flags.NI);
+                id = id2;
             } else {
                 // array
                 writer.Mov(r0, r8, Flags.NI);

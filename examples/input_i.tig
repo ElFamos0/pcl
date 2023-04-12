@@ -1,38 +1,98 @@
 let
+    /*
+    function mod(n:int, m:int):int = (
+        if m = n then (
+            0
+        ) else (
+            if m < n then (
+                mod(n-m, m)
+            ) else (
+                n
+            )
+        )
+    )
+    */
+
     function pick_random(min:int, max:int): int = (
         if (max < min) | (max = 0) then (
             0
         ) else (
             let 
                 var x := random()
-                var y := (x+1)-(((x+1)/max)*max)+min
+                var range := max-min+1
+                /*
+                var y := mod(x, range) + min 
+                */
+                var y := x - (x/range) * range + min
             in
                 y
             end
         )
     )
 
-    var r := pick_random(0,100)
-    var g:int := -1
+    type tries = array of int
+    type game_params = {max:int, min:int}
+    type game = {answer:int, last_try:int, num_tries:int, all_tries:tries , params:game_params}
+    var g := game{
+        answer=0,
+        last_try=0,
+        num_tries=0,
+        all_tries=tries[0] of 0,
+        params=game_params{max=0, min=0}
+    }
 in
     print("Bienvenue dans le jeu du plus ou moins !\n");
-    /*
-    print("Voici le nombre aleatoire: ");
-    print(r);
-    print("\n");
-    */
+    print("Entrez le nombre minimal : ");
+    g.params.min := input_i();
+    print("Entrez le nombre max : ");
+    g.params.max := input_i();
+    print("(min,max)=(");
+    print(g.params.min);
+    print(",");
+    print(g.params.max);
+    print(")\n");
 
-    while r <> g do (
-        print("Entrez votre nombre : ");
-        g := input_i();
-        if g = r then (
-            print("Bien joue, le mot de passe est HTN{br4v0} !\n");
-            break
-        ) else (
-            if g > r then (
-                print("C est moins !\n")
+    if (g.params.max < g.params.min) | (g.params.max = 0) then (
+        print("Les parametres sont incorrect.")
+    ) else (
+        g.answer := pick_random(g.params.min, g.params.max);
+        print("Votre partie va commencer !\n");
+        g.last_try := g.last_try-1;
+        while g.last_try <> g.answer do (
+            print("Entrez votre nombre : ");
+            g.last_try := input_i();
+
+
+            g.num_tries := g.num_tries + 1;
+            let
+                var new_tries := tries[g.num_tries] of 0
+            in
+                for i := 0 to g.num_tries-1 do (
+                    new_tries[i] = g.all_tries[i]
+                );
+                g.all_tries = new_tries
+            end;
+
+
+            if g.last_try = g.answer then (
+                print("Bien joue, le mot de passe est HTN{br4v0} !\n");
+
+                print("Liste des ");
+                print(g.num_tries);
+                print(" tentatives: [");
+                for i := 0 to g.num_tries do (
+                    if (i > 0) & i < g.num_tries-1 then (
+                        print(", ")
+                    );
+                    print(g.all_tries[i])
+                );
+                print("]")
             ) else (
-                print("C est plus !\n")
+                if g.last_try > g.answer then (
+                    print("C est moins !\n")
+                ) else (
+                    print("C est plus !\n")
+                )
             )
         )
     )

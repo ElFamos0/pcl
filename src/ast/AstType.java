@@ -158,7 +158,6 @@ public class AstType extends exprBaseVisitor<Type> {
 
     @Override
     public Type visitNegation(NegationContext ctx) {
-        // System.out.println("Negation");
         return ctx.accept(this);
     }
 

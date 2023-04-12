@@ -1,11 +1,5 @@
 let
-    function test():string = (
-        let 
-            var x := "caca"
-        in
-            x
-        end
-    )
+    var x:= -1
 in
-    print(test())
+    x
 end
