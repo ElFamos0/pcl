@@ -9,7 +9,8 @@ compile:
 	@javac -cp ./lib/antlr-4.9.2-complete.jar:./src ./src/Main.java -d ./bin
 
 run:
-	@java -cp ./lib/antlr-4.9.2-complete.jar:./bin Main $(target)
+	@java -cp ./lib/antlr-4.9.2-complete.jar:./bin Main $(target) 
+	
 
 exec:
 	@cp ./test.asm ./docker/test.s
