@@ -845,7 +845,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     @Override
     public ParserRuleContext visit(DeclarationValeur a) {
         ID id = (ID) a.id;
-        System.out.println("DeclarationValeur: " + type.inferType(table.getSymbolLookup(region), id));
         
         writer.SkipLine();
         writer.Comment("Declare variable " + id.nom, 1);

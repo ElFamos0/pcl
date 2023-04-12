@@ -1,10 +1,9 @@
 let
-    type intArray = array of int
-
-    var x := intArray [ 4 ] of 1
-    var n := 4
+    var x:=8
+    var y:=2
 in
-    x[0] := n;
-    print(x[0]);
-    print(x[1])
+    print(x*y);
+    print(x*3);
+    print(x/y);
+    print(8/4)
 end
