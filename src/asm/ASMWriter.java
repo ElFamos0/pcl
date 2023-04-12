@@ -722,16 +722,6 @@ public class ASMWriter {
         write(instr);
     }
 
-    public void Rand() {
-        String instr = """
-            bl      rand(PLT)
-            mov     r1,r0
-            """;
-
-        // Write instruction to file
-        write(instr);
-    }
-
     public void Exit(Integer status) {
         String instr = "\t"
             + "MOV r0, #" + status.toString() + "\n"

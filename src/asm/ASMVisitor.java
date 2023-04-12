@@ -523,7 +523,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         writer.SkipLine();
         writer.Comment("Add int to the r8 register", 1);
-        writer.Mov(r8, a.toInt(), Flags.NI);
+        writer.Ldr(r8, a.toHex());
 
         return a.ctx;
     }

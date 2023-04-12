@@ -1,7 +1,8 @@
 let
-    var x: int := random()
+    var x: int := 977607833
     /* x % 100 = x-((x/100)*100) */
-    var y: int := x-((x/100)*100)
+    var y: int := (x+1)-(((x+1)/100)*100)
 in
-    print(x)
+    print(x);
+    print(y)
 end

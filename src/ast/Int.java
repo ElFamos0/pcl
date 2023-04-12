@@ -22,4 +22,8 @@ public class Int implements Ast {
 	public int toInt() {
 		return Integer.parseInt(valeur);
 	}
+
+	public String toHex() {
+		return "0x"+Integer.toHexString(Integer.parseInt(valeur));
+	}
 }
