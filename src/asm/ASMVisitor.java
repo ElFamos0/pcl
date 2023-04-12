@@ -106,11 +106,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(Program a) {
-        // System.out.println("Program");
+        // Permet d'instancier le main ainsi que la stack
         initStack();
 
         a.expression.accept(this);
 
+        // On écrit ensuite les fonctions de la librairie
         writer.SkipLine();
         writer.Bl("_exit", Flags.NI);
         writer.SkipLine();
@@ -120,12 +121,14 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.SkipLine();
         writer.Div();
 
+        // Puis une fonction spéciale pour sortir du programme
         writer.SkipLine();
         writer.Comment("syscall exit(int status = 0)", 0);
         writer.Label("_exit");
         writer.Exit(0);
         writer.SkipLine();
 
+        // Enfin on écrit les données statiques du programme
         writer.write(".data\n");
         writer.write("\tformat_str: .ascii      \"%s\\n\\0\"\n");
         writer.write("\tformat_int: .ascii      \"%d\\n\\0\"\n");
@@ -133,6 +136,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.write("\tformat_debug_x: .ascii      \"debug: %x\\n\\0\"\n");
         writer.write("\tformat_debug_addr: .ascii      \"debug: %p\\n\\0\"\n");
 
+        // Ainsi que les données statiques données par l'utilisateur
         for (Constant c : constants) {
             writer.write("\t" + c.toASM() + "\n");
         }
@@ -592,9 +596,13 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             // Branch to the function
             writer.Bl(funclabel, Flags.NI);
 
+            // Get the return value in r8
+            writer.Ldmfd(StackPointer, new Register[] { r8 });
+            writer.Mov(r9, r8, Flags.NI);
+
             // Pop args
             int nbArgs = f.getParamsCount();
-            writer.Add(StackPointer, StackPointer, 4 * (nbArgs + 1), Flags.NI);
+            writer.Add(StackPointer, StackPointer, 4 * (nbArgs), Flags.NI);
         }
 
         return a.ctx;
@@ -841,7 +849,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             if (!(dec instanceof DeclarationFonction))
                 writer.Ldmfd(StackPointer, registers);
         }
-        
+
         registers = new Register[] { BasePointer };
         writer.Ldmfd(StackPointer, registers);
         writer.SkipLine();
@@ -885,9 +893,8 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         StepOneRegion();
         writer.SkipLine();
 
-        // Reverse for to destack
         for (Ast ast : a.args) {
-            ast.accept(this);
+            // ast.accept(this);
         }
 
         ID id = (ID) a.id;
@@ -1007,10 +1014,12 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(InstanciationType a) {
+        // On récupère la TDS afin de pouvoir récuperer chacun des fiels dans l'ordre de la TDS
         SymbolLookup table = this.table.getSymbolLookup(this.region);
         Type t = type.inferType(table, a.id);
         Record r = (Record) t;
 
+        // On alloue la mémoire afin de pouvoir stocker les champs
         int size = r.getFields().size();
         writer.SkipLine();
         writer.Comment("Call to malloc for the array allocation", 1);
@@ -1020,7 +1029,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
         ArrayList<Symbol> sortedFields = r.getFields();
 
-        // Sort a.expressions in the same order as the fields
+        // On trie les expressions dans l'ordre des champs pour pouvoir les stocker dans l'ordre
         ArrayList<Ast> sortedExpressions = new ArrayList<Ast>();
         for (Symbol s : sortedFields) {
             for (int i = 0; i < a.identifiants.size(); i++) {
@@ -1032,18 +1041,15 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
             }
         }
 
-        // Accepts the expressions
+        // On accepte les expressions afin de les stocker dans le bon ordre
         for (int i = 0; i < sortedExpressions.size(); i++) {
             sortedExpressions.get(i).accept(this);
-
-            // Save the value or its address in the stack
             writer.Ldmfd(StackPointer, new Register[] { r0 });
             writer.Str(r8, r0, -(i * 4));
             writer.Stmfd(StackPointer, new Register[] { r0 });
         }
 
-        // Ldr malloc * in R8 to find it on :
-        // public ParserRuleContext visit(DeclarationValeur a) {
+        // On récupère l'adresse de la mémoire allouée
         writer.Ldmfd(StackPointer, new Register[] { r8 });
         return a.ctx;
     }

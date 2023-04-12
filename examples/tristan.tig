@@ -35,11 +35,15 @@ let
     )
 
     function isOdd(n:int):int = (
-        (n+1)-(((n+1)/2)*2)
+        (n)-(((n)/2)*2)
     )
 
     function isEven(n:int):int = (
-        !isOdd(n)
+        if isOdd(n) then (
+            0
+        ) else (
+            1
+        )
     )
 
     function oddity(n:int):string = (
