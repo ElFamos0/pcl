@@ -1,13 +1,9 @@
 package asm;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
-
 import org.antlr.v4.runtime.ParserRuleContext;
 import ast.*;
-import parser.exprParser.*;
 import sl.Array;
 import sl.Function;
 import sl.Primitive;
@@ -150,19 +146,46 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         
         a.left.accept(this);
 
-        writer.Stmfd(StackPointer, new Register[] { r9 });
+        Type t = type.inferType(table.getSymbolLookup(region), a.left);
+
+        // Load addr from r8 if it's an array
+        if (t instanceof Array) {
+            writer.Stmfd(StackPointer, new Register[] { r8, r9 });
+        } else {
+            writer.Stmfd(StackPointer, new Register[] { r9 });
+        }
         
         writer.SkipLine();
         writer.Comment("Right expr in expression",1);
         
         a.right.accept(this);
 
-        writer.Mov(r0, r8, Flags.NI);
+        writer.Mov(r3, r8, Flags.NI);
 
         writer.SkipLine();
         writer.Comment("Store the value inside the var addr", 1);
-        writer.Ldmfd(StackPointer, new Register[] { r1 });
-        writer.Str(r0, r1, 0);
+        if (t instanceof Array) {
+            Array arr = (Array) t;
+
+            writer.SkipLine();
+            writer.Comment("Call malloc for allocation", 1);
+            writer.Stmfd(StackPointer, new Register[] { r8 });
+            writer.Mov(r0, r9, Flags.NI);
+            writer.Lsl(r0, r0, 2, Flags.NI);
+            writer.Bl("malloc", Flags.NI);
+
+            writer.SkipLine();
+            writer.Comment("Alloc the fields of the array", 1);
+            writer.Ldmfd(StackPointer, new Register[] { r3 });
+            writer.Ldmfd(StackPointer, new Register[] { r1, r2 });
+            writer.Str(r0, r2, 0);
+            for (int i = 0; i < arr.getSize(); i++) {
+                writer.Str(r3, r0, -(i * 4));
+            }
+        } else {
+            writer.Ldmfd(StackPointer, new Register[] { r1 });
+            writer.Str(r3, r1, 0);
+        }
 
         return a.ctx;
     }
@@ -892,8 +915,15 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         if (t instanceof Array) {
             Array arr = (Array) t;
 
-            for (int i = 0 ; i < arr.getSize() ; i++) {
-                writer.Stmfd(StackPointer, registers);
+            int size = arr.getSize();
+            writer.SkipLine();
+            writer.Comment("Call to malloc for the array allocation", 1);
+            writer.Mov(r0, size * 4, Flags.NI);
+            writer.Bl("malloc", Flags.NI);
+            writer.Stmfd(StackPointer, new Register[] { r0 });
+
+            for (int i = 0; i < size; i++) {
+                writer.Str(r8, r0, -(i * 4));
             }
         } else {
             writer.Stmfd(StackPointer, registers);
@@ -938,10 +968,10 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
     public ParserRuleContext visit(ListeAcces a) {
         a.id.accept(this);
 
-        Register[] regs = new Register[] { r9 };
+        Register[] regs = new Register[] { r8 };
 
         writer.SkipLine();
-        writer.Comment("Acces of a list", 1);
+        writer.Comment("Access of a list", 1);
         writer.Stmfd(StackPointer, regs);
 
         for (Ast ast : a.accesChamps) {
@@ -968,6 +998,9 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
 
     @Override
     public ParserRuleContext visit(ExpressionArray a) {
+        a.getSize().accept(this);
+        writer.Mov(r9, r8, Flags.NI);
+
         a.getExpr().accept(this);
 
         return a.ctx;
