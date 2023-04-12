@@ -12,7 +12,7 @@ let
         )
     )
 
-    var r := pick_random(0,100);
+    var r := pick_random(0,100)
     var g:int := -1
 in
     print("Bienvenue dans le jeu du plus ou moins !\n");
