@@ -1,13 +1,8 @@
 let
-    type caca = {b:int, a:int}
-    type t = {z:caca}
-    var g := t{z=caca{b=0, a=0}}
+    type intArray = array of int
+    type rec = {arr:intArray}
+    var t := intArray[100] of 0
+    var r := rec{arr=t}
 in
-    g.z.a := 5;
-    g.z.b := 7;
-    print("(a,b)=(");
-    print(g.z.a);
-    print(",");
-    print(g.z.b);
-    print(")\n")
+    r.arr[0] := 5
 end

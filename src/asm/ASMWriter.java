@@ -26,6 +26,15 @@ public class ASMWriter {
         }
     }
 
+    public void close() {
+        // Closes the file
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     // We can implement the {, SHIFT_op #expression}
     // but it's not necessary for the moment.
 
