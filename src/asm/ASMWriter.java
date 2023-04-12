@@ -751,7 +751,7 @@ public class ASMWriter {
     // The result is stored in R0 register.
     public void Mul() {
         String fn = """
-            mul:
+            _mul:
                 STMFD R13!,  {LR} 
                 STMFD R13!, {R1,R2}
                 MOV R0, #0
@@ -777,7 +777,7 @@ public class ASMWriter {
     // The result is stored in R0 register.
     public void Div() {
         String fn = """
-            div:
+            _div:
                 STMFD R13!,  {LR} 
                 STMFD R13!, {R2-R5}
                 MOV R0, #0

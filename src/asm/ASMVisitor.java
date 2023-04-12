@@ -390,7 +390,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         //      R1 = a.left
 
         // Mult R2 and R1
-        writer.Bl("mul", Flags.NI);
+        writer.Bl("_mul", Flags.NI);
 
         // Mov R0 (result of mult) to R8 
         writer.Mov(r8, r0,Flags.NI);
@@ -426,7 +426,7 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         //      R1 = a.left
 
         // Div R2 and R1
-        writer.Bl("div", Flags.NI);
+        writer.Bl("_div", Flags.NI);
 
         // Mov R0 (result of div) to R8 
         writer.Mov(r8, r0,Flags.NI);
