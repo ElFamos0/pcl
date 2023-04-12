@@ -61,7 +61,6 @@ in
 
             g.all_tries := t;
 
-            print("Liste des ");
             print(g.num_tries);
             print(" tentatives: [");
             for i := 0 to g.num_tries do (
