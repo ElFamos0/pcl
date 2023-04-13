@@ -1,0 +1,16 @@
+let
+    var x:= 10
+in
+    while x>-100 do
+        (
+            for i:= 0 to 10 do
+                (
+                    if i>=5 then break else (x:= x -1;print(i); print(" "))
+                );
+            print("\n");
+            print(x);
+            print("\n");
+            if x <=0 then break 
+        )
+
+end
