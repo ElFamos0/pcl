@@ -1,6 +1,6 @@
 let
     var x := 5
-    var y := "caca"
+    var y := "test"
 in
     print(x);
     print(y)

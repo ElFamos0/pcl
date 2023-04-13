@@ -14,7 +14,7 @@ let
         let 
             var retour: int := 0
         in 
-            if x1>x2 then retour := x2 else retour:= x1;
+            if x1>x2 then (retour := x2 )else (retour:= x1);
             retour
         end
     
@@ -28,25 +28,26 @@ let
         	(retour.val := retour.val /10 ;
         	retour.pow := retour.pow + 1);
         x.val = retour.val;
-        x.pow = retour.pow
+        x.pow = retour.pow;
+        print("\n")
         end
 
     function fload_add(x1 : float, x2: float, r : float) = 
         let
         var retour := float {val = 0, pow =  min(x1.pow,x2.pow)}
         in
-        if x1.pow > x2.pow then retour.val := x2.val + x1.val * powfunc(10, x1.pow - x2.pow)
-                             else retour.val := x1.val + x2.val * powfunc(10, x2.pow - x1.pow);
+        if x1.pow > x2.pow then (retour.val := x2.val + x1.val * powfunc(10, x1.pow - x2.pow))
+                             else (retour.val := x1.val + x2.val * powfunc(10, x2.pow - x1.pow));
         r.val := retour.val;
         r.pow := retour.pow
         end
 
-    function fload_sub((x1 : float, x2: float, r : float) = 
+    function fload_sub(x1 : float, x2: float, r : float) = 
         let
         var retour := float {val = 0, pow =  min(x1.pow,x2.pow)}
         in
-        if x1.pow > x2.pow then retour.val := -x2.val + x1.val * powfunc(10, x1.pow - x2.pow)
-                             else retour.val := x1.val - x2.val * powfunc(10, x2.pow - x1.pow);
+        if x1.pow > x2.pow then (retour.val := -x2.val + x1.val * powfunc(10, x1.pow - x2.pow))
+                             else (retour.val := x1.val - x2.val * powfunc(10, x2.pow - x1.pow));
         r.val := retour.val;
         r.pow := retour.pow
         end
@@ -71,7 +72,7 @@ let
      
     function float_print(f : float) = 
 
-        (printi(f.val); print("*"); printi(10);print("^");printi(f.pow))
+        (print(f.val); print("*"); print(10);print("^");print(f.pow);print("\n"))
     
 
     var f1 := float {val = 5, pow = -1}
