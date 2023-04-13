@@ -1,0 +1,26 @@
+let 
+    type intArray = array of int
+
+    var board := intArray [64] of 0
+
+    function init(t:intArray)  =
+        for i:= 20 to 64 do (t[i] := i; print(t[i]))
+        
+        
+    
+    function findFirstNonZero(board:intArray) :int = 
+       let
+            var retour := 0
+       in
+            for i:=0 to 64 do 
+            (
+                if board[i] then (retour:=i;break)
+            );
+            retour
+        end
+
+in
+    init(board);
+    print(board[56]);
+    print(findFirstNonZero(board))
+end

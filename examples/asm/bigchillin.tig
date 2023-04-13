@@ -1,0 +1,19 @@
+let
+    var a := 1
+    var b := 2
+    var c := 3
+    function f() = 
+        let 
+            var d := 4
+            function g() = 
+               ( for i:=0 to 3 do (print(i+a+b);print(" "));
+               print("\n");
+                b := b-1;
+                print(d);print("\n"))
+        in
+            if b > 0 then (g();f()) else print(c)
+        end
+in
+
+    f()
+end

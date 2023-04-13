@@ -818,10 +818,6 @@ public class ASMVisitor implements AstVisitor<ParserRuleContext> {
         writer.Comment("For block", 0);
         writer.Label(this.getLabel(table));
 
-        // variant.accept(this);
-
-        // writer.Stmfd(StackPointer,new Register[] {r9});
-
         startValue.accept(this);
         writer.Stmfd(StackPointer, new Register[] { r8 });
 
