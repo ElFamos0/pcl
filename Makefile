@@ -11,9 +11,11 @@ compile:
 run:
 	@java -cp ./lib/antlr-4.9.2-complete.jar:./bin Main $(target)
 
+.SILENT:
 exec:
 	@cp ./test.asm ./docker/test.s
-	@cd ./docker && sudo docker buildx build -t arm --output type=docker --platform linux/arm/v7 . && sudo docker run --platform linux/arm/v7 --rm -it arm /bin/sh
+	@cd ./docker && sudo docker buildx build -t arm --output type=docker --platform linux/arm/v7 . 
+	@sudo docker run --platform linux/arm/v7 --rm -it arm /bin/sh
 
 svg: 
 	@dot -Tsvg ./out/tree.dot -o ./out/tree.svg

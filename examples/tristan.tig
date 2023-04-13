@@ -39,7 +39,11 @@ let
     )
 
     function isEven(n:int):int = (
-        not(isOdd)
+        if isOdd(n) then (
+            0
+        ) else (
+            1
+        )
     )
 
     function oddity(n:int):string = (
@@ -56,21 +60,22 @@ let
     )
 
 in
-    print("---");
+    print("---\n");
     print(factorial(8));
-    print("---");
+    print("\n---\n");
     print(fibo(15));
-    print("---");
+    print("\n---\n");
     fibo_arr(x, 20);
     for i := 0 to 20 do (
-        print(x[i])
+        print(x[i]);
+        print("\n")
     );
-    print("---");
-    if (isEven(63)) then (
-        print("64 is even")
+    print("---\n");
+    if (isEven(64)) then (
+        print("64 is even\n")
     ) else (
-        print("how??")
+        print("how??\n")
     );
-    print("---");
+    print("\n---");
     print(oddity(63))
 end

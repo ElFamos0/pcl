@@ -1,7 +1,5 @@
 let
     function fibo(n:int):int = (
-        print(n);
-        print("\n");
         if n <= 1 then (
             n
         ) else (
