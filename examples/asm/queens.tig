@@ -6,21 +6,35 @@ let /* The eight queens solver from Appel */
      var diag1 := intArray [ N+N-1 ] of 0
      var diag2 := intArray [ N+N-1 ] of 0
      function printboard() =
-          (for i := 0 to N-1
-               do (for j := 0 to N-1
+          (for i := 0 to N
+               do (for j := 0 to N
                     do print(if col[i]=j then " O" else " .");
                          print("\n"));
                          print("\n"))
      function try(c:int) =
-          (print(c);print(" ");print(N);print("\n");
+     (print(c); print("\n");
           if c=N then printboard()
-          else for r := 0 to N-1
-                do if row[r]=0 &
-               diag1[r+c]=0 & diag2[r+7-c]=0
-                    then (row[r] := 1; diag1[r+c] := 1;
-                    diag2[r+7-c] := 1; col[c] := r;
+          else for r := 0 to N
+                do (print("   ");print(row[r]);print(" "); print(diag1[r+c]); print(" "); print(diag2[r+7-c]); print("\n");
+                if row[r]=0 & diag1[r+c]=0 & diag2[r+7-c]=0
+                    then (row[r] := 1; 
+                    diag1[r+c] := 1;
+                    diag2[r+7-c] := 1;
+                    col[c] := r;
                     try(c+1);
-                    row[r] := 0; diag1[r+c] := 0;
-                    diag2[r+7-c] := 0))
-in try(0) end
+                    row[r] := 0; 
+                    diag1[r+c] := 0;
+                    diag2[r+7-c] := 0)))
+in 
+for k:=0 to N do 
+     (row[k]:=0;
+     col[k]:=0
+     );
+for k:=0 to N+N-1 do 
+     (diag1[k]:=0;
+     diag2[k]:=0
+     );
+try(0) 
+
+end
 	
